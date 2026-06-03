@@ -47,7 +47,8 @@
     <header class="main-header" id="header">
         <div class="header-container">
             <a href="#hero" class="logo" id="logo" aria-label="CAE Inicio">
-                <span class="logo-accent">C</span>AE
+                <!--- <span class="logo-accent">C</span>AE -->
+                <img src="/assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" />
             </a>
             
             <button class="mobile-nav-toggle" id="mobile-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Menú de navegación">
@@ -57,7 +58,7 @@
             </button>
 
             <nav class="primary-nav" id="primary-navigation">
-                <ul class="nav-list">
+                <ul class="nav-list" id="nav-list">
                     <li><a href="#hero" class="nav-link active">Inicio</a></li>
                     <li><a href="#about" class="nav-link">Sobre CAE</a></li>
                     <li><a href="#areas" class="nav-link">Cursos</a></li>
@@ -66,6 +67,14 @@
                     <li><a href="#pricing" class="nav-link">Precios</a></li>
                     <li><a href="#blog" class="nav-link">Blog</a></li>
                     <li><a href="#contacto" class="nav-link">Contacto</a></li>
+
+                    <li class="more-menu" id="more-menu">
+                        <button class="more-btn">
+                            Ver más
+                        </button>
+
+                        <ul class="more-dropdown" id="more-dropdown"></ul>
+                    </li>
                 </ul>
                 <div class="nav-actions">
                     <div class="auth-guest-actions" id="auth-guest-actions">
@@ -536,7 +545,8 @@
                 <!-- Column 1: CAE -->
                 <div class="footer-column col-info scroll-reveal fade-in-up">
                     <a href="#hero" class="footer-logo" aria-label="CAE Inicio">
-                        <span class="logo-accent">C</span>AE
+                        <!-- <span class="logo-accent">C</span>AE -->
+                        <img src="/assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" />
                     </a>
                     <p class="footer-desc">CAE es una plataforma educativa online especializada en Electrónica y Mecatrónica.</p>
                 </div>

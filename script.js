@@ -296,6 +296,112 @@ function initActiveNavOnScroll() {
 }
 
 /* ==========================================================================
+   ADAPTIVE HEADER MENU
+   ========================================================================== */
+(function initAdaptiveNav() {
+    const navList    = document.getElementById('nav-list');
+    const moreMenu   = document.getElementById('more-menu');
+    const moreBtn    = moreMenu?.querySelector('.more-btn');
+    const dropdown   = document.getElementById('more-dropdown');
+    const navActions = document.querySelector('.nav-actions');
+
+    if (!navList || !moreMenu || !dropdown) return;
+
+    // ----- Toggle del dropdown -----
+    // Usamos mousedown en lugar de click para que se ejecute ANTES
+    // del document click que lo cierra
+    moreBtn?.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // evita que el foco cambie y dispare el click global
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        dropdown.classList.toggle('open', !isOpen);
+        moreMenu.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    // Cerrar al hacer click fuera
+    document.addEventListener('click', (e) => {
+        if (!moreMenu.contains(e.target)) {
+            dropdown.classList.remove('open');
+            moreMenu.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            dropdown.classList.remove('open');
+            moreMenu.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // ----- Lógica de colapso -----
+    function updateNavigation() {
+
+        // En móvil el drawer lateral maneja todo — resetear y salir
+        if (window.innerWidth <= 768) {
+            [...dropdown.children].forEach(li => navList.insertBefore(li, moreMenu));
+            moreMenu.style.display = 'none';
+            return;
+        }
+
+        // 1. Restaurar todos los items al nav-list
+        [...dropdown.children].forEach(li => navList.insertBefore(li, moreMenu));
+        moreMenu.style.display = 'none';
+
+        // 2. Espacio disponible para los items de navegación
+        //    = ancho total del contenedor - logo - actions - gaps y padding
+        const headerContainer = document.querySelector('.header-container');
+        const logo            = document.getElementById('logo');
+        const containerWidth  = headerContainer?.clientWidth ?? window.innerWidth;
+        const logoWidth       = logo?.offsetWidth ?? 0;
+        const actionsWidth    = navActions?.offsetWidth ?? 0;
+        // gap: 2rem (logo↔nav) + 2rem (nav↔actions) = ~64px + margen seguridad 16px
+        const gaps            = 80;
+        const available       = containerWidth - logoWidth - actionsWidth - gaps;
+
+        // 3. Medir el ancho de "Ver más" sin afectar el layout
+        moreMenu.style.cssText = 'display:block !important; visibility:hidden !important; position:absolute !important;';
+        const moreWidth = moreMenu.offsetWidth;
+        moreMenu.style.cssText = 'display:none;';
+
+        // 4. Determinar cuántos items caben
+        const items = [...navList.children].filter(li => li !== moreMenu);
+        let usedWidth = 0;
+        let cutIndex  = items.length; // optimista: todos caben
+
+        for (let i = 0; i < items.length; i++) {
+            const w = items[i].offsetWidth;
+            // Si este NO es el último item, reservar espacio para "Ver más"
+            const reserve = (i < items.length - 1) ? moreWidth : 0;
+
+            if (usedWidth + w + reserve > available) {
+                cutIndex = i;
+                break;
+            }
+            usedWidth += w;
+        }
+
+        // 5. Si hay overflow, mostrar "Ver más" y mover los sobrantes
+        if (cutIndex < items.length) {
+            moreMenu.style.display = 'block';
+            for (let i = cutIndex; i < items.length; i++) {
+                dropdown.appendChild(items[i]);
+            }
+        }
+    }
+
+    // Observar cambios de tamaño en el contenedor del header
+    const container = document.querySelector('.header-container');
+    if (container && typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => updateNavigation()).observe(container);
+    } else {
+        window.addEventListener('resize', updateNavigation);
+    }
+
+    // Doble rAF para garantizar que el layout esté completamente pintado
+    requestAnimationFrame(() => requestAnimationFrame(updateNavigation));
+})();
+
+/* ==========================================================================
    NEWSLETTER FORM HANDLER
    ========================================================================== */
 function initNewsletterForm() {
