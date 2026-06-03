@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Virtual - CAE</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom stylesheet shared -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Specific Dashboard Layout Styles */
+        body {
+            background-color: var(--bg-base);
+            display: flex;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sidebar CSS */
+        .sidebar {
+            width: 280px;
+            background: rgba(10, 16, 48, 0.95);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(124, 77, 255, 0.25);
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: var(--transition-smooth);
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            margin-bottom: 3.5rem;
+            padding-left: 0.75rem;
+            display: block;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sidebar-item button {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 1rem 1.25rem;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: var(--transition-fast);
+            text-align: left;
+        }
+
+        .sidebar-item button svg {
+            transition: var(--transition-fast);
+            color: var(--text-muted);
+        }
+
+        .sidebar-item button:hover {
+            background: rgba(124, 77, 255, 0.08);
+            color: var(--text-primary);
+            padding-left: 1.5rem;
+        }
+
+        .sidebar-item button:hover svg {
+            color: var(--primary);
+        }
+
+        .sidebar-item.active button {
+            background: var(--grad-primary);
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px var(--primary-glow-subtle);
+        }
+
+        .sidebar-item.active button svg {
+            color: var(--text-primary);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 1.5rem;
+        }
+
+        /* Content Panel CSS */
+        .main-panel {
+            flex-grow: 1;
+            padding: 3rem 4rem;
+            overflow-y: auto;
+            max-width: calc(100% - 280px);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.2);
+            padding: 0.5rem 1.25rem;
+            border-radius: 30px;
+        }
+
+        .user-pill-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--grad-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* Widgets Grid */
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .widget-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: var(--transition-smooth);
+        }
+
+        .widget-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(124, 77, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .widget-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: rgba(124, 77, 255, 0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .widget-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-val {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .widget-lbl {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Section Layouts inside dashboard tabs */
+        .dashboard-tab {
+            display: none;
+        }
+
+        .dashboard-tab.active {
+            display: block;
+            animation: tab-fade-in 0.4s ease forwards;
+        }
+
+        @keyframes tab-fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Courses Tab Cards Layout */
+        .my-courses-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .course-card-active {
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.25);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition-smooth);
+        }
+
+        .course-card-active:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(124, 77, 255, 0.15);
+        }
+
+        .card-header-banner {
+            height: 140px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(10, 16, 48, 0.95), transparent);
+        }
+
+        .card-banner-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.3rem 0.75rem;
+            border-radius: 12px;
+        }
+
+        .card-inner-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-inner-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-inner-content p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .card-progress-wrapper {
+            margin-bottom: 2rem;
+            margin-top: auto;
+        }
+
+        .card-progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--grad-primary);
+            border-radius: 3px;
+        }
+
+        /* Locked states inside dashboard list */
+        .course-card-locked {
+            position: relative;
+        }
+
+        .course-card-locked .locked-blur-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 22, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .locked-blur-cover svg {
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .locked-blur-cover h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .locked-blur-cover p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 220px;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Certificate tab */
+        .certs-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .cert-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.2);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .cert-thumb {
+            width: 120px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* Profile Forms */
+        .profile-container {
+            max-width: 600px;
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2.5rem;
+        }
+
+        /* Mobile Hamburger menu for dashboard layout */
+        .mobile-header {
+            display: none;
+            background: rgba(10, 16, 48, 0.95);
+            border-bottom: 1px solid rgba(124, 77, 255, 0.25);
+            padding: 1rem 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 110;
+        }
+
+        @media (max-width: 991px) {
+            body {
+                flex-direction: column;
+                padding-top: 70px;
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .sidebar {
+                position: fixed;
+                top: 70px;
+                left: -280px;
+                height: calc(100vh - 70px);
+                width: 280px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .main-panel {
+                max-width: 100%;
+                padding: 2.5rem 1.5rem;
+            }
+            .widgets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .my-courses-grid {
+                grid-template-columns: 1fr;
+            }
+            .certs-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .widgets-grid {
+                grid-template-columns: 1fr;
+            }
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            .user-pill {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- Mobile Header Navigation -->
+    <div class="mobile-header">
+        <a href="index.html" class="logo"><span class="logo-accent">C</span>AE</a>
+        <button class="mobile-nav-toggle" id="db-mobile-toggle" aria-label="Abrir menú">
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+        </button>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Menu Panel -->
+        <aside class="sidebar" id="db-sidebar">
+            <a href="index.html" class="sidebar-logo"><span class="logo-accent">C</span>AE</a>
+            
+            <nav>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active" data-tab="inicio">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            Inicio
+                        </button>
+                    </li>
+                    <li class="sidebar-item" data-tab="cursos">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            Mis Cursos
+                        </button>
+                    </li>
+                    <li class="sidebar-item" data-tab="progreso">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                            Progreso
+                        </button>
+                    </li>
+                    <li class="sidebar-item" data-tab="certificados">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22l-4-4H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4l-4 4z"></path></svg>
+                            Certificados
+                        </button>
+                    </li>
+                    <li class="sidebar-item" data-tab="perfil">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Perfil
+                        </button>
+                    </li>
+                    <li class="sidebar-item" data-tab="soporte">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Soporte
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-outline w-full" id="db-logout-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Cerrar sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-panel">
+            
+            <!-- Dashboard Welcome Header -->
+            <div class="panel-header">
+                <div>
+                    <h1 class="welcome-title">Hola, <span id="welcome-name">Estudiante</span> 👋</h1>
+                    <p class="welcome-subtitle">Qué bueno tenerte de vuelta. Continúa tu ruta de aprendizaje.</p>
+                </div>
+                <div class="user-pill">
+                    <span class="user-pill-avatar" id="user-pill-initials">ES</span>
+                    <span class="user-pill-career" id="user-pill-career">Electrónica</span>
+                </div>
+            </div>
+
+            <!-- TAB 1: INICIO -->
+            <div class="dashboard-tab active" id="tab-inicio">
+                <!-- Metrics Widgets Grid -->
+                <div class="widgets-grid">
+                    <!-- Widget 1 -->
+                    <div class="widget-card">
+                        <div class="widget-icon-wrapper">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </div>
+                        <div class="widget-info">
+                            <span class="widget-val" id="widget-courses-count">1</span>
+                            <span class="widget-lbl">Cursos Inscritos</span>
+                        </div>
+                    </div>
+                    <!-- Widget 2 -->
+                    <div class="widget-card">
+                        <div class="widget-icon-wrapper">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div class="widget-info">
+                            <span class="widget-val" id="widget-lessons-completed">3</span>
+                            <span class="widget-lbl">Lecciones Completadas</span>
+                        </div>
+                    </div>
+                    <!-- Widget 3 -->
+                    <div class="widget-card">
+                        <div class="widget-icon-wrapper">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div class="widget-info">
+                            <span class="widget-val" id="widget-hours-studied">2.4h</span>
+                            <span class="widget-lbl">Horas Estudiadas</span>
+                        </div>
+                    </div>
+                    <!-- Widget 4 -->
+                    <div class="widget-card">
+                        <div class="widget-icon-wrapper">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        </div>
+                        <div class="widget-info">
+                            <span class="widget-val" id="widget-progress-percent">38%</span>
+                            <span class="widget-lbl">Progreso Promedio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last Activity -->
+                <div class="area-card" style="padding: 2rem; margin-bottom: 3rem; flex-direction: row; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span class="eyebrow" style="margin-bottom: 0.5rem;">Última actividad</span>
+                        <h4 style="font-size: 1.25rem; margin-bottom: 0.25rem;" id="widget-last-activity-title">Módulo 1: Ley de Ohm y Leyes de Kirchhoff</h4>
+                        <p style="font-size: 0.9rem;" id="widget-last-activity-course">Carrera de Electrónica</p>
+                    </div>
+                    <a href="course.html?c=electronica" class="btn btn-primary" id="btn-last-activity-action">Continuar clase</a>
+                </div>
+
+                <!-- Featured Course catalog -->
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Tus Cursos</h2>
+                <div class="my-courses-grid" id="dashboard-courses-list">
+                    <!-- Cards will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- TAB 2: CURSOS -->
+            <div class="dashboard-tab" id="tab-cursos">
+                <h2 style="font-size: 1.75rem; margin-bottom: 2rem;">Todos mis cursos asignados</h2>
+                <div class="my-courses-grid" id="courses-tab-list">
+                    <!-- Cards populated here -->
+                </div>
+            </div>
+
+            <!-- TAB 3: PROGRESO -->
+            <div class="dashboard-tab" id="tab-progreso">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem;">Rendimiento académico</h2>
+                <div class="area-card" style="padding: 3rem 2.5rem; margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Distribución de Avance</h3>
+                    <!-- Progress Chart placeholder -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(124, 77, 255, 0.2); border-radius: 8px; height: 250px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" style="margin-bottom: 1rem;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        <p style="font-size: 0.95rem; font-weight: 600;">Estadísticas consolidadas en tiempo real</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 300px; margin-top: 0.25rem;">Completa clases y marca las casillas de verificación en el reproductor de cursos para ver reflejado tu avance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: CERTIFICADOS -->
+            <div class="dashboard-tab" id="tab-certificados">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">Tus Certificados</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Completa el 100% de las lecciones del curso correspondiente para desbloquear tu certificado digital verificable.</p>
+                
+                <div class="certs-list" id="certs-tab-list">
+                    <!-- Certs generated dynamically -->
+                </div>
+            </div>
+
+            <!-- TAB 5: PERFIL -->
+            <div class="dashboard-tab" id="tab-perfil">
+                <h2 style="font-size: 1.75rem; margin-bottom: 2rem;">Configuración de tu Perfil</h2>
+                <div class="profile-container">
+                    <form class="auth-form" id="profile-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profile-name">Nombre</label>
+                                <input type="text" id="profile-name" value="Estudiante" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-lastname">Apellido</label>
+                                <input type="text" id="profile-lastname" value="CAE" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-email">Correo electrónico (Inmutable)</label>
+                            <input type="email" id="profile-email" value="estudiante@cae.com" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profile-career">Carrera registrada</label>
+                                <input type="text" id="profile-career" value="Electrónica" readonly style="opacity: 0.6; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-plan">Plan contratado</label>
+                                <input type="text" id="profile-plan" value="Profesional" readonly style="opacity: 0.6; cursor: not-allowed;">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 6: SOPORTE -->
+            <div class="dashboard-tab" id="tab-soporte">
+                <h2 style="font-size: 1.75rem; margin-bottom: 2rem;">Centro de Soporte Técnico</h2>
+                <div class="profile-container">
+                    <p style="margin-bottom: 1.5rem; font-size: 0.95rem;">¿Tienes algún problema con las clases, simuladores o pagos? Ponte en contacto directo con nuestros tutores académicos.</p>
+                    <a href="https://wa.me/51999999999" target="_blank" class="btn btn-primary" style="gap: 0.75rem;">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.967C16.59 2.016 14.11 1.008 11.48 1.007c-5.442 0-9.867 4.373-9.87 9.802-.001 1.772.477 3.504 1.384 5.047l-.995 3.637 3.73-.969zm13.111-7.25c-.274-.136-1.62-.788-1.872-.878-.25-.09-.434-.136-.617.136-.182.271-.706.878-.865 1.058-.16.18-.32.203-.594.068-.274-.136-1.157-.42-2.204-1.341-.815-.717-1.365-1.604-1.525-1.875-.16-.271-.017-.417.12-.553.123-.122.274-.317.411-.475.137-.158.183-.271.274-.452.09-.18.046-.339-.023-.475-.069-.136-.617-1.463-.846-2.005-.222-.533-.467-.46-.64-.469-.166-.008-.356-.01-.546-.01-.19 0-.503.071-.766.353-.263.283-1.007.971-1.007 2.367 0 1.396 1.03 2.748 1.173 2.94.143.19 2.026 3.053 4.908 4.275.685.29 1.22.464 1.636.594.688.216 1.314.186 1.81.114.552-.08 1.62-.65 1.848-1.247.228-.597.228-1.107.16-1.217-.069-.11-.25-.203-.524-.339z"/></svg>
+                        Contactar Tutor por WhatsApp
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script for dashboard data bindings -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Guard Session: if not logged in, redirect to index.html#login
+            const sessionData = localStorage.getItem('cae_user');
+            if (!sessionData) {
+                window.location.href = 'index.html#login';
+                return;
+            }
+            
+            const user = JSON.parse(sessionData);
+            
+            // If user is admin, redirect to admin panel
+            if (user.role === 'administrador') {
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            // Bind User Details
+            document.getElementById('welcome-name').textContent = user.firstName;
+            document.getElementById('user-pill-initials').textContent = (user.firstName[0] + user.lastName[0]).toUpperCase();
+            document.getElementById('user-pill-career').textContent = user.career;
+
+            // Bind profile inputs
+            document.getElementById('profile-name').value = user.firstName;
+            document.getElementById('profile-lastname').value = user.lastName;
+            document.getElementById('profile-email').value = user.email;
+            document.getElementById('profile-career').value = user.career;
+            document.getElementById('profile-plan').value = user.plan;
+
+            // Handle Profile Save Changes form submission
+            const profileForm = document.getElementById('profile-form');
+            profileForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                user.firstName = document.getElementById('profile-name').value;
+                user.lastName = document.getElementById('profile-lastname').value;
+                localStorage.setItem('cae_user', JSON.stringify(user));
+                
+                // Update local storage students list too
+                const students = JSON.parse(localStorage.getItem('cae_students')) || [];
+                const idx = students.findIndex(s => s.email === user.email);
+                if (idx !== -1) {
+                    students[idx].firstName = user.firstName;
+                    students[idx].lastName = user.lastName;
+                    localStorage.setItem('cae_students', JSON.stringify(students));
+                }
+                
+                alert("Perfil actualizado correctamente");
+                window.location.reload();
+            });
+
+            // Calculate progress and completed states from user checklist
+            const keyChecklist = `cae_progress_${user.email}`;
+            const completedLessons = JSON.parse(localStorage.getItem(keyChecklist)) || {};
+            const completedCount = Object.keys(completedLessons).filter(k => completedLessons[k] === true).length;
+            
+            // Total lessons count
+            const coursesDB = JSON.parse(localStorage.getItem('cae_courses'));
+            let elecTotal = 0;
+            let mecaTotal = 0;
+            coursesDB.electronica.modules.forEach(m => elecTotal += m.lessons.length);
+            coursesDB.mecatronica.modules.forEach(m => mecaTotal += m.lessons.length);
+            
+            const totalCareerLessons = (user.career === "Electrónica") ? elecTotal : mecaTotal;
+            
+            // Widgets values
+            const progressPercent = totalCareerLessons > 0 ? Math.round((completedCount / totalCareerLessons) * 100) : 0;
+            const hoursStudied = (completedCount * 0.8).toFixed(1); // average 48 mins (0.8h) per lesson completed
+
+            document.getElementById('widget-lessons-completed').textContent = completedCount;
+            document.getElementById('widget-progress-percent').textContent = `${progressPercent}%`;
+            document.getElementById('widget-hours-studied').textContent = `${hoursStudied}h`;
+
+            // Active last activity title
+            const lastActivityTitle = document.getElementById('widget-last-activity-title');
+            const lastActivityCourse = document.getElementById('widget-last-activity-course');
+            const lastActivityBtn = document.getElementById('btn-last-activity-action');
+            
+            if (completedCount > 0) {
+                // Find last completed lesson name
+                const completedIds = Object.keys(completedLessons).filter(k => completedLessons[k] === true);
+                const lastId = completedIds[completedIds.length - 1];
+                
+                let foundTitle = "";
+                let careerStr = user.career;
+                
+                const modules = (user.career === "Electrónica") ? coursesDB.electronica.modules : coursesDB.mecatronica.modules;
+                modules.forEach(m => {
+                    m.lessons.forEach(l => {
+                        if (l.id === lastId) foundTitle = l.title;
+                    });
+                });
+                
+                if (foundTitle) {
+                    lastActivityTitle.textContent = `Completado: ${foundTitle}`;
+                } else {
+                    lastActivityTitle.textContent = user.career === "Electrónica" ? "Módulo 1: Introducción a la Electrónica" : "Módulo 1: Fundamentos de la Mecatrónica";
+                }
+            } else {
+                lastActivityTitle.textContent = user.career === "Electrónica" ? "Módulo 1: Introducción a la Electrónica" : "Módulo 1: Fundamentos de la Mecatrónica";
+            }
+            
+            lastActivityCourse.textContent = `Carrera de ${user.career}`;
+            lastActivityBtn.href = user.career === "Electrónica" ? 'course.html?c=electronica' : 'course.html?c=mecatronica';
+
+            // Render Courses catalog
+            renderCoursesList();
+
+            // Mobile menu sidebar toggle
+            const dbMobileToggle = document.getElementById('db-mobile-toggle');
+            const dbSidebar = document.getElementById('db-sidebar');
+            if (dbMobileToggle) {
+                dbMobileToggle.addEventListener('click', () => {
+                    dbSidebar.classList.toggle('open');
+                    dbMobileToggle.classList.toggle('open');
+                });
+            }
+
+            // Tab Switching logic
+            const menuItems = document.querySelectorAll('.sidebar-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Update active sidebar item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Switch tab
+                    const tabId = item.getAttribute('data-tab');
+                    const tabs = document.querySelectorAll('.dashboard-tab');
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    const activeTab = document.getElementById(`tab-${tabId}`);
+                    if (activeTab) activeTab.classList.add('active');
+                    
+                    // Close sidebar on mobile after clicking
+                    if (dbSidebar.classList.contains('open')) {
+                        dbSidebar.classList.remove('open');
+                        dbMobileToggle.classList.remove('open');
+                    }
+                });
+            });
+
+            // Logout trigger
+            document.getElementById('db-logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('cae_user');
+                window.location.href = 'index.html';
+            });
+
+            function renderCoursesList() {
+                const targetLists = [
+                    document.getElementById('dashboard-courses-list'),
+                    document.getElementById('courses-tab-list')
+                ];
+                const certsList = document.getElementById('certs-tab-list');
+                
+                targetLists.forEach(listEl => {
+                    if (!listEl) return;
+                    listEl.innerHTML = ''; // clear
+
+                    // Card 1: Electronica
+                    const isElecLocked = user.career !== "Electrónica";
+                    const elecPercent = isElecLocked ? 0 : progressPercent;
+                    const cardElec = `
+                        <div class="course-card-active ${isElecLocked ? 'course-card-locked' : ''}">
+                            <div class="card-header-banner" style="background-image: url('assets/images/study_electronics.png');">
+                                <div class="card-banner-overlay"></div>
+                                <span class="card-banner-badge">Electrónica</span>
+                            </div>
+                            <div class="card-inner-content">
+                                <h3>Curso Completo de Electrónica</h3>
+                                <p>${coursesDB.electronica.description}</p>
+                                
+                                <div class="card-progress-wrapper">
+                                    <div class="card-progress-labels">
+                                        <span>Progreso</span>
+                                        <span>${elecPercent}%</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: ${elecPercent}%;"></div>
+                                    </div>
+                                </div>
+                                <a href="course.html?c=electronica" class="btn btn-primary w-full" style="text-align: center;">Acceder al Aula</a>
+                            </div>
+                            ${isElecLocked ? `
+                            <div class="locked-blur-cover">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <h4>Material Bloqueado</h4>
+                                <p>Este material pertenece a la carrera de Electrónica.</p>
+                                <button class="btn btn-primary btn-sm" onclick="alert('Debes cambiar tu carrera registrada para desbloquear este curso.')">Cambiar Carrera</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    // Card 2: Mecatronica
+                    const isMecaLocked = user.career !== "Mecatrónica";
+                    const mecaPercent = isMecaLocked ? 0 : progressPercent;
+                    const cardMeca = `
+                        <div class="course-card-active ${isMecaLocked ? 'course-card-locked' : ''}">
+                            <div class="card-header-banner" style="background-image: url('assets/images/study_mecatronica.png');">
+                                <div class="card-banner-overlay"></div>
+                                <span class="card-banner-badge">Mecatrónica</span>
+                            </div>
+                            <div class="card-inner-content">
+                                <h3>Curso Completo de Mecatrónica</h3>
+                                <p>${coursesDB.mecatronica.description}</p>
+                                
+                                <div class="card-progress-wrapper">
+                                    <div class="card-progress-labels">
+                                        <span>Progreso</span>
+                                        <span>${mecaPercent}%</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: ${mecaPercent}%;"></div>
+                                    </div>
+                                </div>
+                                <a href="course.html?c=mecatronica" class="btn btn-primary w-full" style="text-align: center;">Acceder al Aula</a>
+                            </div>
+                            ${isMecaLocked ? `
+                            <div class="locked-blur-cover">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <h4>Material Bloqueado</h4>
+                                <p>Este material pertenece a la carrera de Mecatrónica.</p>
+                                <button class="btn btn-primary btn-sm" onclick="alert('Debes cambiar tu carrera registrada para desbloquear este curso.')">Cambiar Carrera</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    listEl.innerHTML = cardElec + cardMeca;
+                });
+
+                // Render Certificates view
+                if (certsList) {
+                    certsList.innerHTML = '';
+                    if (progressPercent === 100) {
+                        certsList.innerHTML = `
+                            <div class="cert-card">
+                                <div class="cert-thumb">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22l-4-4H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4l-4 4z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">Certificado de Especialización: ${user.career}</h3>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Código de verificación: CAE-${user.career.slice(0,3).toUpperCase()}-${Math.floor(Math.random()*90000 + 10000)}</p>
+                                    <button class="btn btn-outline btn-sm" onclick="alert('Descargando PDF del certificado...')">Descargar Certificado</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        certsList.innerHTML = `
+                            <div style="grid-column: span 2; text-align: center; padding: 3rem 0; color: var(--text-muted);">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem; opacity: 0.5;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <p>Aún no has completado tu curso de ${user.career}.</p>
+                                <p style="font-size: 0.85rem; margin-top: 0.25rem;">Necesitas alcanzar el 100% de progreso (actualmente ${progressPercent}%) para emitir tu certificado.</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        });
+    </script>
+    
+    <!-- Shared Particles Script -->
+    <script>
+        // Inline tiny canvas particles initialization to guarantee work in dashboard
+        const canvas = document.getElementById('particles-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            
+            class P {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedY = Math.random() * -0.2 - 0.05;
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.y += this.speedY;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = 'rgba(124, 77, 255, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            for(let i=0; i<40; i++) particles.push(new P());
+            
+            const anim = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(anim);
+            };
+            anim();
+        }
+    </script>
+
+</body>
+</html>

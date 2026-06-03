@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especialidad en Mecatrónica - CAE</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom stylesheet shared -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-base);
+            overflow-y: auto;
+        }
+
+        .career-hero {
+            padding: 160px 0 100px 0;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .focus-section {
+            padding: 5rem 0;
+            background: rgba(10, 16, 48, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .focus-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+        }
+
+        .focus-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .focus-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(124, 77, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .focus-icon-box {
+            font-size: 2.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .malla-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .malla-card {
+            background: rgba(10, 16, 48, 0.5);
+            border: 1px solid rgba(124, 77, 255, 0.15);
+            border-radius: var(--radius-md);
+            padding: 1.75rem 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .malla-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-surface);
+            transform: translateX(5px);
+            box-shadow: 0 10px 25px rgba(124, 77, 255, 0.08);
+        }
+
+        .malla-num {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .malla-details h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .malla-details p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Projects grids */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .project-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .project-card:hover {
+            border-color: var(--primary-glow);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-img-box {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .project-info-box {
+            padding: 1.75rem;
+        }
+
+        .project-info-box h4 {
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-info-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 991px) {
+            .career-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 120px;
+            }
+            .career-hero .hero-content {
+                align-items: center;
+            }
+            .focus-grid {
+                grid-template-columns: 1fr;
+                max-width: 450px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Particles -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="main-header scrolled">
+        <div class="header-container">
+            <a href="index.html" class="logo"><span class="logo-accent">C</span>AE</a>
+            <nav class="primary-nav">
+                <ul class="nav-list">
+                    <li><a href="index.html#hero" class="nav-link">Inicio</a></li>
+                    <li><a href="index.html#about" class="nav-link">Sobre CAE</a></li>
+                    <li><a href="index.html#areas" class="nav-link active">Cursos</a></li>
+                    <li><a href="index.html#pricing" class="nav-link">Precios</a></li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="container career-hero">
+        <div class="hero-content">
+            <span class="eyebrow">Carrera de Especialización</span>
+            <h1 class="headline section-title" style="font-size: clamp(2.25rem, 5vw, 3.5rem); text-align: left; -webkit-text-fill-color: initial; color: #fff;">
+                Especialización Avanzada en <span class="gradient-text">Mecatrónica</span>
+            </h1>
+            <p class="description">
+                Fusiona la mecánica de precisión, los circuitos de control electrónico avanzados y la programación embebida de alta performance. Aprende a crear robots autónomos y ciberfísicos.
+            </p>
+            <button class="btn btn-primary" id="btn-enroll-meca-page">Inscribirme en Mecatrónica</button>
+        </div>
+        <div class="hero-visual">
+            <div class="processor-wrapper" style="max-width: 420px;">
+                <img src="assets/images/study_mecatronica.png" alt="Brazo robótico mecatrónica" class="processor-img" style="border-radius: var(--radius-lg); border:1px solid rgba(124,77,255,0.3); box-shadow:0 0 40px rgba(124,77,255,0.2);">
+            </div>
+        </div>
+    </section>
+
+    <!-- Focus Modules -->
+    <section class="focus-section">
+        <div class="container">
+            <h2 class="section-title text-center" style="margin-bottom: 3rem;">Núcleos de la Especialidad</h2>
+            <div class="focus-grid">
+                <!-- Focus 1 -->
+                <div class="focus-card">
+                    <div class="focus-icon-box">🤖</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Robótica</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Estudio cinemático directo e inverso, programación de servomotores y algoritmos de posicionamiento 3D en brazos manipuladores.</p>
+                </div>
+                <!-- Focus 2 -->
+                <div class="focus-card">
+                    <div class="focus-icon-box">⚙️</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Automatización</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Integración de PLCs industriales con lenguajes Ladder, pantallas HMI y protocolos de comunicación RS485 / Modbus.</p>
+                </div>
+                <!-- Focus 3 -->
+                <div class="focus-card">
+                    <div class="focus-icon-box">💻</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Sistemas Embebidos</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Programación en C/C++ de microcontroladores ARM y Arduino, implementando interrupciones, Timers y buses de comunicación I2C/SPI.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curriculum -->
+    <section class="container" style="padding: 6rem 0;">
+        <h2 class="section-title text-center">Malla de Aprendizaje</h2>
+        <p class="section-subtitle text-center">Formación progresiva teórica y práctica paso a paso.</p>
+        
+        <div class="malla-container">
+            <div class="malla-card">
+                <span class="malla-num gradient-text">01</span>
+                <div class="malla-details">
+                    <h4>Fundamentos de Automatización y Arduino</h4>
+                    <p>Primeros pasos con microcontroladores, lecturas de sensores analógicos/digitales y programación en lenguaje C++ estructurado.</p>
+                </div>
+            </div>
+            <div class="malla-card">
+                <span class="malla-num gradient-text">02</span>
+                <div class="malla-details">
+                    <h4>Robótica Manipuladora y Actuadores de Potencia</h4>
+                    <p>Control de motores paso a paso y servomotores. Cinemática de mecanismos articulados y lazo de control retroalimentado PID.</p>
+                </div>
+            </div>
+            <div class="malla-card">
+                <span class="malla-num gradient-text">03</span>
+                <div class="malla-details">
+                    <h4>Sistemas de Control Industrial e IoT Ciberfísico</h4>
+                    <p>Integración de autómatas programables (PLCs), sensores fotoeléctricos, inductivos y telemetría de datos a servidores IoT.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Proyectos Showcase -->
+    <section class="container" style="padding-bottom: 6rem;">
+        <h2 class="section-title text-center">Proyectos Prácticos Destacados</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-img-box" style="background-image: url('assets/images/study_mecatronica.png');"></div>
+                <div class="project-info-box">
+                    <h4>Brazo Robótico Articulado 4-Ejes</h4>
+                    <p>Aprende a calcular el torque requerido, modelar los enlaces en 3D e integrar el firmware para movimientos coordinados precisos.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-img-box" style="background-image: url('assets/images/robotics_project.png');"></div>
+                <div class="project-info-box">
+                    <h4>Estación de Clasificación con PLC</h4>
+                    <p>Construcción lógica Ladder para discernir y ordenar materiales mediante cintas transportadoras, sensores inductivos y actuadores neumáticos.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-img-box" style="background-image: url('assets/images/student_learning.png');"></div>
+                <div class="project-info-box">
+                    <h4>Robot Móvil Autónomo (AMR)</h4>
+                    <p>Algoritmos de navegación autónoma y evasión de obstáculos con mapeo básico mediante sensores de distancia ultrasónicos y encoders ópticos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="container text-center" style="padding-bottom: 8rem;">
+        <div class="area-card" style="padding: 4rem 2rem; align-items: center; justify-content: center; background: radial-gradient(circle at top, rgba(124,77,255,0.15) 0%, rgba(10,16,48,0.95) 70%);">
+            <h2 class="section-title" style="margin-bottom: 1rem;">¿Listo para comenzar en Mecatrónica?</h2>
+            <p style="max-width: 500px; color:var(--text-muted); margin-bottom: 2rem;">Accede a todas las lecciones grabadas, material complementario de soporte y certificación digital.</p>
+            <button class="btn btn-primary" id="btn-enroll-meca-bottom" style="font-size: 1rem; padding: 1rem 2rem;">Inscribirme en Mecatrónica</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-container">
+            <div class="footer-bottom">
+                <p class="copyright">© 2024 CAE - Capacitación Avanzada en Electrónica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Enrollment Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const enrollButtons = [
+                document.getElementById('btn-enroll-meca-page'),
+                document.getElementById('btn-enroll-meca-bottom')
+            ];
+
+            enrollButtons.forEach(btn => {
+                if (!btn) return;
+                btn.addEventListener('click', () => {
+                    const session = localStorage.getItem('cae_user');
+                    
+                    if (!session) {
+                        window.location.href = 'index.html#register';
+                    } else {
+                        const user = JSON.parse(session);
+                        user.career = "Mecatrónica";
+                        localStorage.setItem('cae_user', JSON.stringify(user));
+                        
+                        // Update in student list
+                        const students = JSON.parse(localStorage.getItem('cae_students')) || [];
+                        const idx = students.findIndex(s => s.email === user.email);
+                        if (idx !== -1) {
+                            students[idx].career = "Mecatrónica";
+                            localStorage.setItem('cae_students', JSON.stringify(students));
+                        }
+                        
+                        alert("¡Inscripción exitosa! Tu carrera ha sido actualizada a Mecatrónica. Redirigiendo a tu aula...");
+                        window.location.href = 'course.html?c=mecatronica';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Shared Particles Script -->
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            
+            class P {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedY = Math.random() * -0.2 - 0.05;
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.y += this.speedY;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = 'rgba(124, 77, 255, 0.25)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            for(let i=0; i<30; i++) particles.push(new P());
+            
+            const anim = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(anim);
+            };
+            anim();
+        }
+    </script>
+</body>
+</html>

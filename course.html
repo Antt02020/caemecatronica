@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor de Curso - CAE</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom stylesheet shared -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-base);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .player-header {
+            background: rgba(10, 16, 48, 0.95);
+            border-bottom: 1px solid rgba(124, 77, 255, 0.25);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-back-dashboard {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .btn-back-dashboard:hover {
+            color: var(--primary);
+        }
+
+        .header-course-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .player-container {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Left Player Video Area */
+        .player-main {
+            flex-grow: 1;
+            background: #02040b;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .lesson-info-panel {
+            padding: 2.5rem;
+            max-width: 900px;
+        }
+
+        .lesson-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-title-main {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .btn-mark-complete {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-mark-complete.completed {
+            background: #00E676;
+            color: #050816;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
+        }
+
+        .lesson-desc-text {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Nav controls below video */
+        .player-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2.5rem;
+            background: rgba(10, 16, 48, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+
+        /* Right Syllabus Accordion Sidebar */
+        .syllabus-sidebar {
+            width: 360px;
+            background: rgba(10, 16, 48, 0.9);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid rgba(124, 77, 255, 0.25);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .syllabus-title {
+            padding: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Accordion structure */
+        .module-group {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .module-trigger {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: none;
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-fast);
+        }
+
+        .module-trigger:hover {
+            background: rgba(124, 77, 255, 0.05);
+        }
+
+        .module-trigger svg {
+            transition: transform 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .module-group.open .module-trigger svg {
+            transform: rotate(180deg);
+        }
+
+        .module-content {
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .module-group.open .module-content {
+            display: block;
+        }
+
+        /* Lesson Item inside Accordion */
+        .syllabus-lesson-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border-left: 2px solid transparent;
+        }
+
+        .syllabus-lesson-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .syllabus-lesson-item.active {
+            background: rgba(124, 77, 255, 0.08);
+            border-left-color: var(--primary);
+        }
+
+        .syllabus-lesson-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #00E676;
+            cursor: pointer;
+        }
+
+        .syllabus-lesson-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .syllabus-lesson-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .syllabus-lesson-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 991px) {
+            .player-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .syllabus-sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid rgba(124, 77, 255, 0.25);
+                overflow-y: visible;
+            }
+            .player-main {
+                overflow-y: visible;
+                height: auto;
+            }
+            .video-wrapper {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Area -->
+    <header class="player-header">
+        <div class="header-left">
+            <a href="dashboard.html" class="btn-back-dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Volver al Campus
+            </a>
+            <span class="header-course-title" id="course-header-title">Curso de Electrónica Aplicada</span>
+        </div>
+        <div class="user-pill" style="padding: 0.35rem 1rem; border-radius: 20px;">
+            <span class="user-pill-avatar" id="user-initials" style="width: 24px; height: 24px; font-size: 0.7rem;">ES</span>
+            <span style="font-size: 0.8rem;" id="user-name-span">Estudiante</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="player-container">
+        
+        <!-- Video Player Section -->
+        <main class="player-main">
+            <div class="video-wrapper">
+                <iframe id="video-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            
+            <!-- Controls below video -->
+            <div class="player-controls">
+                <button class="btn btn-outline" id="btn-prev-lesson" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Clase anterior
+                </button>
+                <button class="btn btn-primary" id="btn-next-lesson" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+                    Siguiente clase
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 0.25rem;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+
+            <!-- Lesson Info panel -->
+            <div class="lesson-info-panel">
+                <div class="lesson-info-header">
+                    <h2 class="lesson-title-main" id="lesson-header-title">Introducción a la Electrónica y Semiconductores</h2>
+                    <button class="btn btn-outline btn-mark-complete" id="btn-toggle-complete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" id="complete-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span id="complete-text">Marcar como completada</span>
+                    </button>
+                </div>
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
+                <p class="lesson-desc-text">
+                    En esta clase daremos los primeros pasos conceptuales del curso, abordando qué es el flujo de corriente, la tensión y cómo se comportan los electrones dentro de materiales conductores y semiconductores. Este conocimiento sentará las bases del diseño de circuitos.
+                </p>
+            </div>
+        </main>
+
+        <!-- Syllabus Accordion Sidebar -->
+        <aside class="syllabus-sidebar">
+            <div class="syllabus-title">Temario del Curso</div>
+            <div id="accordion-syllabus-container">
+                <!-- Loaded dynamically -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripting for video navigation logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Guard Session: redirect if not logged in
+            const session = localStorage.getItem('cae_user');
+            if (!session) {
+                window.location.href = 'index.html#login';
+                return;
+            }
+            
+            const user = JSON.parse(session);
+            document.getElementById('user-initials').textContent = (user.firstName[0] + user.lastName[0]).toUpperCase();
+            document.getElementById('user-name-span').textContent = user.firstName;
+
+            // Get parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseKey = urlParams.get('c') || 'electronica';
+            
+            // Career Guard: prevent student from reading content of other career
+            if (user.role !== 'administrador' && user.career.toLowerCase() !== courseKey.toLowerCase()) {
+                alert(`No tienes acceso a los cursos de ${courseKey.toUpperCase()}. Serás redirigido a tu panel.`);
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Set UI headers
+            const coursesDB = JSON.parse(localStorage.getItem('cae_courses'));
+            const activeCourse = coursesDB[courseKey];
+            document.getElementById('course-header-title').textContent = `Curso Completo de ${activeCourse.title}`;
+
+            // Syllabus tree flattened for navigation indexes
+            let flattenedLessons = [];
+            
+            // Render accordion
+            const syllabusContainer = document.getElementById('accordion-syllabus-container');
+            syllabusContainer.innerHTML = '';
+            
+            activeCourse.modules.forEach((mod, modIdx) => {
+                const isFirst = (modIdx === 0);
+                const modEl = document.createElement('div');
+                modEl.className = `module-group ${isFirst ? 'open' : ''}`;
+                
+                let lessonsListHTML = '';
+                mod.lessons.forEach((les, lesIdx) => {
+                    // Save to flat list
+                    flattenedLessons.push({
+                        ...les,
+                        moduleId: mod.id,
+                        moduleTitle: mod.title
+                    });
+                    
+                    lessonsListHTML += `
+                        <div class="syllabus-lesson-item" data-lesson-id="${les.id}">
+                            <input type="checkbox" class="syllabus-lesson-checkbox" data-checkbox-id="${les.id}">
+                            <div class="syllabus-lesson-info">
+                                <span class="syllabus-lesson-title">${les.title}</span>
+                                <span class="syllabus-lesson-meta">Video · ${les.duration}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                modEl.innerHTML = `
+                    <button class="module-trigger">
+                        <span>${mod.title}</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="module-content">
+                        ${lessonsListHTML}
+                    </div>
+                `;
+                
+                // Toggle accordion trigger
+                modEl.querySelector('.module-trigger').addEventListener('click', () => {
+                    modEl.classList.toggle('open');
+                });
+                
+                syllabusContainer.appendChild(modEl);
+            });
+
+            // State management
+            let currentLessonIndex = 0;
+            const progressKey = `cae_progress_${user.email}`;
+            let userProgress = JSON.parse(localStorage.getItem(progressKey)) || {};
+
+            // Render checkboxes states on syllabus
+            const syncCheckboxesUI = () => {
+                const checkBoxes = document.querySelectorAll('.syllabus-lesson-checkbox');
+                checkBoxes.forEach(chk => {
+                    const id = chk.getAttribute('data-checkbox-id');
+                    chk.checked = !!userProgress[id];
+                    
+                    // Bind checkbox event manually
+                    chk.onclick = (e) => {
+                        e.stopPropagation();
+                        userProgress[id] = chk.checked;
+                        localStorage.setItem(progressKey, JSON.stringify(userProgress));
+                        syncCompleteButtonUI();
+                    };
+                });
+            };
+
+            // Active lesson playback function
+            const playLesson = (idx) => {
+                if (idx < 0 || idx >= flattenedLessons.length) return;
+                currentLessonIndex = idx;
+                const lesson = flattenedLessons[idx];
+
+                // Remove active class from syllabus
+                document.querySelectorAll('.syllabus-lesson-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Add active to current
+                const activeItem = document.querySelector(`.syllabus-lesson-item[data-lesson-id="${lesson.id}"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                    // Automatically open parent module group if closed
+                    const parentGroup = activeItem.closest('.module-group');
+                    if (parentGroup) parentGroup.classList.add('open');
+                }
+
+                // Update Player
+                document.getElementById('video-player').src = `https://www.youtube.com/embed/${lesson.videoId}`;
+                document.getElementById('lesson-header-title').textContent = lesson.title;
+
+                // Sync UI buttons Prev/Next states
+                document.getElementById('btn-prev-lesson').disabled = (idx === 0);
+                document.getElementById('btn-prev-lesson').style.opacity = (idx === 0) ? '0.5' : '1';
+                
+                document.getElementById('btn-next-lesson').disabled = (idx === flattenedLessons.length - 1);
+                document.getElementById('btn-next-lesson').style.opacity = (idx === flattenedLessons.length - 1) ? '0.5' : '1';
+
+                syncCompleteButtonUI();
+            };
+
+            // Check completion button state
+            const syncCompleteButtonUI = () => {
+                const activeLesson = flattenedLessons[currentLessonIndex];
+                const btn = document.getElementById('btn-toggle-complete');
+                const text = document.getElementById('complete-text');
+                const isCompleted = !!userProgress[activeLesson.id];
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                    text.textContent = 'Clase Completada';
+                } else {
+                    btn.classList.remove('completed');
+                    text.textContent = 'Marcar como completada';
+                }
+                
+                // Sync syllabus checkbox checking
+                const chk = document.querySelector(`.syllabus-lesson-checkbox[data-checkbox-id="${activeLesson.id}"]`);
+                if (chk) chk.checked = isCompleted;
+            };
+
+            // Setup lessons clicking
+            document.querySelectorAll('.syllabus-lesson-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = item.getAttribute('data-lesson-id');
+                    const idx = flattenedLessons.findIndex(l => l.id === id);
+                    playLesson(idx);
+                });
+            });
+
+            // Mark complete toggle click handler
+            document.getElementById('btn-toggle-complete').addEventListener('click', () => {
+                const activeLesson = flattenedLessons[currentLessonIndex];
+                const state = !userProgress[activeLesson.id];
+                
+                userProgress[activeLesson.id] = state;
+                localStorage.setItem(progressKey, JSON.stringify(userProgress));
+                syncCompleteButtonUI();
+            });
+
+            // Prev button click
+            document.getElementById('btn-prev-lesson').addEventListener('click', () => {
+                if (currentLessonIndex > 0) {
+                    playLesson(currentLessonIndex - 1);
+                }
+            });
+
+            // Next button click
+            document.getElementById('btn-next-lesson').addEventListener('click', () => {
+                if (currentLessonIndex < flattenedLessons.length - 1) {
+                    playLesson(currentLessonIndex + 1);
+                }
+            });
+
+            // Start player with first lesson on load
+            playLesson(0);
+            syncCheckboxesUI();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Técnico - CAE</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom stylesheet shared -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-base);
+            overflow-y: auto;
+        }
+
+        .blog-header-section {
+            padding: 100px 0 60px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Search and Categories bar */
+        .blog-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            width: 320px;
+            max-width: 100%;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1rem;
+            color: #fff;
+            width: 100%;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .categories-filter {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 15px var(--primary-glow-subtle);
+        }
+
+        /* Grid layout */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            margin-bottom: 6rem;
+        }
+
+        .blog-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(124, 77, 255, 0.2);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 45px rgba(124, 77, 255, 0.15);
+        }
+
+        .blog-card-image {
+            height: 180px;
+            background-color: rgba(255, 255, 255, 0.02);
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .blog-card-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(10, 16, 48, 0.9);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+        }
+
+        .blog-card-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .blog-card-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .blog-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            transition: var(--transition-fast);
+        }
+
+        .blog-card:hover .blog-card-title {
+            color: var(--primary);
+        }
+
+        .blog-card-summary {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Reader Mode Layout CSS */
+        .reader-layout {
+            max-width: 800px;
+            margin: 120px auto 80px auto;
+            padding: 0 var(--padding-container);
+            position: relative;
+            z-index: 10;
+        }
+
+        .reader-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .reader-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+        }
+
+        .reader-content p {
+            margin-bottom: 1.75rem;
+        }
+
+        .reader-content h2,
+        .reader-content h3 {
+            color: var(--text-primary);
+            margin: 2.5rem 0 1rem 0;
+        }
+
+        .related-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 4rem;
+            margin-top: 5rem;
+        }
+
+        @media (max-width: 991px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particles Underlying -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- Header Navigation (Simplified Landing static block) -->
+    <header class="main-header scrolled" id="header">
+        <div class="header-container">
+            <a href="index.html" class="logo"><span class="logo-accent">C</span>AE</a>
+            <nav class="primary-nav">
+                <ul class="nav-list">
+                    <li><a href="index.html#hero" class="nav-link">Inicio</a></li>
+                    <li><a href="index.html#about" class="nav-link">Sobre CAE</a></li>
+                    <li><a href="index.html#areas" class="nav-link">Cursos</a></li>
+                    <li><a href="index.html#pricing" class="nav-link">Precios</a></li>
+                    <li><a href="blog.html" class="nav-link active">Blog</a></li>
+                    <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======================================================================
+         LISTING VIEW
+         ====================================================================== -->
+    <div id="blog-listing-view">
+        <section class="blog-header-section">
+            <div class="container">
+                <span class="eyebrow">Blog Técnico</span>
+                <h1 class="section-title">Actualidad y Recursos de Electrónica</h1>
+                <p class="section-subtitle">Aprende sobre las últimas tendencias tecnológicas, tutoriales prácticos e innovación industrial.</p>
+            </div>
+        </section>
+
+        <main class="container">
+            <!-- Search & Filters -->
+            <div class="blog-toolbar">
+                <div class="categories-filter" id="categories-filter-container">
+                    <button class="category-tab active" data-category="todos">Todos</button>
+                    <button class="category-tab" data-category="Electrónica">Electrónica</button>
+                    <button class="category-tab" data-category="Mecatrónica">Mecatrónica</button>
+                    <button class="category-tab" data-category="Tutoriales">Tutoriales</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="blog-search-input" placeholder="Buscar artículos...">
+                </div>
+            </div>
+
+            <!-- Blog posts Grid -->
+            <div class="blog-grid" id="public-blog-grid">
+                <!-- Populated dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <!-- ======================================================================
+         READING VIEW (HIDDEN BY DEFAULT)
+         ====================================================================== -->
+    <div id="blog-reading-view" style="display: none;">
+        <main class="reader-layout">
+            <a href="blog.html" class="btn-back-dashboard" style="margin-bottom: 2rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Volver al Listado
+            </a>
+            
+            <span class="eyebrow" id="article-category">Electrónica</span>
+            <h1 class="section-title" id="article-title" style="-webkit-text-fill-color: initial; color: #fff; margin-bottom: 1rem; text-align: left;">Título del artículo</h1>
+            
+            <div class="reader-meta">
+                <span id="article-date">Fecha de publicación</span>
+                <span>·</span>
+                <span>Por: CAE Academia</span>
+            </div>
+
+            <div style="width: 100%; height: 350px; border-radius: var(--radius-lg); background-size: cover; background-position: center; margin-bottom: 3rem; border: 1px solid rgba(124, 77, 255, 0.25);" id="article-cover"></div>
+
+            <div class="reader-content" id="article-content">
+                <!-- Content injected here -->
+            </div>
+
+            <!-- Related Articles -->
+            <div class="related-section">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem;">Artículos relacionados</h3>
+                <div class="blog-grid" id="related-blog-grid" style="margin-bottom: 2rem;">
+                    <!-- Related posts -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer block standard -->
+    <footer class="main-footer">
+        <div class="container footer-container">
+            <div class="footer-bottom">
+                <p class="copyright">© 2024 CAE - Capacitación Avanzada en Electrónica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Blog Routing and Render Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DEFAULT_BLOG_POSTS = [
+                {
+                    title: "El Futuro del Diseño de PCBs en la Era IoT",
+                    slug: "el-futuro-del-diseno-de-pcbs-en-la-era-iot",
+                    category: "Electrónica",
+                    status: "Publicado",
+                    date: "2026-05-30",
+                    summary: "Exploramos cómo el Internet de las Cosas exige placas de circuito impreso cada vez más pequeñas, eficientes y complejas.",
+                    content: "El diseño de PCBs ha evolucionado drásticamente. Hoy en día, la miniaturización y la integridad de señal a altas frecuencias son pilares indispensables. En este artículo detallamos las metodologías de enrutamiento multicapa avanzadas. Además, la disipación térmica y el apilamiento de capas (stackup) juegan un rol clave al evitar ruidos inductivos. Dominar estas habilidades es el paso definitivo para ingenieros que diseñan hardware IoT moderno.",
+                    image: "assets/images/electronics_board.png"
+                },
+                {
+                    title: "Robótica Colaborativa: La Nueva Frontera Industrial",
+                    slug: "robotica-colaborativa-la-nueva-frontier-industrial",
+                    category: "Mecatrónica",
+                    status: "Publicado",
+                    date: "2026-05-28",
+                    summary: "Los cobots están revolucionando las líneas de ensamble automatizado cooperando de forma segura con operarios humanos.",
+                    content: "Los brazos robóticos tradicionales requerían jaulas de seguridad para proteger a los operarios. La llegada de los robots colaborativos o cobots, equipados con sensores de par y visión artificial, cambia las reglas del juego. Estos sistemas integran cinemática directa, sensores de fuerza y control de trayectorias. En este post analizamos la programación de cobots en entornos reales de automatización mecatrónica.",
+                    image: "assets/images/study_mecatronica.png"
+                },
+                {
+                    title: "Primeros Pasos con Arduino y C++ Embebido",
+                    slug: "primeros-pasos-con-arduino-y-cpp-embebido",
+                    category: "Tutoriales",
+                    status: "Publicado",
+                    date: "2026-05-25",
+                    summary: "Guía de inicio rápido para conectar, programar y depurar tus primeros microcontroladores de desarrollo.",
+                    content: "Si deseas ingresar al mundo de la mecatrónica, Arduino es el punto de partida ideal. En este tutorial aprenderemos a realizar lecturas analógicas de sensores y el control básico de un puente H para motores paso a paso. Analizaremos las arquitecturas de microcontroladores de 8 bits y cómo estructurar código eficiente en C++ para no saturar la memoria RAM del sistema embebido.",
+                    image: "assets/images/robotics_project.png"
+                }
+            ];
+
+            // Initialize Blog DB in LocalStorage if not present
+            if (!localStorage.getItem('cae_blog_posts')) {
+                localStorage.setItem('cae_blog_posts', JSON.stringify(DEFAULT_BLOG_POSTS));
+            }
+
+            const posts = JSON.parse(localStorage.getItem('cae_blog_posts'));
+
+            // Simple URL Parameter Router
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeSlug = urlParams.get('post');
+
+            if (activeSlug) {
+                // Show Reader View
+                document.getElementById('blog-listing-view').style.display = 'none';
+                document.getElementById('blog-reading-view').style.display = 'block';
+                renderArticle(activeSlug);
+            } else {
+                // Show Listing View
+                document.getElementById('blog-listing-view').style.display = 'block';
+                document.getElementById('blog-reading-view').style.display = 'none';
+                renderBlogListing(posts);
+                setupFiltersAndSearch(posts);
+            }
+
+            function renderBlogListing(postList) {
+                const grid = document.getElementById('public-blog-grid');
+                grid.innerHTML = '';
+
+                // Only render published status
+                const publishedPosts = postList.filter(p => p.status === 'Publicado');
+
+                if (publishedPosts.length === 0) {
+                    grid.innerHTML = `<p style="grid-column: span 3; text-align:center; color: var(--text-muted);">No se encontraron artículos.</p>`;
+                    return;
+                }
+
+                publishedPosts.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'blog-card';
+                    // Fallback cover image
+                    const coverImg = p.image || 'assets/images/electronics_board.png';
+                    
+                    card.innerHTML = `
+                        <div class="blog-card-image" style="background-image: url('${coverImg}');">
+                            <span class="blog-card-category">${p.category}</span>
+                        </div>
+                        <div class="blog-card-content">
+                            <span class="blog-card-date">${p.date}</span>
+                            <h3 class="blog-card-title">${p.title}</h3>
+                            <p class="blog-card-summary">${p.summary}</p>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => {
+                        window.location.href = `blog.html?post=${p.slug}`;
+                    });
+                    grid.appendChild(card);
+                });
+            }
+
+            function setupFiltersAndSearch(allPosts) {
+                const searchInput = document.getElementById('blog-search-input');
+                const categoryTabs = document.querySelectorAll('.category-tab');
+                
+                let activeCategory = 'todos';
+                let activeQuery = '';
+
+                const filterPosts = () => {
+                    let filtered = allPosts.filter(p => p.status === 'Publicado');
+                    
+                    if (activeCategory !== 'todos') {
+                        filtered = filtered.filter(p => p.category === activeCategory);
+                    }
+                    if (activeQuery) {
+                        filtered = filtered.filter(p => 
+                            p.title.toLowerCase().includes(activeQuery.toLowerCase()) || 
+                            p.summary.toLowerCase().includes(activeQuery.toLowerCase())
+                        );
+                    }
+                    renderBlogListing(filtered);
+                };
+
+                // Search key typing
+                searchInput.addEventListener('input', () => {
+                    activeQuery = searchInput.value.trim();
+                    filterPosts();
+                });
+
+                // Categories tabs clicks
+                categoryTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        categoryTabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        activeCategory = tab.getAttribute('data-category');
+                        filterPosts();
+                    });
+                });
+            }
+
+            function renderArticle(slug) {
+                const article = posts.find(p => p.slug === slug);
+                if (!article) {
+                    document.getElementById('article-title').textContent = "Artículo no encontrado";
+                    document.getElementById('article-content').innerHTML = "<p>El post solicitado no existe en nuestra base de datos.</p>";
+                    return;
+                }
+
+                // Render detail fields
+                document.getElementById('article-category').textContent = article.category;
+                document.getElementById('article-title').textContent = article.title;
+                document.getElementById('article-date').textContent = `Publicado el ${article.date}`;
+                
+                const cover = document.getElementById('article-cover');
+                cover.style.backgroundImage = `url('${article.image || "assets/images/electronics_board.png"}')`;
+
+                // Structure paragraphs
+                const contentEl = document.getElementById('article-content');
+                const paragraphs = article.content.split('\n\n');
+                contentEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+
+                // Render related
+                const relatedGrid = document.getElementById('related-blog-grid');
+                relatedGrid.innerHTML = '';
+                
+                const related = posts.filter(p => p.slug !== slug && p.status === 'Publicado').slice(0, 3);
+                related.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'blog-card';
+                    card.innerHTML = `
+                        <div class="blog-card-image" style="background-image: url('${p.image || "assets/images/electronics_board.png"}');">
+                            <span class="blog-card-category">${p.category}</span>
+                        </div>
+                        <div class="blog-card-content">
+                            <span class="blog-card-date">${p.date}</span>
+                            <h3 class="blog-card-title" style="font-size:1.1rem;">${p.title}</h3>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => {
+                        window.location.href = `blog.html?post=${p.slug}`;
+                    });
+                    relatedGrid.appendChild(card);
+                });
+            }
+        });
+    </script>
+
+    <!-- Shared Particles Script -->
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            
+            class P {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedY = Math.random() * -0.2 - 0.05;
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.y += this.speedY;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = 'rgba(124, 77, 255, 0.25)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            for(let i=0; i<30; i++) particles.push(new P());
+            
+            const anim = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(anim);
+            };
+            anim();
+        }
+    </script>
+</body>
+</html>

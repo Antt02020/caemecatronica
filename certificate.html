@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Certificado - CAE</title>
+    
+    <!-- Google Fonts - Inter & Playfair Display (for certificate elegance) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <!-- Custom stylesheet shared -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-base);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 80px 0;
+        }
+
+        .cert-verify-container {
+            max-width: 900px;
+            width: 90%;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Certificate Landscape Board */
+        .certificate-board {
+            width: 100%;
+            aspect-ratio: 1.414; /* Standard A4 landscape aspect ratio */
+            background: #060b24;
+            border: 15px double rgba(124, 77, 255, 0.4);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 50px rgba(124, 77, 255, 0.15);
+            padding: 3rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+        }
+
+        /* Circuit pattern overlays in certificate corners */
+        .cert-circuit-overlay {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .top-left-circuit {
+            top: 10px;
+            left: 10px;
+            border-left: 2px solid var(--primary);
+            border-top: 2px solid var(--primary);
+        }
+
+        .bottom-right-circuit {
+            bottom: 10px;
+            right: 10px;
+            border-right: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .cert-crest {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .cert-crest-logo {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            background: rgba(124, 77, 255, 0.1);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 0 0 15px var(--primary-glow-subtle);
+        }
+
+        .cert-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .cert-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1.5rem;
+        }
+
+        .cert-recipient-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .cert-recipient-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-style: italic;
+            font-weight: 600;
+            background: var(--grad-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .cert-explanation {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 620px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .cert-bottom-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: auto;
+        }
+
+        .cert-sign-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+        }
+
+        .cert-signature-svg {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: var(--accent);
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cert-sign-line {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0.5rem 0;
+        }
+
+        .cert-sign-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .cert-qr-panel {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            text-align: left;
+        }
+
+        .cert-qr-svg-wrapper {
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            border-radius: 4px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .cert-verification-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .cert-id-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .cert-date-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Status verify alert */
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid rgba(0, 230, 118, 0.25);
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            color: #00E676;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.05);
+        }
+
+        /* Print Media Styles to output landscape PDF clean */
+        @media print {
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .cert-verify-container {
+                width: 100% !important;
+                max-width: none !important;
+            }
+            .certificate-board {
+                border: 10px double #7C4DFF !important;
+                background: #060b24 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                page-break-after: avoid !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            header, footer, .verification-badge, .export-toolbar, #particles-canvas, .btn-back-dashboard {
+                display: none !important;
+            }
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Particles -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <div class="cert-verify-container">
+        
+        <!-- Official verify message box -->
+        <div class="verification-badge" id="verification-status-alert">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Certificado Verificado Oficialmente
+        </div>
+
+        <!-- The Certificate Canvas Board -->
+        <div class="certificate-board">
+            <div class="cert-circuit-overlay top-left-circuit"></div>
+            <div class="cert-circuit-overlay bottom-right-circuit"></div>
+
+            <!-- Crest logo top -->
+            <div class="cert-crest">
+                <div class="cert-crest-logo">CAE</div>
+                <span>Capacitación Avanzada en Electrónica</span>
+            </div>
+
+            <!-- Title -->
+            <div>
+                <h1 class="cert-title">Certificado de Aprobación</h1>
+                <div class="cert-subtitle">Otorgado con distinción académica a:</div>
+            </div>
+
+            <!-- Recipient name -->
+            <div>
+                <span class="cert-recipient-name" id="cert-name">Estudiante de Ejemplo</span>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <p class="cert-explanation" id="cert-desc-text">
+                    Por haber cursado y aprobado satisfactoriamente todos los módulos teórico-prácticos correspondientes al programa de especialización de <strong>Electrónica Aplicada</strong> de la plataforma de educación online de CAE.
+                </p>
+            </div>
+
+            <!-- Bottom Row: Signatures and QR Verification -->
+            <div class="cert-bottom-row">
+                <!-- Signature left -->
+                <div class="cert-sign-panel">
+                    <span class="cert-signature-svg">C. Valenzuela</span>
+                    <div class="cert-sign-line"></div>
+                    <span class="cert-sign-label">Director Académico CAE</span>
+                </div>
+
+                <!-- QR verify right -->
+                <div class="cert-qr-panel">
+                    <div class="cert-qr-svg-wrapper">
+                        <!-- Clean vector SVG QR code representation -->
+                        <svg width="72" height="72" viewBox="0 0 100 100">
+                            <!-- Outer square -->
+                            <rect x="0" y="0" width="25" height="25" fill="#000"/>
+                            <rect x="5" y="5" width="15" height="15" fill="#fff"/>
+                            <rect x="8" y="8" width="9" height="9" fill="#000"/>
+
+                            <rect x="75" y="0" width="25" height="25" fill="#000"/>
+                            <rect x="80" y="5" width="15" height="15" fill="#fff"/>
+                            <rect x="83" y="8" width="9" height="9" fill="#000"/>
+
+                            <rect x="0" y="75" width="25" height="25" fill="#000"/>
+                            <rect x="5" y="80" width="15" height="15" fill="#fff"/>
+                            <rect x="8" y="83" width="9" height="9" fill="#000"/>
+                            
+                            <!-- Internal mock QR bits -->
+                            <rect x="35" y="10" width="10" height="15" fill="#000"/>
+                            <rect x="55" y="15" width="15" height="10" fill="#000"/>
+                            <rect x="40" y="40" width="20" height="20" fill="#000"/>
+                            <rect x="45" y="45" width="10" height="10" fill="#fff"/>
+                            <rect x="75" y="45" width="15" height="10" fill="#000"/>
+                            <rect x="45" y="70" width="10" height="15" fill="#000"/>
+                            <rect x="80" y="80" width="10" height="10" fill="#000"/>
+                            <rect x="65" y="75" width="10" height="10" fill="#000"/>
+                        </svg>
+                    </div>
+                    <div class="cert-verification-details">
+                        <span class="cert-id-label" id="cert-id-val">ID: CAE-ELEC-17826</span>
+                        <span class="cert-date-label" id="cert-date-val">Fecha: 30 de Mayo de 2026</span>
+                        <span class="cert-date-label" style="opacity: 0.6;">cae.edu.pe/verify</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export controls bottom -->
+        <div class="export-toolbar" style="justify-content: center;">
+            <a href="dashboard.html" class="btn btn-outline">Volver al Campus</a>
+            <button class="btn btn-primary" onclick="window.print()">Descargar Certificado (PDF)</button>
+        </div>
+
+    </div>
+
+    <!-- Parameter routing script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Route bindings from query parameters or fallback
+            const nameParam = urlParams.get('name') || 'Estudiante de Especialidad';
+            const courseParam = urlParams.get('c') || 'electronica';
+            const idParam = urlParams.get('id') || `CAE-${courseParam.slice(0,3).toUpperCase()}-${Math.floor(Math.random()*90000 + 10000)}`;
+            
+            // Format issued date
+            const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const today = new Date();
+            const dateStr = `${today.getDate()} de ${months[today.getMonth()]} de ${today.getFullYear()}`;
+
+            // Bind values to DOM
+            document.getElementById('cert-name').textContent = nameParam;
+            document.getElementById('cert-id-val').textContent = `ID: ${idParam}`;
+            document.getElementById('cert-date-val').textContent = `Fecha: ${dateStr}`;
+
+            const descText = document.getElementById('cert-desc-text');
+            if (courseParam.toLowerCase() === 'mecatronica') {
+                descText.innerHTML = `Por haber cursado y aprobado satisfactoriamente todos los módulos teórico-prácticos correspondientes al programa de especialización de <strong>Mecatrónica Industrial</strong> de la plataforma de educación online de CAE.`;
+            } else {
+                descText.innerHTML = `Por haber cursado y aprobado satisfactoriamente todos los módulos teórico-prácticos correspondientes al programa de especialización de <strong>Electrónica Aplicada</strong> de la plataforma de educación online de CAE.`;
+            }
+        });
+    </script>
+
+    <!-- Shared Particles Script -->
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            
+            class P {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedY = Math.random() * -0.2 - 0.05;
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.y += this.speedY;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = 'rgba(124, 77, 255, 0.25)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            for(let i=0; i<30; i++) particles.push(new P());
+            
+            const anim = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(anim);
+            };
+            anim();
+        }
+    </script>
+</body>
+</html>

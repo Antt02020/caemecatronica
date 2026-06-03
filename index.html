@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CAE - Capacitación Avanzada en Electrónica. Plataforma online de cursos especializados en Electrónica y Mecatrónica. Aprende a tu ritmo con proyectos reales.">
+    <meta name="keywords" content="electrónica, mecatrónica, cursos online, robótica, PCB, microcontroladores, automatización, ingeniería">
+    <meta name="author" content="CAE">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cae.edu.pe/">
+    <meta property="og:title" content="CAE - Capacitación Avanzada en Electrónica y Mecatrónica">
+    <meta property="og:description" content="Plataforma online de cursos especializados en Electrónica y Mecatrónica. Proyectos prácticos y certificados verificables.">
+    <meta property="og:image" content="assets/images/hero_processor.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="CAE - Capacitación Avanzada en Electrónica">
+    <meta property="twitter:description" content="Plataforma online de cursos especializados en Electrónica y Mecatrónica. Proyectos prácticos y certificados verificables.">
+    <meta property="twitter:image" content="assets/images/hero_processor.png">
+
+    <title>CAE - Capacitación Avanzada en Electrónica</title>
+
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JavaScript -->
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- Glowing Background Lights -->
+    <div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-3" aria-hidden="true"></div>
+
+    <!-- Header Navigation -->
+    <header class="main-header" id="header">
+        <div class="header-container">
+            <a href="#hero" class="logo" id="logo" aria-label="CAE Inicio">
+                <span class="logo-accent">C</span>AE
+            </a>
+            
+            <button class="mobile-nav-toggle" id="mobile-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Menú de navegación">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <nav class="primary-nav" id="primary-navigation">
+                <ul class="nav-list">
+                    <li><a href="#hero" class="nav-link active">Inicio</a></li>
+                    <li><a href="#about" class="nav-link">Sobre CAE</a></li>
+                    <li><a href="#areas" class="nav-link">Cursos</a></li>
+                    <li><a href="#benefits" class="nav-link">Ventajas</a></li>
+                    <li><a href="#process" class="nav-link">Pasos</a></li>
+                    <li><a href="#pricing" class="nav-link">Precios</a></li>
+                    <li><a href="#blog" class="nav-link">Blog</a></li>
+                    <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <div class="auth-guest-actions" id="auth-guest-actions">
+                        <a href="#login" class="btn btn-outline" id="nav-login-btn">Iniciar sesión</a>
+                        <a href="#register" class="btn btn-primary" id="nav-register-btn">Registrarse</a>
+                    </div>
+                    <div class="user-profile-badge" id="user-profile-badge" style="display: none;">
+                        <button class="avatar-btn" id="avatar-btn" aria-label="Menú de usuario">
+                            <span class="user-avatar" id="user-avatar-initials">U</span>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown" aria-hidden="true">
+                            <div class="user-dropdown-info">
+                                <span class="user-dropdown-name" id="user-dropdown-name">Usuario</span>
+                                <span class="user-dropdown-role" id="user-dropdown-role">Plan Profesional</span>
+                                <span class="user-dropdown-career" id="user-dropdown-career">Electrónica</span>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <button class="dropdown-item" id="nav-logout-btn">Cerrar sesión</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="section-hero" id="hero" aria-label="Introducción a CAE">
+            <div class="container hero-container">
+                <div class="hero-content scroll-reveal fade-in-up">
+                    <span class="eyebrow" id="hero-eyebrow">Capacitación Avanzada en Electrónica</span>
+                    <h1 class="headline" id="hero-headline">
+                        <span class="gradient-text">Aprende. Innova.</span><br>
+                        Transforma tu futuro.
+                    </h1>
+                    <p class="description" id="hero-desc">
+                        Plataforma online de cursos especializados en Electrónica y Mecatrónica. Aprende a tu ritmo con clases grabadas, proyectos prácticos y certificado al finalizar.
+                    </p>
+                    
+                    <ul class="features-list" id="hero-features" role="list">
+                        <li>
+                            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Clases grabadas 24/7 para ti</span>
+                        </li>
+                        <li>
+                            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Proyectos prácticos</span>
+                        </li>
+                        <li>
+                            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Certificados verificables</span>
+                        </li>
+                        <li>
+                            <svg class="icon-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Acceso de por vida</span>
+                        </li>
+                    </ul>
+
+                    <div class="hero-actions">
+                        <a href="#areas" class="btn btn-primary" id="hero-primary-btn">Explorar Cursos</a>
+                        <a href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer" class="btn btn-outline" id="hero-whatsapp-btn">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.967C16.59 2.016 14.11 1.008 11.48 1.007c-5.442 0-9.867 4.373-9.87 9.802-.001 1.772.477 3.504 1.384 5.047l-.995 3.637 3.73-.969zm13.111-7.25c-.274-.136-1.62-.788-1.872-.878-.25-.09-.434-.136-.617.136-.182.271-.706.878-.865 1.058-.16.18-.32.203-.594.068-.274-.136-1.157-.42-2.204-1.341-.815-.717-1.365-1.604-1.525-1.875-.16-.271-.017-.417.12-.553.123-.122.274-.317.411-.475.137-.158.183-.271.274-.452.09-.18.046-.339-.023-.475-.069-.136-.617-1.463-.846-2.005-.222-.533-.467-.46-.64-.469-.166-.008-.356-.01-.546-.01-.19 0-.503.071-.766.353-.263.283-1.007.971-1.007 2.367 0 1.396 1.03 2.748 1.173 2.94.143.19 2.026 3.053 4.908 4.275.685.29 1.22.464 1.636.594.688.216 1.314.186 1.81.114.552-.08 1.62-.65 1.848-1.247.228-.597.228-1.107.16-1.217-.069-.11-.25-.203-.524-.339z"/>
+                            </svg>
+                            Inscríbete por WhatsApp
+                        </a>
+                    </div>
+
+                    <div class="social-proof" id="hero-social">
+                        <span class="indicator-dot"></span>
+                        <span>+3,000 estudiantes ya están transformando su carrera</span>
+                    </div>
+                </div>
+
+                <div class="hero-visual scroll-reveal fade-in-right">
+                    <div class="processor-wrapper">
+                        <!-- Holographic circuit animation lines -->
+                        <div class="circuit-ring circuit-ring-1"></div>
+                        <div class="circuit-ring circuit-ring-2"></div>
+                        <div class="circuit-ring circuit-ring-3"></div>
+                        <img src="assets/images/hero_processor.png" alt="Microchip futurista con logotipo CAE y circuitos luminosos violeta" class="processor-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section-about" id="about" aria-label="Acerca de nosotros">
+            <div class="container about-container">
+                <div class="about-visual scroll-reveal fade-in-left">
+                    <div class="about-gallery">
+                        <div class="gallery-item item-1">
+                            <img src="assets/images/student_learning.png" alt="Estudiante soldando placa electrónica en laboratorio">
+                        </div>
+                        <div class="gallery-item item-2">
+                            <img src="assets/images/electronics_board.png" alt="Placa electrónica profesional con luces violeta">
+                        </div>
+                        <div class="gallery-item item-3">
+                            <img src="assets/images/robotics_project.png" alt="Proyecto de robótica y programación">
+                        </div>
+                        <!-- Floating Glassmorphism Card -->
+                        <div class="floating-card" id="about-floating-card">
+                            <span class="card-title">Plataforma educativa</span>
+                            <span class="card-value gradient-text">100% online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-content scroll-reveal fade-in-up">
+                    <span class="eyebrow" id="about-eyebrow">SOBRE CAE</span>
+                    <h2 class="section-title" id="about-title">Educación de calidad para ingenieros del mañana</h2>
+                    <p class="description" id="about-desc">
+                        En CAE formamos profesionales y entusiastas de la tecnología con conocimientos sólidos y aplicables. Nuestra metodología combina teoría, práctica y proyectos reales para que aprendas haciendo.
+                    </p>
+                    
+                    <ul class="bullets-list" id="about-bullets" role="list">
+                        <li>
+                            <div class="bullet-icon-wrapper">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <span>Contenido actualizado y relevante</span>
+                        </li>
+                        <li>
+                            <div class="bullet-icon-wrapper">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <span>Aprende desde cualquier dispositivo</span>
+                        </li>
+                        <li>
+                            <div class="bullet-icon-wrapper">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <span>Comunidad de estudiantes y soporte</span>
+                        </li>
+                        <li>
+                            <div class="bullet-icon-wrapper">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <span>Certificación al completar cada módulo</span>
+                        </li>
+                    </ul>
+
+                    <div class="about-action">
+                        <a href="#areas" class="btn btn-outline" id="about-btn">Conoce más sobre CAE</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Study Areas Section -->
+        <section class="section-areas" id="areas" aria-label="Áreas de estudio">
+            <div class="container">
+                <div class="section-header scroll-reveal fade-in-up">
+                    <h2 class="section-title text-center">Explora nuestras áreas de estudio</h2>
+                    <p class="section-subtitle text-center">Cursos diseñados para llevarte de principiante a experto en las áreas más demandadas de la industria.</p>
+                </div>
+
+                <div class="areas-grid">
+                    <!-- Area Card: Electronica -->
+                    <div class="area-card scroll-reveal fade-in-up" id="card-electronica">
+                        <div class="area-image-wrapper">
+                            <img src="assets/images/study_electronics.png" alt="Macro close-up de placa electrónica" class="area-img">
+                            <div class="area-overlay"></div>
+                        </div>
+                        <div class="area-content">
+                            <h3 class="area-card-title">Electrónica</h3>
+                            <p class="area-description">Desde los fundamentos hasta el diseño avanzado de circuitos electrónicos. Ideal para estudiantes, técnicos e ingenieros.</p>
+                            
+                            <ul class="area-topics" role="list">
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Circuitos analógicos y digitales
+                                </li>
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Microcontroladores y FPGA
+                                </li>
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Diseño de PCB
+                                </li>
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Instrumentación electrónica
+                                </li>
+                            </ul>
+
+                            <a href="#contacto" class="btn btn-primary area-btn" id="btn-elec-action">Ver cursos de Electrónica</a>
+                        </div>
+                        <!-- Lock Overlay -->
+                        <div class="card-lock-overlay" id="lock-electronica" style="display: none;">
+                            <div class="lock-blur-bg"></div>
+                            <div class="lock-content">
+                                <svg class="icon-lock-md" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <h4>Contenido Bloqueado</h4>
+                                <p>Este material pertenece a otra carrera de estudio. Regístrate en Electrónica para desbloquearlo.</p>
+                                <button class="btn btn-primary btn-sm request-unlock-btn" id="unlock-elec-btn">Cambiar Suscripción</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Area Card: Mecatronica -->
+                    <div class="area-card scroll-reveal fade-in-up" id="card-mecatronica" style="animation-delay: 0.15s;">
+                        <div class="area-image-wrapper">
+                            <img src="assets/images/study_mecatronica.png" alt="Brazo robótico industrial futurista" class="area-img">
+                            <div class="area-overlay"></div>
+                        </div>
+                        <div class="area-content">
+                            <h3 class="area-card-title">Mecatrónica</h3>
+                            <p class="area-description">Integra mecánica, electrónica y programación para crear sistemas inteligentes y automatizados.</p>
+                            
+                            <ul class="area-topics" role="list">
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Robótica y automatización
+                                </li>
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Control de motores y sensores
+                                </li>
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    PC y sistemas embebidos
+                                </li>
+                                <li>
+                                    <svg class="topic-dot" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>
+                                    Diseño mecatrónico
+                                </li>
+                            </ul>
+
+                            <a href="#contacto" class="btn btn-primary area-btn" id="btn-meca-action">Ver cursos de Mecatrónica</a>
+                        </div>
+                        <!-- Lock Overlay -->
+                        <div class="card-lock-overlay" id="lock-mecatronica" style="display: none;">
+                            <div class="lock-blur-bg"></div>
+                            <div class="lock-content">
+                                <svg class="icon-lock-md" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <h4>Contenido Bloqueado</h4>
+                                <p>Este material pertenece a otra carrera de estudio. Regístrate en Mecatrónica para desbloquearlo.</p>
+                                <button class="btn btn-primary btn-sm request-unlock-btn" id="unlock-meca-btn">Cambiar Suscripción</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="section-benefits" id="benefits" aria-label="Ventajas de CAE">
+            <div class="container">
+                <div class="section-header scroll-reveal fade-in-up">
+                    <h2 class="section-title text-center">Ventajas que impulsan tu aprendizaje</h2>
+                </div>
+
+                <div class="benefits-grid">
+                    <!-- Benefit 1 -->
+                    <div class="benefit-card scroll-reveal fade-in-up">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <h3 class="benefit-title">Aprende a tu ritmo</h3>
+                        <p class="benefit-desc">Accede a las clases cuando quieras, desde donde estés.</p>
+                    </div>
+
+                    <!-- Benefit 2 -->
+                    <div class="benefit-card scroll-reveal fade-in-up" style="animation-delay: 0.1s;">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3 class="benefit-title">Acceso de por vida</h3>
+                        <p class="benefit-desc">Revisa el contenido siempre que lo necesites.</p>
+                    </div>
+
+                    <!-- Benefit 3 -->
+                    <div class="benefit-card scroll-reveal fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        </div>
+                        <h3 class="benefit-title">Proyectos prácticos</h3>
+                        <p class="benefit-desc">Aplica lo aprendido con proyectos reales.</p>
+                    </div>
+
+                    <!-- Benefit 4 -->
+                    <div class="benefit-card scroll-reveal fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                        </div>
+                        <h3 class="benefit-title">Certificado digital</h3>
+                        <p class="benefit-desc">Obtén tu certificado e impulsa tu currículum.</p>
+                    </div>
+
+                    <!-- Benefit 5 -->
+                    <div class="benefit-card scroll-reveal fade-in-up" style="animation-delay: 0.4s;">
+                        <div class="benefit-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        </div>
+                        <h3 class="benefit-title">Pago seguro</h3>
+                        <p class="benefit-desc">Paga de forma segura con tarjeta o transferencia.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Steps Section -->
+        <section class="section-steps" id="process" aria-label="Cómo empezar">
+            <div class="container">
+                <div class="section-header scroll-reveal fade-in-up">
+                    <h2 class="section-title text-center">Empieza en 3 simples pasos</h2>
+                </div>
+
+                <div class="steps-flow">
+                    <!-- Step 1 -->
+                    <div class="step-item scroll-reveal fade-in-up">
+                        <div class="step-number-container">
+                            <span class="step-num gradient-text">01</span>
+                            <div class="step-connector"></div>
+                        </div>
+                        <h3 class="step-title">Regístrate gratis</h3>
+                        <p class="step-desc">Crea tu cuenta en segundos y accede a la plataforma.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-item scroll-reveal fade-in-up" style="animation-delay: 0.15s;">
+                        <div class="step-number-container">
+                            <span class="step-num gradient-text">02</span>
+                            <div class="step-connector"></div>
+                        </div>
+                        <h3 class="step-title">Elige tu curso</h3>
+                        <p class="step-desc">Explora los módulos disponibles y selecciona el que más te guste.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-item scroll-reveal fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="step-number-container">
+                            <span class="step-num gradient-text">03</span>
+                        </div>
+                        <h3 class="step-title">Paga y comienza</h3>
+                        <p class="step-desc">Realiza tu pago de forma segura y empieza a aprender hoy mismo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="section-pricing" id="pricing" aria-label="Planes y Precios">
+            <div class="container">
+                <div class="section-header scroll-reveal fade-in-up">
+                    <h2 class="section-title text-center">Elige el plan que mejor se adapte a ti</h2>
+                </div>
+
+                <div class="pricing-grid">
+                    <!-- Plan 1: Basico -->
+                    <div class="price-card scroll-reveal fade-in-up">
+                        <div class="price-header">
+                            <h3 class="plan-name">Básico</h3>
+                            <div class="plan-price-block">
+                                <span class="currency">USD</span>
+                                <span class="price">$19</span>
+                            </div>
+                            <span class="period">Pago único por curso</span>
+                        </div>
+                        <ul class="plan-features" role="list">
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Acceso a 1 curso</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Clases grabadas</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Material de apoyo</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Certificado digital</li>
+                        </ul>
+                        <button class="btn btn-outline plan-btn">Seleccionar plan</button>
+                    </div>
+
+                    <!-- Plan 2: Profesional (Highlight) -->
+                    <div class="price-card highlighted scroll-reveal fade-in-up" style="animation-delay: 0.15s;">
+                        <div class="badge-recommended">Recomendado</div>
+                        <div class="price-header">
+                            <h3 class="plan-name">Profesional</h3>
+                            <div class="plan-price-block">
+                                <span class="currency">USD</span>
+                                <span class="price">$49</span>
+                            </div>
+                            <span class="period">Pago único</span>
+                        </div>
+                        <ul class="plan-features" role="list">
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Acceso a todos los cursos</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Nuevos cursos incluidos</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Proyectos prácticos</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Certificado digital</li>
+                        </ul>
+                        <button class="btn btn-primary plan-btn">Seleccionar plan</button>
+                    </div>
+
+                    <!-- Plan 3: Premium -->
+                    <div class="price-card scroll-reveal fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="price-header">
+                            <h3 class="plan-name">Premium</h3>
+                            <div class="plan-price-block">
+                                <span class="currency">USD</span>
+                                <span class="price">$89</span>
+                            </div>
+                            <span class="period">Pago único</span>
+                        </div>
+                        <ul class="plan-features" role="list">
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Acceso total a la plataforma</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Clases en vivo exclusivas</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Soporte prioritario</li>
+                            <li><svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Certificado digital avanzado</li>
+                        </ul>
+                        <button class="btn btn-outline plan-btn">Seleccionar plan</button>
+                    </div>
+                </div>
+
+                <!-- Secure Payments Info -->
+                <div class="secure-payments scroll-reveal fade-in-up">
+                    <div class="payments-content">
+                        <div class="payments-title-wrapper">
+                            <svg class="icon-lock" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <h4 class="secure-title">Pagos 100% seguros</h4>
+                        </div>
+                        <p class="secure-desc">Aceptamos tarjetas, transferencias y pagos internacionales.</p>
+                    </div>
+                    
+                    <div class="payment-methods-grid">
+                        <span class="payment-method-badge">Visa</span>
+                        <span class="payment-method-badge">Mastercard</span>
+                        <span class="payment-method-badge">American Express</span>
+                        <span class="payment-method-badge">PayPal</span>
+                        <span class="payment-method-badge">Transferencia bancaria</span>
+                        <span class="payment-method-badge">Pago internacional</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Final Section -->
+        <section class="section-cta" id="final_cta" aria-label="Llamado a la acción final">
+            <div class="container cta-container">
+                <div class="cta-inner scroll-reveal fade-in-up">
+                    <!-- Tech overlay design element -->
+                    <div class="cta-grid-overlay"></div>
+                    
+                    <div class="cta-text-content">
+                        <h2 class="cta-title">¿Listo para llevar tu conocimiento al siguiente nivel?</h2>
+                        <p class="cta-desc">Únete a miles de estudiantes que ya están aprendiendo con CAE.</p>
+                        
+                        <div class="cta-actions">
+                            <a href="#areas" class="btn btn-primary">Explorar cursos</a>
+                            <a href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.967C16.59 2.016 14.11 1.008 11.48 1.007c-5.442 0-9.867 4.373-9.87 9.802-.001 1.772.477 3.504 1.384 5.047l-.995 3.637 3.73-.969zm13.111-7.25c-.274-.136-1.62-.788-1.872-.878-.25-.09-.434-.136-.617.136-.182.271-.706.878-.865 1.058-.16.18-.32.203-.594.068-.274-.136-1.157-.42-2.204-1.341-.815-.717-1.365-1.604-1.525-1.875-.16-.271-.017-.417.12-.553.123-.122.274-.317.411-.475.137-.158.183-.271.274-.452.09-.18.046-.339-.023-.475-.069-.136-.617-1.463-.846-2.005-.222-.533-.467-.46-.64-.469-.166-.008-.356-.01-.546-.01-.19 0-.503.071-.766.353-.263.283-1.007.971-1.007 2.367 0 1.396 1.03 2.748 1.173 2.94.143.19 2.026 3.053 4.908 4.275.685.29 1.22.464 1.636.594.688.216 1.314.186 1.81.114.552-.08 1.62-.65 1.848-1.247.228-.597.228-1.107.16-1.217-.069-.11-.25-.203-.524-.339z"/>
+                                </svg>
+                                Inscríbete por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="cta-image-wrapper">
+                        <img src="assets/images/cta_student.png" alt="Estudiante trabajando en un proyecto electrónico">
+                        <div class="cta-img-glow"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer" id="contacto">
+        <div class="container footer-container">
+            <div class="footer-grid">
+                <!-- Column 1: CAE -->
+                <div class="footer-column col-info scroll-reveal fade-in-up">
+                    <a href="#hero" class="footer-logo" aria-label="CAE Inicio">
+                        <span class="logo-accent">C</span>AE
+                    </a>
+                    <p class="footer-desc">CAE es una plataforma educativa online especializada en Electrónica y Mecatrónica.</p>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="footer-column scroll-reveal fade-in-up" style="animation-delay: 0.1s;">
+                    <h4 class="footer-col-title">Enlaces rápidos</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="#hero" class="footer-link">Inicio</a></li>
+                        <li><a href="#about" class="nav-link">Sobre CAE</a></li>
+                        <li><a href="#areas" class="footer-link">Cursos</a></li>
+                        <li><a href="#benefits" class="footer-link">Ventajas</a></li>
+                        <li><a href="#process" class="footer-link">Pasos</a></li>
+                        <li><a href="#pricing" class="footer-link">Planes y Precios</a></li>
+                        <li><a href="#blog" class="footer-link">Blog</a></li>
+                        <li><a href="#contacto" class="footer-link">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Support -->
+                <div class="footer-column scroll-reveal fade-in-up" style="animation-delay: 0.2s;">
+                    <h4 class="footer-col-title">Soporte</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="#faq" class="footer-link">Preguntas frecuentes</a></li>
+                        <li><a href="#privacy" class="footer-link">Políticas de privacidad</a></li>
+                        <li><a href="#terms" class="footer-link">Términos y condiciones</a></li>
+                        <li><a href="#support" class="footer-link">Soporte técnico</a></li>
+                        <li><a href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer" class="footer-link">WhatsApp</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter -->
+                <div class="footer-column col-newsletter scroll-reveal fade-in-up" style="animation-delay: 0.3s;">
+                    <h4 class="footer-col-title">Suscríbete al boletín</h4>
+                    <p class="footer-desc">Recibe noticias, nuevos cursos y promociones exclusivas.</p>
+                    <form class="newsletter-form" id="newsletter-form" novalidate>
+                        <div class="input-group">
+                            <label for="newsletter-email" class="sr-only">Correo electrónico</label>
+                            <input type="email" id="newsletter-email" placeholder="Tu correo electrónico" required aria-required="true">
+                            <button type="submit" class="btn btn-primary btn-icon" aria-label="Suscribirse">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <span class="form-feedback" id="newsletter-feedback" aria-live="polite"></span>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="copyright">© 2024 CAE - Capacitación Avanzada en Electrónica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal Container -->
+    <div class="auth-modal-overlay" id="auth-modal-overlay" aria-hidden="true">
+        <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+            <button class="auth-modal-close" id="auth-modal-close" aria-label="Cerrar modal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <!-- VIEW 1: LOGIN -->
+            <div class="auth-view" id="auth-view-login">
+                <h3 class="auth-modal-title" id="auth-modal-title">Iniciar sesión</h3>
+                <p class="auth-modal-subtitle">Accede a tu aula virtual y continúa aprendiendo.</p>
+                <form class="auth-form" id="login-form" novalidate>
+                    <div class="form-group">
+                        <label for="login-email">Correo electrónico</label>
+                        <input type="email" id="login-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label for="login-password">Contraseña</label>
+                            <button type="button" class="form-link-btn" id="to-forgot-btn">¿Olvidaste tu contraseña?</button>
+                        </div>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Ingresar</button>
+                </form>
+                <p class="auth-modal-footer">¿No tienes cuenta? <button type="button" class="form-link-btn" id="to-register-btn">Regístrate</button></p>
+            </div>
+
+            <!-- VIEW 2: REGISTER -->
+            <div class="auth-view" id="auth-view-register" style="display: none;">
+                <h3 class="auth-modal-title">Crear cuenta</h3>
+                <p class="auth-modal-subtitle">Comienza tu formación en tecnología hoy mismo.</p>
+                <form class="auth-form" id="register-form" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-firstname">Nombre</label>
+                            <input type="text" id="reg-firstname" required placeholder="Juan">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-lastname">Apellido</label>
+                            <input type="text" id="reg-lastname" required placeholder="Pérez">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Correo electrónico</label>
+                        <input type="email" id="reg-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-password">Contraseña</label>
+                            <input type="password" id="reg-password" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-password">Confirmar contraseña</label>
+                            <input type="password" id="reg-confirm-password" required placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-career">Carrera</label>
+                            <select id="reg-career" required class="form-select">
+                                <option value="Electrónica">Electrónica</option>
+                                <option value="Mecatrónica">Mecatrónica</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-plan">Plan</label>
+                            <select id="reg-plan" required class="form-select">
+                                <option value="Básico">Básico ($19)</option>
+                                <option value="Profesional" selected>Profesional ($49)</option>
+                                <option value="Premium">Premium ($89)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-checkbox-group">
+                        <input type="checkbox" id="reg-terms" required>
+                        <label for="reg-terms" style="color:#A8B0C5; font-size:0.85rem;">Acepto los <a href="#terms" style="color:#7C4DFF; text-decoration:none;">términos y condiciones</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Registrarse</button>
+                </form>
+                <p class="auth-modal-footer">¿Ya tienes cuenta? <button type="button" class="form-link-btn" id="to-login-btn">Inicia sesión</button></p>
+            </div>
+
+            <!-- VIEW 3: FORGOT PASSWORD -->
+            <div class="auth-view" id="auth-view-forgot" style="display: none;">
+                <h3 class="auth-modal-title">Recuperar contraseña</h3>
+                <p class="auth-modal-subtitle">Ingresa tu correo y te enviaremos un enlace de recuperación.</p>
+                <form class="auth-form" id="forgot-form" novalidate>
+                    <div class="form-group">
+                        <label for="forgot-email">Correo electrónico</label>
+                        <input type="email" id="forgot-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Enviar enlace</button>
+                </form>
+                <p class="auth-modal-footer">Volver a <button type="button" class="form-link-btn" id="to-login-from-forgot-btn">Iniciar sesión</button></p>
+            </div>
+
+            <!-- VIEW 4: RESET PASSWORD -->
+            <div class="auth-view" id="auth-view-reset" style="display: none;">
+                <h3 class="auth-modal-title">Restablecer contraseña</h3>
+                <p class="auth-modal-subtitle">Escribe tu nueva contraseña de acceso.</p>
+                <form class="auth-form" id="reset-form" novalidate>
+                    <div class="form-group">
+                        <label for="reset-password">Nueva contraseña</label>
+                        <input type="password" id="reset-password" required placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-confirm-password">Confirmar nueva contraseña</label>
+                        <input type="password" id="reset-confirm-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Guardar contraseña</button>
+                </form>
+                <p class="auth-modal-footer">Volver a <button type="button" class="form-link-btn" id="to-login-from-reset-btn">Iniciar sesión</button></p>
+            </div>
+            
+            <div class="auth-feedback" id="auth-feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+</body>
+</html>
