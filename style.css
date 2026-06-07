@@ -332,9 +332,9 @@ p {
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 1.25rem var(--padding-container);
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 2rem;                   /* gap uniforme entre logo, nav y actions */
     transition: var(--transition-smooth);
 }
 
@@ -362,16 +362,21 @@ p {
 
 .logo-img {
     max-width: 50px;
+    height: 50px;
+    width: 50px;
+    object-fit: contain;
+    display: block;
 }
 
-/* nav ocupa todo el espacio entre logo y actions */
+/* nav: centrar el menú en la cabecera (independiente del logo) */
 .primary-nav {
     display: flex;
     align-items: center;
-    flex: 1;
-    min-width: 0;
+    justify-content: center;
     gap: 1.5rem;
-    overflow: visible;           /* necesario para que el dropdown se vea */
+    overflow: visible;
+    z-index: 105;
+    /* grid column 2: centrado naturalmente */
 }
 
 /* la lista ocupa el espacio disponible dentro del nav */
@@ -433,6 +438,16 @@ p {
     align-items: center;
     gap: 0.75rem;
     flex-shrink: 0;
+    position: fixed;
+    right: var(--padding-container);
+    top: 1.25rem;
+    transform: none;
+    z-index: 110;
+    transition: top var(--transition-smooth);
+}
+
+.main-header.scrolled .nav-actions {
+    top: 0.875rem;
 }
 
 .auth-guest-actions {
@@ -1697,9 +1712,8 @@ p {
     }
     
     .nav-actions {
-        flex-direction: column;
-        width: 100%;
-        gap: 1rem;
+        justify-content: flex-end;
+        gap: 0.75rem;
     }
     
     .nav-actions .btn {
