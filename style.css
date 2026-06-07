@@ -1209,6 +1209,32 @@ p {
     display: block;
 }
 
+.payment-methods {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.payment-methods.pagopar {
+    max-width: 200px;
+}
+
+.payment-methods.ueno {
+    max-width: 250px;
+}
+
+.payment-methods.familiar {
+    max-width: 150px;
+    border-radius:8px;
+}
+
+.payment-methods:hover {
+    filter: brightness(0.9);
+    transform: scale(1.1);
+}
+
 .plan-features {
     list-style: none;
     display: flex;
@@ -1377,6 +1403,12 @@ p {
     height: 100%;
     background: radial-gradient(circle, transparent 40%, rgba(5, 8, 22, 0.6) 100%);
     pointer-events: none;
+}
+
+.whatsapp-icon {
+    color: #25D366;
+    margin-right: 5px;
+    margin-bottom: -2px;
 }
 
 /* ==========================================================================
