@@ -1705,8 +1705,13 @@ p {
 
 @media (max-width: 768px) {
     /* Mobile Menu Toggle Navigation styling */
+    .header-container {
+        grid-template-columns: 1fr auto;
+    }
+
     .mobile-nav-toggle {
         display: flex;
+        margin-left: 0;
     }
     
     .primary-nav {
@@ -1744,12 +1749,23 @@ p {
     }
     
     .nav-actions {
-        justify-content: flex-end;
+        position: static;
+        justify-content: center;
+        width: 100%;
         gap: 0.75rem;
     }
     
-    .nav-actions .btn {
+    .auth-guest-actions {
+        flex-wrap: wrap;
+        justify-content: center;
         width: 100%;
+    }
+
+    .nav-actions .btn {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: center;
+        white-space: nowrap;
     }
     
     /* Hamburger Menu Toggle Animation states */
