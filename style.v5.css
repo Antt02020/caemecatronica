@@ -353,6 +353,7 @@ p {
     flex-shrink: 0;              /* el logo nunca se comprime */
     position: relative;
     z-index: 110;
+    max-width: 60px;
 }
 
 .logo-accent {
