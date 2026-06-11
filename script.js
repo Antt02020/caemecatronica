@@ -898,6 +898,10 @@ function switchView(view) {
         }
     });
     clearFeedback();
+    const modalCard = document.querySelector('.auth-modal-card');
+    if (modalCard) {
+        modalCard.scrollTop = 0;
+    }
 }
 
 // Feedback alerts inside Modal

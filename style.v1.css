@@ -1226,7 +1226,7 @@ p {
 }
 
 .payment-methods.familiar {
-    max-width: 150px;
+    max-width: 190px;
     border-radius:8px;
 }
 
@@ -1729,7 +1729,7 @@ p {
         justify-content: center;
         align-items: flex-start;
         padding: 4rem 3rem;
-        gap: 3rem;
+        gap: 2rem;
         transition: var(--transition-smooth);
         z-index: 105;
         box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
@@ -1741,7 +1741,9 @@ p {
     
     .nav-list {
         flex-direction: column;
-        gap: 1.75rem;
+        align-items: flex-start;
+        gap: 1.25rem;
+        width: 100%;
     }
     
     .nav-link {
@@ -1753,6 +1755,7 @@ p {
         justify-content: center;
         width: 100%;
         gap: 0.75rem;
+        margin-bottom: 1rem;
     }
     
     .auth-guest-actions {
@@ -2043,8 +2046,10 @@ p {
     border-radius: var(--radius-lg);
     width: 90%;
     max-width: 480px;
+    max-height: 90vh;
     padding: 3rem 2.5rem;
     position: relative;
+    overflow-y: auto;
     transform: scale(0.95);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
