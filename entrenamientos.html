@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CAE - Capacitación Avanzada en Electrónica y Mecatrónica. Explora nuestra oferta formativa completa en diagnóstico mecatrónico, reparación de módulos ECU, programación e inyección electrónica.">
+    <meta name="keywords" content="electrónica, mecatrónica, cursos online, entrenamientos técnicos, diagnóstico automotriz, reparación ECU, inyección electrónica, robótica, PLCs">
+    <meta name="author" content="CAE">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cae.edu.pe/entrenamientos.html">
+    <meta property="og:title" content="Entrenamientos Especializados - CAE">
+    <meta property="og:description" content="Nuestra oferta formativa centralizada. Encuentra entrenamientos en Mecatrónica y Electrónica con acordeones interactivos y certificados de alta competencia.">
+    <meta property="og:image" content="assets/images/hero_processor.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Entrenamientos Especializados - CAE">
+    <meta property="twitter:description" content="Nuestra oferta formativa centralizada. Encuentra entrenamientos en Mecatrónica y Electrónica con acordeones interactivos y certificados de alta competencia.">
+    <meta property="twitter:image" content="assets/images/hero_processor.png">
+
+    <title>Nuestros Entrenamientos - CAE</title>
+
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.v2.css">
+
+    <!-- JavaScript -->
+    <script src="script.js" defer></script>
+
+    <style>
+        body {
+            background-color: var(--bg-base);
+            overflow-y: auto;
+        }
+
+        /* Hero Section */
+        .entrenamientos-hero {
+            padding: 180px 0 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .entrenamientos-hero .headline {
+            font-size: clamp(2.25rem, 5vw, 3.75rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Section Layouts */
+        .category-section {
+            padding: 5rem 0;
+            position: relative;
+            border-top: 1px solid rgba(124, 77, 255, 0.1);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        /* Category Card (Sticky Side) */
+        .category-intro-card {
+            position: sticky;
+            top: 120px;
+            background: radial-gradient(circle at top, rgba(124, 77, 255, 0.15) 0%, rgba(10, 16, 48, 0.9) 70%);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .category-intro-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(124, 77, 255, 0.2);
+        }
+
+        .category-intro-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--grad-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .category-intro-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Subcategory Block */
+        .subcategory-block {
+            margin-bottom: 3rem;
+        }
+
+        .subcategory-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .subcategory-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Accordion Component */
+        .accordion-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .accordion-item {
+            background: rgba(10, 16, 48, 0.45);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(124, 77, 255, 0.15);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .accordion-item:hover {
+            border-color: rgba(124, 77, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 0 20px rgba(124, 77, 255, 0.05);
+        }
+
+        .accordion-item.active {
+            border-color: var(--primary);
+            background: rgba(10, 16, 48, 0.85);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 30px rgba(124, 77, 255, 0.15);
+        }
+
+        .accordion-header {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 1.5rem;
+            text-align: left;
+            font-family: var(--font-sans);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-fast);
+        }
+
+        .accordion-header:focus {
+            outline: none;
+        }
+
+        .accordion-header svg {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .accordion-item.active .accordion-header svg {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .accordion-content-inner {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid rgba(124, 77, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .training-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Modules list inside details */
+        .training-modules-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .training-modules-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+        }
+
+        .training-modules-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .training-modules-list li {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .training-modules-list li svg {
+            color: var(--primary);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        /* Specs pills */
+        .training-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .spec-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Premium Notification (Toast overlay) */
+        .premium-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(10, 16, 48, 0.97);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(124, 77, 255, 0.45);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(124, 77, 255, 0.25);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slide-in-notification 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            max-width: 380px;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .notification-progress {
+            height: 3px;
+            background: linear-gradient(90deg, #7C4DFF, #9D6CFF);
+            width: 100%;
+            margin-top: 1rem;
+            transform-origin: left;
+            animation: shrink-progress 4s linear forwards;
+        }
+
+        @keyframes slide-in-notification {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes shrink-progress {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+
+        @media (max-width: 991px) {
+            .category-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            .category-intro-card {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .premium-notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- Glowing Background Lights -->
+    <div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-3" aria-hidden="true"></div>
+
+    <!-- Header Navigation -->
+    <header class="main-header scrolled" id="header">
+        <div class="header-container">
+            <a href="index.html" class="logo" id="logo" aria-label="CAE Inicio">
+                <img src="assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" />
+            </a>
+            
+            <button class="mobile-nav-toggle" id="mobile-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Menú de navegación">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <nav class="primary-nav" id="primary-navigation">
+                <ul class="nav-list" id="nav-list">
+                    <li><a href="index.html#hero" class="nav-link">Inicio</a></li>
+                    <li><a href="index.html#about" class="nav-link">Sobre CAE</a></li>
+                    <li><a href="entrenamientos.html" class="nav-link active">Entrenamientos</a></li>
+                    <li><a href="index.html#benefits" class="nav-link">Ventajas</a></li>
+                    <li><a href="index.html#process" class="nav-link">Pasos</a></li>
+                    <li><a href="index.html#pricing" class="nav-link">Precios</a></li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+
+                    <li class="more-menu" id="more-menu">
+                        <button class="more-btn">
+                            Ver más
+                        </button>
+                        <ul class="more-dropdown" id="more-dropdown"></ul>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <div class="auth-guest-actions" id="auth-guest-actions">
+                        <a href="#login" class="btn btn-outline" id="nav-login-btn">Iniciar sesión</a>
+                        <a href="#register" class="btn btn-primary" id="nav-register-btn">Registrarse</a>
+                    </div>
+                    <div class="user-profile-badge" id="user-profile-badge" style="display: none;">
+                        <button class="avatar-btn" id="avatar-btn" aria-label="Menú de usuario">
+                            <span class="user-avatar" id="user-avatar-initials">U</span>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown" aria-hidden="true">
+                            <div class="user-dropdown-info">
+                                <span class="user-dropdown-name" id="user-dropdown-name">Usuario</span>
+                                <span class="user-dropdown-role" id="user-dropdown-role">Plan Profesional</span>
+                                <span class="user-dropdown-career" id="user-dropdown-career">Electrónica</span>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <button class="dropdown-item" id="nav-logout-btn">Cerrar sesión</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="entrenamientos-hero">
+            <div class="container">
+                <span class="eyebrow">Catálogo Completo</span>
+                <h1 class="headline"><span class="gradient-text">Nuestros Entrenamientos</span></h1>
+                <p class="section-subtitle">Toda la oferta formativa especializada y avanzada de CAE centralizada en una única plataforma interactiva.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 1: MECATRÓNICA -->
+        <section class="category-section" id="mecatronica">
+            <div class="container">
+                <div class="category-grid">
+                    <!-- Intro Card sticky -->
+                    <div class="category-intro-card">
+                        <img src="assets/images/study_mecatronica.png" alt="Mecatrónica Industrial" class="category-intro-img">
+                        <h2 class="category-intro-title">Mecatrónica</h2>
+                        <p class="category-intro-desc">Fusión avanzada de mecánica industrial, electrónica de control y programación en sistemas de diagnóstico técnico y reparación de computadoras automotrices y pesadas.</p>
+                    </div>
+
+                    <!-- Accordion container -->
+                    <div class="subcategory-wrapper">
+                        <!-- Subcategory 1: Diagnóstico Mecatrónico -->
+                        <div class="subcategory-block">
+                            <h3 class="subcategory-title">Diagnóstico Mecatrónico</h3>
+                            
+                            <div class="accordion-list">
+                                <!-- Item 1 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Diagnóstico Mecatrónico de Vehículos Livianos
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Análisis, diagnóstico y resolución de fallas complejas en la mecatrónica de vehículos comerciales ligeros y particulares. Aprende a dominar sensores y multiplexados.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Redes de comunicación multiplexadas (CAN-bus, LIN-bus).</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Interpretación de señales analógicas y digitales de sensores críticos.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Pruebas con osciloscopio en tiempo real y protocolo OBD-II.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 40 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Verificable</span>
+                                                <span class="spec-pill">🖥️ Acceso 24/7</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="diag-meca-vehiculos-livianos" data-training-title="Diagnóstico Mecatrónico de Vehículos Livianos">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 2 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Diagnóstico Mecatrónico Sistema Scania
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Capacitación especializada en camiones y buses de la marca Scania. Diagnóstico de sistemas electrónicos de motor e inyección con equipos de nivel concesionario.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Arquitectura eléctrica y multiplexado Scania (DEC).</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Diagnóstico de sistemas de inyección PDE y HPI.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Software de diagnóstico SDP3 e interpretación de fallas.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 45 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Oficial</span>
+                                                <span class="spec-pill">⚙️ Prácticas en SDP3</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="diag-meca-scania" data-training-title="Diagnóstico Mecatrónico Sistema Scania">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 3 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Diagnóstico Mecatrónico Mercedes Benz
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Especialización en sistemas de control de vehículos comerciales y pesados Mercedes Benz. Diagnóstico de motores PLD / MR y sistemas SCR (BlueTec).</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Multiplexado avanzado en chasis Mercedes Benz.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Módulos de motor MR y dosificación de AdBlue.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Utilización del Star Diagnosis (Xentry) y osciloscopio en fallas MB.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 50 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Oficial</span>
+                                                <span class="spec-pill">💼 MB Star Scanner Pro</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="diag-meca-mercedes" data-training-title="Diagnóstico Mecatrónico Mercedes Benz">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 4 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Diagnóstico Mecatrónico Caterpillar
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Formación en la electrónica aplicada y control hidráulico electroasistido en maquinaria pesada e industrial Caterpillar.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Enlace de datos J1939 y CAT Data Link.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Inyección diésel electrónica HEUI y MEUI.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Software CAT ET (Electronic Technician) y calibraciones.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 55 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Caterpillar-Spec</span>
+                                                <span class="spec-pill">🚜 CAT ET Simulator</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="diag-meca-caterpillar" data-training-title="Diagnóstico Mecatrónico Caterpillar">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subcategory 2: Reparación de Módulos ECU -->
+                        <div class="subcategory-block">
+                            <h3 class="subcategory-title">Reparación de Módulos ECU</h3>
+                            
+                            <div class="accordion-list">
+                                <!-- Item 1 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación ECU Automotriz
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Aprende a diagnosticar, soldar y reparar fallas en placas de computadoras de motor (ECU) de vehículos ligeros, incluyendo reemplazo de transistores, reguladores y micros.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Arquitectura interna (fuentes conmutadas, drivers, memoria, micro).</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Técnicas profesionales de soldadura SMD y reflujo.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Lectura, escritura de memorias EEPROM y clonación de ECUs.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 60 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Hardware Master</span>
+                                                <span class="spec-pill">🔬 Soldadura Práctica</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-automotriz" data-training-title="Reparación ECU Automotriz">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 2 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación de Módulo de Control de Motor Scania
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Reparación a nivel de componente electrónico de módulos de gestión de motor Scania (módulos EMS S6, S7 y S8).</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Circuito de potencia y drivers de inyección en placas Scania EMS.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Reemplazo de transistores de control y reguladores de carga.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Pruebas con banco de simulación de sensores.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 40 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Oficial</span>
+                                                <span class="spec-pill">⚡ Reparación S6/S7/S8</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-scania-motor" data-training-title="Reparación de Módulo de Control de Motor Scania">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 3 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación de Módulo Coordinador Scania
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Especialización de alta demanda en el coordinador central COO7 de Scania, corazón de los sistemas multiplexados del vehículo.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Fallas térmicas comunes y problemas de bus de comunicación CAN.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Reballing y sustitución de microprocesadores y BGA.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Volcado y programación en memorias flash COO7.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 45 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Microsoldering</span>
+                                                <span class="spec-pill">🔧 Diagnóstico COO7</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-scania-coord" data-training-title="Reparación de Módulo Coordinador Scania">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 4 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación de Módulo Motor Mercedes Benz
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Reparación a nivel físico de módulos de control de inyección en motores Mercedes Benz (módulos PLD / MR).</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Arquitectura electrónica de la etapa MR y fuente interna de poder.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Diagnóstico y desbloqueo del inmovilizador en el micro.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Reemplazo de transistores de inyectores y reguladores.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 40 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado MB-Hardware</span>
+                                                <span class="spec-pill">📦 Prácticas PLD/MR</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-mercedes" data-training-title="Reparación de Módulo Motor Mercedes Benz">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 5 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación de Módulo Motor Cummins
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Reparación física y diagnóstico de computadoras de motor Cummins (modelos CM850, CM2150 y CM2250).</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Identificación de componentes en diagramas internos de Cummins.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Reemplazo de drivers de control EGR, mariposa y turbocompresor.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Protocolo JTAG / BDM para recuperación de módulos bloqueados.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 42 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Cummins Spec</span>
+                                                <span class="spec-pill">💻 BDM Flasher Práctica</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-cummins" data-training-title="Reparación de Módulo Motor Cummins">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 6 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación de Módulo Motor Caterpillar
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Reparación física avanzada de módulos de control electrónico Caterpillar (ECM), fuentes de alta potencia e inyectores HEUI/MEUI.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Reguladores de potencia internos y condensadores en ECM CAT (C7/C9/C12/C15).</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Reemplazo de etapas de potencia e inductores del inyector.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Volcado y lecturas BDM para reprogramar ECMs dañados.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 48 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Caterpillar ECM</span>
+                                                <span class="spec-pill">⚡ Alta Potencia Diagnosis</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-caterpillar" data-training-title="Reparación de Módulo Motor Caterpillar">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 7 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Reparación de Módulo Motor John Deere
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Formación técnica dedicada a reparar módulos controladores de tractores, cosechadoras e implementos John Deere.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Fuentes internas, comunicación ISOBUS y drivers de control.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Sustitución de MOSFETs y drivers específicos de válvulas proporcionales.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Proceso de sellado hermético e impermeabilizado de placas John Deere.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 45 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Agro-Hardware</span>
+                                                <span class="spec-pill">🚜 Reparación L14/L16/L21</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="rep-ecu-johndeere" data-training-title="Reparación de Módulo Motor John Deere">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: ELECTRÓNICA -->
+        <section class="category-section" id="electronica">
+            <div class="container">
+                <div class="category-grid">
+                    <!-- Intro Card sticky -->
+                    <div class="category-intro-card">
+                        <img src="assets/images/study_electronics.png" alt="Electrónica Avanzada" class="category-intro-img">
+                        <h2 class="category-intro-title">Electrónica</h2>
+                        <p class="category-intro-desc">Desde los fundamentos de semiconductores hasta programación avanzada, multiplexados complejos y calibraciones de inyección directa en vehículos livianos, pesados y agrícolas.</p>
+                    </div>
+
+                    <!-- Accordion container -->
+                    <div class="subcategory-wrapper">
+                        <!-- Subcategory 1: Programación Automotriz -->
+                        <div class="subcategory-block">
+                            <h3 class="subcategory-title">Programación Automotriz</h3>
+                            
+                            <div class="accordion-list">
+                                <!-- Item 1 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Programación Automotriz para Vehículos Livianos
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Reprogramación de computadoras de motor (chipseado/tuning) y codificación de módulos electrónicos de carrocería e inmovilizador.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Sistemas de Inmovilizadores y lectura del código PIN en transpondedores.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Calibración y reprogramación vía interfaz J2534 (OEM flasher).</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Lectura en banco K-TAG / Alientech para ajustes de curvas de torque.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 50 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Software Tuning</span>
+                                                <span class="spec-pill">💻 Programadores K-TAG/J2534</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="prog-automotriz-livianos" data-training-title="Programación Automotriz para Vehículos Livianos">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subcategory 2: Inyección Electrónica -->
+                        <div class="subcategory-block">
+                            <h3 class="subcategory-title">Inyección Electrónica</h3>
+                            
+                            <div class="accordion-list">
+                                <!-- Item 1 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Inyección Electrónica Vehículos Livianos
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Gestión electrónica de la combustión en motores a gasolina e inyección diésel common rail ligera. Comportamientos dinámicos y diagnóstico con instrumental.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Sensores MAF, MAP, Sondas lambda y curvas dinámicas de osciloscopio.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Inyección directa GDI, presiones y ciclos de trabajo de actuadores.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Análisis de gases y diagnóstico de fallas térmicas y lógicas OBD-II.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 40 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Inyección Liviana</span>
+                                                <span class="spec-pill">📈 Gráficas Diagnóstico</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="inj-elec-livianos" data-training-title="Inyección Electrónica Vehículos Livianos">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 2 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Inyección Electrónica Vehículos Pesados
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Gestión avanzada de la inyección diésel en motores de transporte pesado e industriales. Análisis de fallas hidráulicas y del multiplexado electrónico.</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Sistemas Common Rail Diésel pesados (Bosch, Denso, Cummins).</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Inyectores-Bomba UIS/EUI e inyectores unitarios individuales UPS.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Sistemas SCR de postratamiento (AdBlue, DPF, catalizadores).</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 48 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Inyección Pesada</span>
+                                                <span class="spec-pill">🚛 Common Rail Diésel Pro</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="inj-elec-pesados" data-training-title="Inyección Electrónica Vehículos Pesados">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 3 -->
+                                <div class="accordion-item">
+                                    <button class="accordion-header">
+                                        Inyección Electrónica Vehículos Agrícolas
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="accordion-content-inner">
+                                            <p class="training-description">Gestión de inyección y optimización de curvas de torque específicas en motores agrícolas (tractores, cosechadoras y fumigadoras).</p>
+                                            
+                                            <div class="training-modules-section">
+                                                <span class="training-modules-title">Estructura Curricular</span>
+                                                <ul class="training-modules-list">
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 1: Common rail agrícola, sensores de torque y carga hidráulica.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 2: Redes de control ISOBUS aplicadas a inyección e implementos.</li>
+                                                    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Módulo 3: Calibraciones y diagnósticos con escáneres multimarca en campo.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="training-specs">
+                                                <span class="spec-pill">⏱️ 45 Horas Académicas</span>
+                                                <span class="spec-pill">🎓 Certificado Agro-Tec</span>
+                                                <span class="spec-pill">🚜 Diagnóstico en Campo</span>
+                                            </div>
+
+                                            <button class="btn btn-primary register-training-btn" data-training-id="inj-elec-agricolas" data-training-title="Inyección Electrónica Vehículos Agrícolas">Registrarme en este entrenamiento</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer" id="contacto">
+        <div class="container footer-container">
+            <div class="footer-grid">
+                <!-- Column 1: CAE -->
+                <div class="footer-column col-info">
+                    <a href="index.html" class="footer-logo" aria-label="CAE Inicio">
+                        <img src="assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" />
+                    </a>
+                    <p class="footer-desc">CAE es una plataforma educativa online especializada en Electrónica y Mecatrónica.</p>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="footer-column">
+                    <h4 class="footer-col-title">Enlaces rápidos</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="index.html#hero" class="footer-link">Inicio</a></li>
+                        <li><a href="index.html#about" class="footer-link">Sobre CAE</a></li>
+                        <li><a href="entrenamientos.html" class="footer-link">Entrenamientos</a></li>
+                        <li><a href="index.html#benefits" class="footer-link">Ventajas</a></li>
+                        <li><a href="index.html#process" class="footer-link">Pasos</a></li>
+                        <li><a href="index.html#pricing" class="footer-link">Planes y Precios</a></li>
+                        <li><a href="blog.html" class="footer-link">Blog</a></li>
+                        <li><a href="index.html#contacto" class="footer-link">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Support -->
+                <div class="footer-column">
+                    <h4 class="footer-col-title">Soporte</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="index.html#faq" class="footer-link">Preguntas frecuentes</a></li>
+                        <li><a href="index.html#privacy" class="footer-link">Políticas de privacidad</a></li>
+                        <li><a href="index.html#terms" class="footer-link">Términos y condiciones</a></li>
+                        <li><a href="index.html#support" class="footer-link">Soporte técnico</a></li>
+                        <li><a href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer" class="footer-link">WhatsApp</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter -->
+                <div class="footer-column col-newsletter">
+                    <h4 class="footer-col-title">Suscríbete al boletín</h4>
+                    <p class="footer-desc">Recibe noticias, nuevos entrenamientos y promociones exclusivas.</p>
+                    <form class="newsletter-form" id="newsletter-form" novalidate>
+                        <div class="input-group">
+                            <label for="newsletter-email" class="sr-only">Correo electrónico</label>
+                            <input type="email" id="newsletter-email" placeholder="Tu correo electrónico" required aria-required="true">
+                            <button type="submit" class="btn btn-primary btn-icon" aria-label="Suscribirse">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <span class="form-feedback" id="newsletter-feedback" aria-live="polite"></span>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="copyright">© 2024 CAE - Capacitación Avanzada en Electrónica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal Container (Identical mapping for session integration) -->
+    <div class="auth-modal-overlay" id="auth-modal-overlay" aria-hidden="true">
+        <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+            <button class="auth-modal-close" id="auth-modal-close" aria-label="Cerrar modal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <!-- VIEW 1: LOGIN -->
+            <div class="auth-view" id="auth-view-login">
+                <h3 class="auth-modal-title" id="auth-modal-title">Iniciar sesión</h3>
+                <p class="auth-modal-subtitle">Accede a tu aula virtual y continúa aprendiendo.</p>
+                <form class="auth-form" id="login-form" novalidate>
+                    <div class="form-group">
+                        <label for="login-email">Correo electrónico</label>
+                        <input type="email" id="login-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label for="login-password">Contraseña</label>
+                            <button type="button" class="form-link-btn" id="to-forgot-btn">¿Olvidaste tu contraseña?</button>
+                        </div>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Ingresar</button>
+                </form>
+                <p class="auth-modal-footer">¿No tienes cuenta? <button type="button" class="form-link-btn" id="to-register-btn">Regístrate</button></p>
+            </div>
+
+            <!-- VIEW 2: REGISTER -->
+            <div class="auth-view" id="auth-view-register" style="display: none;">
+                <h3 class="auth-modal-title">Crear cuenta</h3>
+                <p class="auth-modal-subtitle">Comienza tu formación en tecnología hoy mismo.</p>
+                <form class="auth-form" id="register-form" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-firstname">Nombre</label>
+                            <input type="text" id="reg-firstname" required placeholder="Juan">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-lastname">Apellido</label>
+                            <input type="text" id="reg-lastname" required placeholder="Pérez">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Correo electrónico</label>
+                        <input type="email" id="reg-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-password">Contraseña</label>
+                            <input type="password" id="reg-password" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-password">Confirmar contraseña</label>
+                            <input type="password" id="reg-confirm-password" required placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-career">Carrera</label>
+                            <select id="reg-career" required class="form-select">
+                                <option value="Electrónica">Electrónica</option>
+                                <option value="Mecatrónica">Mecatrónica</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-plan">Plan</label>
+                            <select id="reg-plan" required class="form-select">
+                                <option value="Básico">Básico ($19)</option>
+                                <option value="Profesional" selected>Profesional ($49)</option>
+                                <option value="Premium">Premium ($89)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-checkbox-group">
+                        <input type="checkbox" id="reg-terms" required>
+                        <label for="reg-terms" style="color:#A8B0C5; font-size:0.85rem;">Acepto los <a href="#terms" style="color:#7C4DFF; text-decoration:none;">términos y condiciones</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Registrarse</button>
+                </form>
+                <p class="auth-modal-footer">¿Ya tienes cuenta? <button type="button" class="form-link-btn" id="to-login-btn">Inicia sesión</button></p>
+            </div>
+
+            <!-- VIEW 3: FORGOT PASSWORD -->
+            <div class="auth-view" id="auth-view-forgot" style="display: none;">
+                <h3 class="auth-modal-title">Recuperar contraseña</h3>
+                <p class="auth-modal-subtitle">Ingresa tu correo y te enviaremos un enlace de recuperación.</p>
+                <form class="auth-form" id="forgot-form" novalidate>
+                    <div class="form-group">
+                        <label for="forgot-email">Correo electrónico</label>
+                        <input type="email" id="forgot-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Enviar enlace</button>
+                </form>
+                <p class="auth-modal-footer">Volver a <button type="button" class="form-link-btn" id="to-login-from-forgot-btn">Iniciar sesión</button></p>
+            </div>
+
+            <!-- VIEW 4: RESET PASSWORD -->
+            <div class="auth-view" id="auth-view-reset" style="display: none;">
+                <h3 class="auth-modal-title">Restablecer contraseña</h3>
+                <p class="auth-modal-subtitle">Escribe tu nueva contraseña de acceso.</p>
+                <form class="auth-form" id="reset-form" novalidate>
+                    <div class="form-group">
+                        <label for="reset-password">Nueva contraseña</label>
+                        <input type="password" id="reset-password" required placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-confirm-password">Confirmar nueva contraseña</label>
+                        <input type="password" id="reset-confirm-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Guardar contraseña</button>
+                </form>
+                <p class="auth-modal-footer">Volver a <button type="button" class="form-link-btn" id="to-login-from-reset-btn">Iniciar sesión</button></p>
+            </div>
+            
+            <div class="auth-feedback" id="auth-feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <!-- Accordion and Hash Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Accordion interactiveness
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const item = header.parentElement;
+                    const content = item.querySelector('.accordion-content');
+                    const inner = item.querySelector('.accordion-content-inner');
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close other items in the same accordion-list to keep layout clean
+                    const list = item.closest('.accordion-list');
+                    const siblings = list.querySelectorAll('.accordion-item');
+                    siblings.forEach(sib => {
+                        if (sib !== item) {
+                            sib.classList.remove('active');
+                            sib.querySelector('.accordion-content').style.maxHeight = null;
+                        }
+                    });
+                    
+                    if (isActive) {
+                        item.classList.remove('active');
+                        content.style.maxHeight = null;
+                    } else {
+                        item.classList.add('active');
+                        content.style.maxHeight = inner.scrollHeight + 'px';
+                    }
+                });
+            });
+
+            // Hash detection scroll
+            const checkHashScroll = () => {
+                const hash = window.location.hash;
+                if (hash) {
+                    const section = document.querySelector(hash);
+                    if (section) {
+                        setTimeout(() => {
+                            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 200);
+                    }
+                }
+            };
+
+            checkHashScroll();
+            window.addEventListener('hashchange', checkHashScroll);
+
+            // Inactive Register CTA Alert for future integrations
+            const regBtns = document.querySelectorAll('.register-training-btn');
+            regBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-training-id');
+                    const title = btn.getAttribute('data-training-title');
+                    
+                    // Show a premium glassmorphic toast notification
+                    showFutureIntegrationToast(title);
+                });
+            });
+        });
+
+        function showFutureIntegrationToast(trainingTitle) {
+            // Check if there is already a toast
+            const existingToast = document.querySelector('.premium-notification');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'premium-notification';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: rgba(10, 16, 48, 0.95);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid var(--primary);
+                border-radius: 12px;
+                padding: 1.25rem 1.5rem;
+                z-index: 1000;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(124,77,255,0.2);
+                max-width: 380px;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                animation: toast-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            `;
+
+            toast.innerHTML = `
+                <div class="notification-content" style="display:flex; align-items:flex-start; gap:0.75rem;">
+                    <svg class="icon-lock" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C4DFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px; flex-shrink:0;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <div>
+                        <h4 style="color:#ffffff; font-size:0.95rem; font-weight:700; margin-bottom: 0.15rem;">Registro de Entrenamiento</h4>
+                        <p style="color:#A8B0C5; font-size:0.82rem; line-height:1.4;">La arquitectura del sistema está preparada para iniciar sesión, registrarse y asociar automáticamente el entrenamiento:<br><strong style="color:#fff;">${trainingTitle}</strong></p>
+                    </div>
+                </div>
+                <div class="notification-progress" style="height:3px; background:linear-gradient(90deg, #7C4DFF, #9D6CFF); animation: shrink-progress 4s linear forwards;"></div>
+            `;
+
+            // Style keyframes injection if not already in document
+            if (!document.getElementById('toast-keyframes')) {
+                const styleSheet = document.createElement('style');
+                styleSheet.id = 'toast-keyframes';
+                styleSheet.textContent = `
+                    @keyframes toast-slide-in {
+                        from { transform: translateY(50px) scale(0.95); opacity: 0; }
+                        to { transform: translateY(0) scale(1); opacity: 1; }
+                    }
+                    @keyframes shrink-progress {
+                        from { transform: scaleX(1); }
+                        to { transform: scaleX(0); }
+                    }
+                `;
+                document.head.appendChild(styleSheet);
+            }
+
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toast-slide-in 0.3s reverse ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+
+</body>
+</html>
