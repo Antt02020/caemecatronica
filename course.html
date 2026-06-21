@@ -356,15 +356,21 @@
             }
             
             const user = JSON.parse(session);
-            document.getElementById('user-initials').textContent = (user.firstName[0] + user.lastName[0]).toUpperCase();
+            document.getElementById('user-initials').textContent = ((user.firstName ? user.firstName[0] : '') + (user.lastName ? user.lastName[0] : '')).toUpperCase();
             document.getElementById('user-name-span').textContent = user.firstName;
 
             // Get parameters
             const urlParams = new URLSearchParams(window.location.search);
             const courseKey = urlParams.get('c') || 'electronica';
             
-            // Career Guard: prevent student from reading content of other career
-            if (user.role !== 'administrador' && user.career.toLowerCase() !== courseKey.toLowerCase()) {
+            // Updated Career Guard for Plan Básico: allow if has purchased modules in this career
+            const hasPurchasedModulesInCourse = user.purchasedModules && user.purchasedModules.some(m => m.startsWith(courseKey === 'mecatronica' ? 'meca-' : 'elec-'));
+            const hasAccessToCourse = (user.role === 'administrador') || 
+                                      (user.plan === 'Premium') ||
+                                      (user.plan === 'Profesional' && user.career.toLowerCase() === courseKey.toLowerCase()) ||
+                                      (user.plan === 'Básico' && hasPurchasedModulesInCourse);
+                                      
+            if (!hasAccessToCourse) {
                 alert(`No tienes acceso a los cursos de ${courseKey.toUpperCase()}. Serás redirigido a tu panel.`);
                 window.location.href = 'dashboard.html';
                 return;
@@ -375,6 +381,15 @@
             const activeCourse = coursesDB[courseKey];
             document.getElementById('course-header-title').textContent = `Curso Completo de ${activeCourse.title}`;
 
+            // Helper to check if a specific module is unlocked
+            const isModuleUnlocked = (mId) => {
+                if (user.role === 'administrador') return true;
+                if (user.plan === 'Premium') return true;
+                if (user.plan === 'Profesional' && user.career.toLowerCase() === courseKey.toLowerCase()) return true;
+                if (user.plan === 'Básico' && user.purchasedModules && user.purchasedModules.includes(mId)) return true;
+                return false;
+            };
+
             // Syllabus tree flattened for navigation indexes
             let flattenedLessons = [];
             
@@ -383,9 +398,9 @@
             syllabusContainer.innerHTML = '';
             
             activeCourse.modules.forEach((mod, modIdx) => {
-                const isFirst = (modIdx === 0);
+                const unlocked = isModuleUnlocked(mod.id);
                 const modEl = document.createElement('div');
-                modEl.className = `module-group ${isFirst ? 'open' : ''}`;
+                modEl.className = `module-group ${unlocked && modIdx === 0 ? 'open' : ''}`;
                 
                 let lessonsListHTML = '';
                 mod.lessons.forEach((les, lesIdx) => {
@@ -393,14 +408,15 @@
                     flattenedLessons.push({
                         ...les,
                         moduleId: mod.id,
-                        moduleTitle: mod.title
+                        moduleTitle: mod.title,
+                        unlocked: unlocked
                     });
                     
                     lessonsListHTML += `
-                        <div class="syllabus-lesson-item" data-lesson-id="${les.id}">
-                            <input type="checkbox" class="syllabus-lesson-checkbox" data-checkbox-id="${les.id}">
+                        <div class="syllabus-lesson-item ${unlocked ? '' : 'lesson-locked'}" data-lesson-id="${les.id}" style="${unlocked ? '' : 'opacity:0.6; pointer-events:auto;'}">
+                            <input type="checkbox" class="syllabus-lesson-checkbox" data-checkbox-id="${les.id}" ${unlocked ? '' : 'disabled'}>
                             <div class="syllabus-lesson-info">
-                                <span class="syllabus-lesson-title">${les.title}</span>
+                                <span class="syllabus-lesson-title">${les.title}${unlocked ? '' : ' 🔒'}</span>
                                 <span class="syllabus-lesson-meta">Video · ${les.duration}</span>
                             </div>
                         </div>
@@ -408,8 +424,8 @@
                 });
                 
                 modEl.innerHTML = `
-                    <button class="module-trigger">
-                        <span>${mod.title}</span>
+                    <button class="module-trigger" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <span>${mod.title}${unlocked ? '' : ' 🔒'}</span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     <div class="module-content">
@@ -468,15 +484,24 @@
                 }
 
                 // Update Player
+                document.getElementById('video-player').style.display = 'block';
                 document.getElementById('video-player').src = `https://www.youtube.com/embed/${lesson.videoId}`;
                 document.getElementById('lesson-header-title').textContent = lesson.title;
 
-                // Sync UI buttons Prev/Next states
-                document.getElementById('btn-prev-lesson').disabled = (idx === 0);
-                document.getElementById('btn-prev-lesson').style.opacity = (idx === 0) ? '0.5' : '1';
+                // Sync UI buttons Prev/Next states based on unlocked lessons
+                let hasPrevUnlocked = false;
+                for (let i = idx - 1; i >= 0; i--) {
+                    if (flattenedLessons[i].unlocked) { hasPrevUnlocked = true; break; }
+                }
+                document.getElementById('btn-prev-lesson').disabled = !hasPrevUnlocked;
+                document.getElementById('btn-prev-lesson').style.opacity = !hasPrevUnlocked ? '0.5' : '1';
                 
-                document.getElementById('btn-next-lesson').disabled = (idx === flattenedLessons.length - 1);
-                document.getElementById('btn-next-lesson').style.opacity = (idx === flattenedLessons.length - 1) ? '0.5' : '1';
+                let hasNextUnlocked = false;
+                for (let i = idx + 1; i < flattenedLessons.length; i++) {
+                    if (flattenedLessons[i].unlocked) { hasNextUnlocked = true; break; }
+                }
+                document.getElementById('btn-next-lesson').disabled = !hasNextUnlocked;
+                document.getElementById('btn-next-lesson').style.opacity = !hasNextUnlocked ? '0.5' : '1';
 
                 syncCompleteButtonUI();
             };
@@ -501,11 +526,65 @@
                 if (chk) chk.checked = isCompleted;
             };
 
+            // Show locked module glassmorphic notification
+            function showLockedModuleNotice(moduleId, moduleTitle) {
+                const existing = document.querySelector('.locked-module-toast');
+                if (existing) existing.remove();
+
+                const notice = document.createElement('div');
+                notice.className = 'locked-module-toast';
+                notice.style.cssText = `
+                    position: fixed; bottom: 30px; right: 30px;
+                    background: rgba(10, 16, 48, 0.95); backdrop-filter: blur(12px);
+                    border: 1px solid #FF5252; border-radius: 12px;
+                    padding: 1.25rem 2rem; z-index: 2000;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(255, 82, 82, 0.25);
+                    display: flex; flex-direction: column; gap: 0.75rem; max-width: 380px;
+                    animation: slide-in-toast 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                `;
+                notice.innerHTML = `
+                    <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                        <span style="font-size:1.5rem; margin-top:2px;">🔒</span>
+                        <div>
+                            <h4 style="color:#fff; font-size:0.95rem; font-weight:700; margin:0; font-family:var(--font-sans);">Módulo Bloqueado</h4>
+                            <p style="color:#A8B0C5; font-size:0.82rem; margin:0.25rem 0 0 0; line-height:1.4;">El módulo <strong style="color:#fff;">${moduleTitle}</strong> no está disponible en tu plan actual.</p>
+                        </div>
+                    </div>
+                    <a href="entrenamientos.html#${courseKey}" style="align-self:flex-end; background:#7C4DFF; color:#fff; text-decoration:none; padding:0.4rem 1rem; border-radius:6px; font-size:0.8rem; font-weight:600; text-align:center; font-family:var(--font-sans);">Adquirir Módulo (Gs. 350.000)</a>
+                `;
+                
+                if (!document.getElementById('toast-keyframes')) {
+                    const style = document.createElement('style');
+                    style.id = 'toast-keyframes';
+                    style.textContent = `
+                        @keyframes slide-in-toast {
+                            from { transform: translateY(50px) scale(0.9); opacity: 0; }
+                            to { transform: translateY(0) scale(1); opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                document.body.appendChild(notice);
+                
+                setTimeout(() => {
+                    notice.style.opacity = '0';
+                    setTimeout(() => notice.remove(), 400);
+                }, 5000);
+            }
+
             // Setup lessons clicking
             document.querySelectorAll('.syllabus-lesson-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const id = item.getAttribute('data-lesson-id');
                     const idx = flattenedLessons.findIndex(l => l.id === id);
+                    const lesson = flattenedLessons[idx];
+                    
+                    if (!lesson.unlocked) {
+                        showLockedModuleNotice(lesson.moduleId, lesson.moduleTitle);
+                        return;
+                    }
+                    
                     playLesson(idx);
                 });
             });
@@ -513,8 +592,9 @@
             // Mark complete toggle click handler
             document.getElementById('btn-toggle-complete').addEventListener('click', () => {
                 const activeLesson = flattenedLessons[currentLessonIndex];
-                const state = !userProgress[activeLesson.id];
+                if (!activeLesson.unlocked) return;
                 
+                const state = !userProgress[activeLesson.id];
                 userProgress[activeLesson.id] = state;
                 localStorage.setItem(progressKey, JSON.stringify(userProgress));
                 syncCompleteButtonUI();
@@ -522,20 +602,41 @@
 
             // Prev button click
             document.getElementById('btn-prev-lesson').addEventListener('click', () => {
-                if (currentLessonIndex > 0) {
-                    playLesson(currentLessonIndex - 1);
+                let prevIdx = currentLessonIndex - 1;
+                while (prevIdx >= 0 && !flattenedLessons[prevIdx].unlocked) {
+                    prevIdx--;
+                }
+                if (prevIdx >= 0) {
+                    playLesson(prevIdx);
                 }
             });
 
             // Next button click
             document.getElementById('btn-next-lesson').addEventListener('click', () => {
-                if (currentLessonIndex < flattenedLessons.length - 1) {
-                    playLesson(currentLessonIndex + 1);
+                let nextIdx = currentLessonIndex + 1;
+                while (nextIdx < flattenedLessons.length && !flattenedLessons[nextIdx].unlocked) {
+                    nextIdx++;
+                }
+                if (nextIdx < flattenedLessons.length) {
+                    playLesson(nextIdx);
                 }
             });
 
-            // Start player with first lesson on load
-            playLesson(0);
+            // Start player with first unlocked lesson on load
+            const firstUnlockedIdx = flattenedLessons.findIndex(l => l.unlocked);
+            if (firstUnlockedIdx !== -1) {
+                playLesson(firstUnlockedIdx);
+            } else {
+                document.getElementById('video-player').style.display = 'none';
+                document.querySelector('.video-wrapper').innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:2rem;">
+                        <span style="font-size:3rem; margin-bottom:1rem;">🔒</span>
+                        <h3 style="color:#fff; font-family:var(--font-sans);">Contenido Bloqueado</h3>
+                        <p style="color:var(--text-muted); font-size:0.9rem; max-width:320px; margin:0 0 1.5rem 0;">No posees ningún módulo desbloqueado en esta sección.</p>
+                        <a href="entrenamientos.html#${courseKey}" class="btn btn-primary" style="text-decoration:none;">Adquirir Módulos</a>
+                    </div>
+                `;
+            }
             syncCheckboxesUI();
         });
     </script>

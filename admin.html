@@ -261,6 +261,12 @@
                             Inteligencia Financiera
                         </button>
                     </li>
+                    <li class="sidebar-item" data-tab="db-pagopar">
+                        <button>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            Pasarela Pagopar
+                        </button>
+                    </li>
                 </ul>
             </nav>
             
@@ -714,6 +720,34 @@
 
             </div>
 
+            <!-- TAB 6: CONFIGURACIÓN PAGOPAR -->
+            <div class="dashboard-tab" id="tab-db-pagopar">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Configuración de Pasarela Pagopar</h2>
+                
+                <div class="admin-form-box" id="pagopar-form-box" style="max-width: 600px;">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Credenciales de Integración</h3>
+                    <form class="auth-form" id="pagopar-config-form">
+                        <div class="form-group">
+                            <label for="pagopar-public-key" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token Público (Public Key)</label>
+                            <input type="text" id="pagopar-public-key" required placeholder="Ej: 63820974a40fe7c5c5c5c53c429af8b25bed599dbf" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label for="pagopar-private-key" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token Privado (Private Key)</label>
+                            <input type="password" id="pagopar-private-key" placeholder="Dejar en blanco para no modificar" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            <span id="private-key-status" style="font-size: 0.8rem; color: #a8b0c5; margin-bottom: 1.25rem; display: block;"></span>
+                        </div>
+                        
+                        <div style="background: rgba(124, 77, 255, 0.1); border: 1px solid rgba(124, 77, 255, 0.2); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-size: 0.85rem; color: #a8b0c5; line-height: 1.4;">
+                            ℹ️ <strong>Nota de Integración:</strong> Si las credenciales están vacías o incompletas, el sistema funcionará en modo <strong>Simulación Local</strong> para pruebas de desarrollo.
+                        </div>
+
+                        <div class="action-btn-group">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Guardar Configuración</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -797,6 +831,8 @@
                         subhead.textContent = 'Redactar, editar, eliminar y programar artículos del blog técnico.';
                     } else if (tabId === 'db-financiero') {
                         subhead.textContent = 'Reportes de inteligencia financiera, ventas y conversiones.';
+                    } else if (tabId === 'db-pagopar') {
+                        subhead.textContent = 'Configurar credenciales y tokens seguros para la pasarela de pagos.';
                     }
                 });
             });
@@ -1296,10 +1332,97 @@
                 window.print();
             });
 
+            // ======================================================================
+            // PAGOPAR CONFIGURATION (Sub-agente 12 / Main Integration)
+            // ======================================================================
+            const pagoparForm = document.getElementById('pagopar-config-form');
+            const pubKeyInput = document.getElementById('pagopar-public-key');
+            const privKeyInput = document.getElementById('pagopar-private-key');
+            const privKeyStatus = document.getElementById('private-key-status');
+
+            const loadPagoparConfig = async () => {
+                try {
+                    const res = await fetch('/api/admin/config');
+                    if (res.ok) {
+                        const data = await res.json();
+                        pubKeyInput.value = data.public_key || '';
+                        if (data.has_private_key) {
+                            privKeyStatus.textContent = '🔒 Clave privada configurada y guardada de forma segura.';
+                            privKeyStatus.style.color = '#00E676';
+                        } else {
+                            privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
+                            privKeyStatus.style.color = '#FF5252';
+                        }
+                    } else {
+                        // Fallback to localStorage configuration if server is not running
+                        const localConfig = JSON.parse(localStorage.getItem('cae_pagopar_config')) || { public_key: '', private_key: '' };
+                        pubKeyInput.value = localConfig.public_key || '';
+                        if (localConfig.private_key) {
+                            privKeyStatus.textContent = '🔒 Clave privada configurada en almacenamiento local.';
+                            privKeyStatus.style.color = '#00E676';
+                        } else {
+                            privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
+                            privKeyStatus.style.color = '#FF5252';
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading config from API, trying localStorage fallback:", e);
+                    const localConfig = JSON.parse(localStorage.getItem('cae_pagopar_config')) || { public_key: '', private_key: '' };
+                    pubKeyInput.value = localConfig.public_key || '';
+                    if (localConfig.private_key) {
+                        privKeyStatus.textContent = '🔒 Clave privada configurada en almacenamiento local.';
+                        privKeyStatus.style.color = '#00E676';
+                    } else {
+                        privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
+                        privKeyStatus.style.color = '#FF5252';
+                    }
+                }
+            };
+
+            pagoparForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const public_key = pubKeyInput.value.trim();
+                const private_key = privKeyInput.value.trim();
+
+                const payload = { public_key };
+                if (private_key) {
+                    payload.private_key = private_key;
+                }
+
+                try {
+                    const res = await fetch('/api/admin/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        alert("Configuración guardada exitosamente en el servidor.");
+                        privKeyInput.value = '';
+                        loadPagoparConfig();
+                    } else {
+                        throw new Error("API return error state");
+                    }
+                } catch (err) {
+                    console.error("Error saving to API, updating localStorage fallback:", err);
+                    // Fallback to local storage if server is offline or not running
+                    const localConfig = JSON.parse(localStorage.getItem('cae_pagopar_config')) || { public_key: '', private_key: '' };
+                    localConfig.public_key = public_key;
+                    if (private_key) {
+                        localConfig.private_key = private_key;
+                    }
+                    localStorage.setItem('cae_pagopar_config', JSON.stringify(localConfig));
+                    alert("Configuración guardada localmente (Modo offline).");
+                    privKeyInput.value = '';
+                    loadPagoparConfig();
+                }
+            });
+
             // Initial renders
             renderStudentsTable();
             renderLessonsTable();
             renderBlogTable();
+            loadPagoparConfig();
         });
     </script>
 

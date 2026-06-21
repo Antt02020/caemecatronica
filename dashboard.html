@@ -712,17 +712,99 @@
                 return;
             }
 
+            // Check if user has active permissions
+            const hasElecModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('elec-'));
+            const hasMecaModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('meca-'));
+            
+            const hasAccess = (user.plan === 'Premium') || 
+                              (user.plan === 'Profesional' && (user.career === 'Electrónica' || user.career === 'Mecatrónica' || (user.purchasedCareers && user.purchasedCareers.length > 0))) || 
+                              (user.plan === 'Básico' && (hasElecModules || hasMecaModules));
+
+            if (!hasAccess) {
+                // Renders locked empty states for tabs
+                const emptyLockedHTML = `
+                <div class="empty-locked-state" style="text-align:center; padding:5rem 2rem; background:var(--bg-surface); border:1px solid rgba(124,77,255,0.25); border-radius:12px; margin-top:2rem; box-shadow:0 15px 30px rgba(0,0,0,0.4); display:flex; flex-direction:column; align-items:center;">
+                    <div style="font-size:3.5rem; margin-bottom:1.5rem; filter:drop-shadow(0 0 15px rgba(124,77,255,0.4));">🔒</div>
+                    <h3 style="font-size:1.75rem; font-weight:800; margin-bottom:1rem; color:#fff; font-family:var(--font-sans);">Tu Aula Virtual está Bloqueada</h3>
+                    <p style="color:var(--text-muted); font-size:0.95rem; max-width:460px; margin:0 auto 2rem auto; line-height:1.6;">Aún no tienes ningún entrenamiento o módulo individual adquirido. Inscríbete en uno de nuestros programas especializados para desbloquear tu material académico.</p>
+                    <a href="entrenamientos.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.8rem 2rem; text-decoration:none; justify-content:center;">Ver Catálogo de Entrenamientos</a>
+                </div>
+                `;
+                
+                // Override Tab 1 (Inicio) content
+                document.getElementById('tab-inicio').innerHTML = emptyLockedHTML;
+                
+                // Override Tab 2 (Cursos) content
+                document.getElementById('tab-cursos').innerHTML = emptyLockedHTML;
+                
+                // Override Tab 3 (Progreso) content
+                document.getElementById('tab-progreso').innerHTML = emptyLockedHTML;
+                
+                // Override Tab 4 (Certificados) content
+                document.getElementById('tab-certificados').innerHTML = `
+                <div class="empty-locked-state" style="text-align:center; padding:5rem 2rem; background:var(--bg-surface); border:1px solid rgba(124,77,255,0.25); border-radius:12px; margin-top:2rem; box-shadow:0 15px 30px rgba(0,0,0,0.4); display:flex; flex-direction:column; align-items:center;">
+                    <div style="font-size:3.5rem; margin-bottom:1.5rem; filter:drop-shadow(0 0 15px rgba(124,77,255,0.4));">🔒</div>
+                    <h3 style="font-size:1.75rem; font-weight:800; margin-bottom:1rem; color:#fff; font-family:var(--font-sans);">Certificados no Disponibles</h3>
+                    <p style="color:var(--text-muted); font-size:0.95rem; max-width:460px; margin:0 auto 2rem auto; line-height:1.6;">Debes completar el 100% de un entrenamiento para emitir un certificado de especialización.</p>
+                    <a href="entrenamientos.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.8rem 2rem; text-decoration:none; justify-content:center;">Ver Catálogo de Entrenamientos</a>
+                </div>
+                `;
+            }
+
+            // Show payment success toast notification
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'success') {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed; bottom: 30px; right: 30px;
+                    background: rgba(10, 16, 48, 0.95); backdrop-filter: blur(12px);
+                    border: 1px solid var(--accent); border-radius: 12px;
+                    padding: 1.25rem 2rem; z-index: 2000;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0, 230, 118, 0.2);
+                    display: flex; flex-direction: column; gap: 0.25rem;
+                    animation: slide-in-toast 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                `;
+                toast.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <span style="font-size:1.5rem;">🎉</span>
+                        <div>
+                            <h4 style="color:#fff; font-size:0.95rem; font-weight:700; margin:0;">¡Pago Confirmado con Éxito!</h4>
+                            <p style="color:#A8B0C5; font-size:0.82rem; margin:0.15rem 0 0 0;">Tus accesos académicos han sido actualizados en la plataforma.</p>
+                        </div>
+                    </div>
+                `;
+                
+                // keyframes style
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slide-in-toast {
+                        from { transform: translateY(50px) scale(0.9); opacity: 0; }
+                        to { transform: translateY(0) scale(1); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 400);
+                }, 5000);
+                
+                // Clear URL param
+                history.pushState("", document.title, window.location.pathname);
+            }
+
             // Bind User Details
             document.getElementById('welcome-name').textContent = user.firstName;
             document.getElementById('user-pill-initials').textContent = (user.firstName[0] + user.lastName[0]).toUpperCase();
-            document.getElementById('user-pill-career').textContent = user.career;
+            document.getElementById('user-pill-career').textContent = user.career || "Ninguna";
 
             // Bind profile inputs
             document.getElementById('profile-name').value = user.firstName;
             document.getElementById('profile-lastname').value = user.lastName;
             document.getElementById('profile-email').value = user.email;
-            document.getElementById('profile-career').value = user.career;
-            document.getElementById('profile-plan').value = user.plan;
+            document.getElementById('profile-career').value = user.career || "Ninguna";
+            document.getElementById('profile-plan').value = user.plan || "None";
 
             // Handle Profile Save Changes form submission
             const profileForm = document.getElementById('profile-form');
@@ -754,10 +836,12 @@
             const coursesDB = JSON.parse(localStorage.getItem('cae_courses'));
             let elecTotal = 0;
             let mecaTotal = 0;
-            coursesDB.electronica.modules.forEach(m => elecTotal += m.lessons.length);
-            coursesDB.mecatronica.modules.forEach(m => mecaTotal += m.lessons.length);
+            if(coursesDB) {
+                coursesDB.electronica.modules.forEach(m => elecTotal += m.lessons.length);
+                coursesDB.mecatronica.modules.forEach(m => mecaTotal += m.lessons.length);
+            }
             
-            const totalCareerLessons = (user.career === "Electrónica") ? elecTotal : mecaTotal;
+            const totalCareerLessons = (user.career === "Electrónica") ? elecTotal : (user.career === "Mecatrónica" ? mecaTotal : 1);
             
             // Widgets values
             const progressPercent = totalCareerLessons > 0 ? Math.round((completedCount / totalCareerLessons) * 100) : 0;
@@ -778,7 +862,6 @@
                 const lastId = completedIds[completedIds.length - 1];
                 
                 let foundTitle = "";
-                let careerStr = user.career;
                 
                 const modules = (user.career === "Electrónica") ? coursesDB.electronica.modules : coursesDB.mecatronica.modules;
                 modules.forEach(m => {
@@ -796,7 +879,7 @@
                 lastActivityTitle.textContent = user.career === "Electrónica" ? "Módulo 1: Introducción a la Electrónica" : "Módulo 1: Fundamentos de la Mecatrónica";
             }
             
-            lastActivityCourse.textContent = `Carrera de ${user.career}`;
+            lastActivityCourse.textContent = `Carrera de ${user.career || "Ninguna"}`;
             lastActivityBtn.href = user.career === "Electrónica" ? 'course.html?c=electronica' : 'course.html?c=mecatronica';
 
             // Render Courses catalog
@@ -849,12 +932,21 @@
                 ];
                 const certsList = document.getElementById('certs-tab-list');
                 
+                const hasElecModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('elec-'));
+                const isElecLocked = user.plan !== "Premium" && 
+                                     !(user.plan === "Profesional" && user.career === "Electrónica") &&
+                                     !(user.plan === "Básico" && hasElecModules);
+                                     
+                const hasMecaModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('meca-'));
+                const isMecaLocked = user.plan !== "Premium" && 
+                                     !(user.plan === "Profesional" && user.career === "Mecatrónica") &&
+                                     !(user.plan === "Básico" && hasMecaModules);
+
                 targetLists.forEach(listEl => {
                     if (!listEl) return;
                     listEl.innerHTML = ''; // clear
 
                     // Card 1: Electronica
-                    const isElecLocked = user.career !== "Electrónica";
                     const elecPercent = isElecLocked ? 0 : progressPercent;
                     const cardElec = `
                         <div class="course-card-active ${isElecLocked ? 'course-card-locked' : ''}">
@@ -882,14 +974,13 @@
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 <h4>Material Bloqueado</h4>
                                 <p>Este material pertenece a la carrera de Electrónica.</p>
-                                <button class="btn btn-primary btn-sm" onclick="alert('Debes cambiar tu carrera registrada para desbloquear este curso.')">Cambiar Carrera</button>
+                                <a href="entrenamientos.html#electronica" class="btn btn-primary btn-sm" style="text-decoration:none;">Adquirir Entrenamiento</a>
                             </div>
                             ` : ''}
                         </div>
                     `;
 
                     // Card 2: Mecatronica
-                    const isMecaLocked = user.career !== "Mecatrónica";
                     const mecaPercent = isMecaLocked ? 0 : progressPercent;
                     const cardMeca = `
                         <div class="course-card-active ${isMecaLocked ? 'course-card-locked' : ''}">
@@ -917,7 +1008,7 @@
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 <h4>Material Bloqueado</h4>
                                 <p>Este material pertenece a la carrera de Mecatrónica.</p>
-                                <button class="btn btn-primary btn-sm" onclick="alert('Debes cambiar tu carrera registrada para desbloquear este curso.')">Cambiar Carrera</button>
+                                <a href="entrenamientos.html#mecatronica" class="btn btn-primary btn-sm" style="text-decoration:none;">Adquirir Entrenamiento</a>
                             </div>
                             ` : ''}
                         </div>

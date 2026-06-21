@@ -1037,23 +1037,7 @@
                             <input type="password" id="reg-confirm-password" required placeholder="••••••••">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="reg-career">Carrera</label>
-                            <select id="reg-career" required class="form-select">
-                                <option value="Electrónica">Electrónica</option>
-                                <option value="Mecatrónica">Mecatrónica</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-plan">Plan</label>
-                            <select id="reg-plan" required class="form-select">
-                                <option value="Básico">Básico ($19)</option>
-                                <option value="Profesional" selected>Profesional ($49)</option>
-                                <option value="Premium">Premium ($89)</option>
-                            </select>
-                        </div>
-                    </div>
+
                     <div class="form-checkbox-group">
                         <input type="checkbox" id="reg-terms" required>
                         <label for="reg-terms" style="color:#A8B0C5; font-size:0.85rem;">Acepto los <a href="#terms" style="color:#7C4DFF; text-decoration:none;">términos y condiciones</a></label>
@@ -1147,82 +1131,268 @@
             checkHashScroll();
             window.addEventListener('hashchange', checkHashScroll);
 
-            // Inactive Register CTA Alert for future integrations
-            const regBtns = document.querySelectorAll('.register-training-btn');
-            regBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-training-id');
-                    const title = btn.getAttribute('data-training-title');
+            // Checkout Overlay Popup creation
+            const checkoutPopupHTML = `
+            <div id="checkout-popup-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(5,8,22,0.85); backdrop-filter:blur(16px); z-index:2000; justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s ease;">
+                <div style="background:rgba(10,16,48,0.95); border:1px solid rgba(124,77,255,0.35); box-shadow:0 0 50px rgba(124,77,255,0.25); border-radius:12px; width:90%; max-width:440px; padding:2.5rem; position:relative; transform:scale(0.9); transition:transform 0.3s ease;">
+                    <button id="close-checkout-popup" style="position:absolute; top:15px; right:15px; background:transparent; border:none; color:#A8B0C5; cursor:pointer; font-size:1.2rem; transition:color 0.2s;">✕</button>
+                    <h3 style="margin-top:0; margin-bottom:0.5rem; font-size:1.5rem; font-weight:800; background:linear-gradient(90deg, #7C4DFF, #00E676); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-family:var(--font-sans);">Confirmar Compra</h3>
+                    <p style="font-size:0.85rem; color:#A8B0C5; margin-bottom:1.5rem; line-height:1.4;" id="checkout-popup-summary">Cargando...</p>
                     
-                    // Show a premium glassmorphic toast notification
-                    showFutureIntegrationToast(title);
+                    <form id="checkout-popup-form" style="display:flex; flex-direction:column; gap:1.25rem;">
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <label for="check-phone" style="font-size:0.8rem; font-weight:500; color:#fff;">Teléfono (obligatorio)</label>
+                            <input type="text" id="check-phone" required placeholder="Ej. +595981123456" style="padding:0.75rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; font-family:var(--font-sans);">
+                        </div>
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <label for="check-doc" style="font-size:0.8rem; font-weight:500; color:#fff;">Cédula de Identidad / CI (obligatorio)</label>
+                            <input type="text" id="check-doc" required placeholder="Ej. 1234567" style="padding:0.75rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; font-family:var(--font-sans);">
+                        </div>
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <label for="check-ruc" style="font-size:0.8rem; font-weight:500; color:#fff;">RUC (opcional)</label>
+                            <input type="text" id="check-ruc" placeholder="Ej. 1234567-8" style="padding:0.75rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; font-family:var(--font-sans);">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem; justify-content:center; padding:0.75rem;">IR A PAGAR</button>
+                    </form>
+                </div>
+            </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', checkoutPopupHTML);
+
+            const overlay = document.getElementById('checkout-popup-overlay');
+            const card = overlay.querySelector('div');
+            const closeBtn = document.getElementById('close-checkout-popup');
+            const form = document.getElementById('checkout-popup-form');
+            const summary = document.getElementById('checkout-popup-summary');
+            
+            let activeIntent = null;
+
+            const openCheckoutPopup = (intent) => {
+                activeIntent = intent;
+                summary.innerHTML = `Estás por adquirir:<br><strong style="color:#fff;">${intent.trainingTitle}</strong> bajo el <strong style="color:#7C4DFF;">Plan ${intent.plan}</strong>.<br>Precio: <strong style="color:#00E676;">Gs. ${(intent.plan === 'Profesional' ? 990000 : 350000 * intent.modules.length).toLocaleString('es-PY')}</strong>`;
+                overlay.style.display = 'flex';
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                }, 50);
+            };
+
+            const closeCheckoutPopup = () => {
+                overlay.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            };
+
+            closeBtn.addEventListener('click', closeCheckoutPopup);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeCheckoutPopup();
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!activeIntent) return;
+                
+                const phone = document.getElementById('check-phone').value.trim();
+                const doc = document.getElementById('check-doc').value.trim();
+                const ruc = document.getElementById('check-ruc').value.trim();
+                
+                const user = JSON.parse(localStorage.getItem('cae_user'));
+                if (!user) return;
+
+                const payload = {
+                    email: user.email,
+                    plan: activeIntent.plan,
+                    career: activeIntent.career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica',
+                    modules: activeIntent.modules,
+                    comprador: {
+                        ruc: ruc,
+                        telefono: phone,
+                        documento: doc
+                    }
+                };
+
+                // Show processing loading animation
+                const payButton = form.querySelector('button[type="submit"]');
+                payButton.disabled = true;
+                payButton.textContent = "Procesando pago...";
+
+                fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.redirectUrl) {
+                        // Clear pending purchase
+                        localStorage.removeItem('cae_pending_purchase');
+                        // Redirect to pagopar checkout or local simulator
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        alert("Error al iniciar la transacción: " + (data.error || "Respuesta inválida"));
+                        payButton.disabled = false;
+                        payButton.textContent = "IR A PAGAR";
+                    }
+                })
+                .catch(err => {
+                    console.warn("Express server checkout offline, running client fallback simulator:", err);
+                    
+                    // Client-only fallback: save order to LocalStorage list, and redirect to local simulator
+                    const id_pedido_comercio = "CAE-" + Date.now().toString().slice(-6) + Math.floor(Math.random() * 10);
+                    
+                    // Remove pending
+                    localStorage.removeItem('cae_pending_purchase');
+                    
+                    // We save the order to LocalStorage for the simulator to read
+                    const orders = JSON.parse(localStorage.getItem('cae_orders')) || [];
+                    const newOrder = {
+                        id_pedido_comercio,
+                        email: user.email,
+                        plan: activeIntent.plan,
+                        career: activeIntent.career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica',
+                        modules: activeIntent.modules,
+                        monto_total: activeIntent.plan === 'Profesional' ? 990000 : 350000 * activeIntent.modules.length,
+                        comprador: { ruc, telefono: phone, documento: doc },
+                        estado: "Pendiente"
+                    };
+                    orders.push(newOrder);
+                    localStorage.setItem('cae_orders', JSON.stringify(orders));
+                    
+                    window.location.href = `/checkout-simulator.html?pedido=${id_pedido_comercio}`;
                 });
             });
-        });
 
-        function showFutureIntegrationToast(trainingTitle) {
-            // Check if there is already a toast
-            const existingToast = document.querySelector('.premium-notification');
-            if (existingToast) existingToast.remove();
-
-            const toast = document.createElement('div');
-            toast.className = 'premium-notification';
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
-                background: rgba(10, 16, 48, 0.95);
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                border: 1px solid var(--primary);
-                border-radius: 12px;
-                padding: 1.25rem 1.5rem;
-                z-index: 1000;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(124,77,255,0.2);
-                max-width: 380px;
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-                animation: toast-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            `;
-
-            toast.innerHTML = `
-                <div class="notification-content" style="display:flex; align-items:flex-start; gap:0.75rem;">
-                    <svg class="icon-lock" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C4DFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px; flex-shrink:0;">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <div>
-                        <h4 style="color:#ffffff; font-size:0.95rem; font-weight:700; margin-bottom: 0.15rem;">Registro de Entrenamiento</h4>
-                        <p style="color:#A8B0C5; font-size:0.82rem; line-height:1.4;">La arquitectura del sistema está preparada para iniciar sesión, registrarse y asociar automáticamente el entrenamiento:<br><strong style="color:#fff;">${trainingTitle}</strong></p>
-                    </div>
-                </div>
-                <div class="notification-progress" style="height:3px; background:linear-gradient(90deg, #7C4DFF, #9D6CFF); animation: shrink-progress 4s linear forwards;"></div>
-            `;
-
-            // Style keyframes injection if not already in document
-            if (!document.getElementById('toast-keyframes')) {
-                const styleSheet = document.createElement('style');
-                styleSheet.id = 'toast-keyframes';
-                styleSheet.textContent = `
-                    @keyframes toast-slide-in {
-                        from { transform: translateY(50px) scale(0.95); opacity: 0; }
-                        to { transform: translateY(0) scale(1); opacity: 1; }
-                    }
-                    @keyframes shrink-progress {
-                        from { transform: scaleX(1); }
-                        to { transform: scaleX(0); }
-                    }
+            // Conversion of accordion module lists to checkbox modular selection
+            const moduleLists = document.querySelectorAll('.training-modules-list');
+            moduleLists.forEach(list => {
+                const categorySection = list.closest('.category-section');
+                const isMeca = categorySection && categorySection.id === 'mecatronica';
+                const courseKey = isMeca ? 'mecatronica' : 'electronica';
+                const prefix = isMeca ? 'meca' : 'elec';
+                
+                const listItems = list.querySelectorAll('li');
+                const accordionInner = list.closest('.accordion-content-inner');
+                const registerBtn = accordionInner.querySelector('.register-training-btn');
+                
+                if (!registerBtn) return; // avoid double run
+                
+                const trainingTitle = registerBtn.getAttribute('data-training-title');
+                const trainingId = registerBtn.getAttribute('data-training-id');
+                
+                // Clear and regenerate list items as checkboxes
+                const originalTexts = Array.from(listItems).map(li => {
+                    const clone = li.cloneNode(true);
+                    const svg = clone.querySelector('svg');
+                    if (svg) svg.remove();
+                    return clone.textContent.trim();
+                });
+                
+                list.innerHTML = '';
+                originalTexts.forEach((text, index) => {
+                    const mId = `${prefix}-m${index + 1}`;
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <label class="module-chk-label" style="display:flex; align-items:center; gap:0.75rem; cursor:pointer; font-size:0.9rem; color:var(--text-primary); width:100%; padding:0.4rem 0.5rem; border-radius:6px; transition:background 0.2s ease;">
+                            <input type="checkbox" class="module-chk" data-module-id="${mId}" data-module-title="${text}" style="width:16px; height:16px; accent-color:var(--accent); cursor:pointer;">
+                            <span>${text}</span>
+                        </label>
+                    `;
+                    list.appendChild(li);
+                });
+                
+                // Add price details and Plan Básico checkout button
+                const pricingDiv = document.createElement('div');
+                pricingDiv.className = 'modular-price-info';
+                pricingDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; font-size:0.9rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.05); padding-top:0.75rem;';
+                pricingDiv.innerHTML = `
+                    <span>Módulos seleccionados: <strong class="checked-count" style="color:#fff;">0</strong></span>
+                    <span>Total Plan Básico: <strong class="checked-price" style="color:var(--accent); font-weight:700;">Gs. 0</strong></span>
                 `;
-                document.head.appendChild(styleSheet);
+                
+                // Replace main button with two buttons: Profesional and Básico
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.cssText = 'display:flex; flex-direction:column; gap:0.75rem; margin-top:1.5rem; width:100%;';
+                
+                const profBtn = document.createElement('button');
+                profBtn.className = 'btn btn-primary';
+                profBtn.style.cssText = 'width:100%; text-align:center; justify-content:center; padding:0.75rem 1rem;';
+                profBtn.textContent = `Registrarme en este entrenamiento (Plan Profesional - Gs. 990.000)`;
+                profBtn.addEventListener('click', () => {
+                    handleEnrollIntent('Profesional', courseKey, trainingId, trainingTitle, []);
+                });
+                
+                const basicBtn = document.createElement('button');
+                basicBtn.className = 'btn btn-outline';
+                basicBtn.style.cssText = 'width:100%; text-align:center; justify-content:center; opacity:0.5; padding:0.75rem 1rem;';
+                basicBtn.disabled = true;
+                basicBtn.textContent = `Comprar Módulos Seleccionados (Plan Básico - Gs. 0)`;
+                basicBtn.addEventListener('click', () => {
+                    const checkedChks = list.querySelectorAll('.module-chk:checked');
+                    const selectedModules = Array.from(checkedChks).map(c => c.getAttribute('data-module-id'));
+                    handleEnrollIntent('Básico', courseKey, trainingId, trainingTitle, selectedModules);
+                });
+                
+                buttonContainer.appendChild(profBtn);
+                buttonContainer.appendChild(basicBtn);
+                
+                // Remove original registerBtn and append new items
+                registerBtn.remove();
+                accordionInner.appendChild(pricingDiv);
+                accordionInner.appendChild(buttonContainer);
+                
+                // Listen to checkbox changes to update count and price
+                list.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('module-chk')) {
+                        const checkedChks = list.querySelectorAll('.module-chk:checked');
+                        const count = checkedChks.length;
+                        const price = count * 350000;
+                        
+                        pricingDiv.querySelector('.checked-count').textContent = count;
+                        pricingDiv.querySelector('.checked-price').textContent = `Gs. ${price.toLocaleString('es-PY')}`;
+                        
+                        if (count > 0) {
+                            basicBtn.disabled = false;
+                            basicBtn.style.opacity = '1';
+                            basicBtn.textContent = `Comprar Módulos Seleccionados (Plan Básico - Gs. ${price.toLocaleString('es-PY')})`;
+                        } else {
+                            basicBtn.disabled = true;
+                            basicBtn.style.opacity = '0.5';
+                            basicBtn.textContent = `Comprar Módulos Seleccionados (Plan Básico - Gs. 0)`;
+                        }
+                    }
+                });
+            });
+
+            // Handle enrollment intents
+            function handleEnrollIntent(plan, career, trainingId, trainingTitle, modules) {
+                const user = localStorage.getItem('cae_user');
+                const intent = { plan, career, trainingId, trainingTitle, modules };
+                
+                if (!user) {
+                    // Cache intent and open register modal
+                    localStorage.setItem('cae_pending_purchase', JSON.stringify(intent));
+                    openAuthModal('register');
+                } else {
+                    // Open checkout popup directly
+                    openCheckoutPopup(intent);
+                }
             }
 
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.animation = 'toast-slide-in 0.3s reverse ease forwards';
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
+            // Check if there is a pending purchase on load
+            const checkPendingPurchase = () => {
+                const pending = localStorage.getItem('cae_pending_purchase');
+                const user = localStorage.getItem('cae_user');
+                
+                if (pending && user) {
+                    const intent = JSON.parse(pending);
+                    openCheckoutPopup(intent);
+                }
+            };
+            
+            checkPendingPurchase();
+        });
     </script>
 
 </body>

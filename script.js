@@ -675,54 +675,89 @@ function initAuthUI() {
                 return;
             }
             
-            // Check in mockup students first
-            const students = JSON.parse(localStorage.getItem('cae_students')) || [];
-            
-            // Allow admin bypass
-            if (email === "admin@cae.com" && pass === "admin123") {
-                const sessionUser = {
-                    email: email,
-                    firstName: "Admin",
-                    lastName: "General",
-                    role: "administrador",
-                    career: "Ambas",
-                    plan: "Full-access"
-                };
-                localStorage.setItem('cae_user', JSON.stringify(sessionUser));
-                showFeedback('¡Ingreso exitoso! Redirigiendo al panel...', 'success');
-                setTimeout(() => {
-                    closeAuthModal();
-                    window.location.href = 'admin.html';
-                }, 1000);
-                return;
-            }
-            
-            const studentMatch = students.find(s => s.email.toLowerCase() === email.toLowerCase());
-            
-            if (studentMatch) {
-                if (studentMatch.status === "Bloqueado") {
-                    showFeedback('Tu cuenta ha sido bloqueada. Contacta a soporte.', 'error');
+            // Attempt calling Express Server API
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: pass })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(err => { throw new Error(err.message || 'Error de autenticación'); });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('cae_user', JSON.stringify(data.user));
+                    showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        if (localStorage.getItem('cae_pending_purchase')) {
+                            window.location.reload();
+                        } else {
+                            window.location.href = data.user.role === 'administrador' ? 'admin.html' : 'dashboard.html';
+                        }
+                    }, 1000);
+                }
+            })
+            .catch(err => {
+                console.warn("Backend auth failed, falling back to LocalStorage mock:", err.message);
+                
+                // Local fallback
+                const students = JSON.parse(localStorage.getItem('cae_students')) || [];
+                if (email === "admin@cae.com" && pass === "admin123") {
+                    const sessionUser = {
+                        email: email,
+                        firstName: "Admin",
+                        lastName: "General",
+                        role: "administrador",
+                        career: "Ambas",
+                        plan: "Premium",
+                        purchasedModules: [],
+                        purchasedCareers: ["electronica", "mecatronica"]
+                    };
+                    localStorage.setItem('cae_user', JSON.stringify(sessionUser));
+                    showFeedback('¡Ingreso exitoso! Redirigiendo al panel...', 'success');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        window.location.href = 'admin.html';
+                    }, 1000);
                     return;
                 }
                 
-                const sessionUser = {
-                    email: studentMatch.email,
-                    firstName: studentMatch.firstName,
-                    lastName: studentMatch.lastName,
-                    role: "alumno",
-                    career: studentMatch.career,
-                    plan: studentMatch.plan
-                };
-                
-                localStorage.setItem('cae_user', JSON.stringify(sessionUser));
-                showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
-                setTimeout(() => {
-                    closeAuthModal();
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            } else {
-                showFeedback('Credenciales incorrectas o usuario no registrado.', 'error');
-            }
+                const studentMatch = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+                if (studentMatch) {
+                    if (studentMatch.status === "Bloqueado") {
+                        showFeedback('Tu cuenta ha sido bloqueada. Contacta a soporte.', 'error');
+                        return;
+                    }
+                    
+                    const sessionUser = {
+                        email: studentMatch.email,
+                        firstName: studentMatch.firstName,
+                        lastName: studentMatch.lastName,
+                        role: "alumno",
+                        career: studentMatch.career || "Ninguna",
+                        plan: studentMatch.plan || "None",
+                        purchasedModules: studentMatch.purchasedModules || [],
+                        purchasedCareers: studentMatch.purchasedCareers || []
+                    };
+                    
+                    localStorage.setItem('cae_user', JSON.stringify(sessionUser));
+                    showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        if (localStorage.getItem('cae_pending_purchase')) {
+                            window.location.reload();
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1000);
+                } else {
+                    showFeedback('Credenciales incorrectas o usuario no registrado.', 'error');
+                }
+            });
         });
     }
 
@@ -739,8 +774,6 @@ function initAuthUI() {
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-password').value;
             const confirmPass = document.getElementById('reg-confirm-password').value;
-            const career = document.getElementById('reg-career').value;
-            const plan = document.getElementById('reg-plan').value;
             const termsChecked = document.getElementById('reg-terms').checked;
             
             if (!firstName || !lastName || !email || !pass || !confirmPass) {
@@ -763,44 +796,78 @@ function initAuthUI() {
                 return;
             }
             
-            const students = JSON.parse(localStorage.getItem('cae_students')) || [];
-            
-            // Check if email already registered
-            if (students.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-                showFeedback('El correo ya está registrado en la plataforma.', 'error');
-                return;
-            }
-            
-            // Create student
-            const newStudent = {
-                firstName,
-                lastName,
-                email,
-                career,
-                plan,
-                status: "Activo"
-            };
-            
-            students.push(newStudent);
-            localStorage.setItem('cae_students', JSON.stringify(students));
-            
-            // Create user session
-            const sessionUser = {
-                email,
-                firstName,
-                lastName,
-                role: "alumno",
-                career,
-                plan
-            };
-            
-            localStorage.setItem('cae_user', JSON.stringify(sessionUser));
-            
-            showFeedback('¡Registro exitoso! Redirigiendo a tu panel...', 'success');
-            setTimeout(() => {
-                closeAuthModal();
-                window.location.href = 'dashboard.html';
-            }, 1200);
+            // Attempt calling Express Server API
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, password: pass })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(err => { throw new Error(err.message || 'Error de registro'); });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('cae_user', JSON.stringify(data.user));
+                    showFeedback('¡Registro exitoso! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        if (localStorage.getItem('cae_pending_purchase')) {
+                            window.location.reload();
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1200);
+                }
+            })
+            .catch(err => {
+                console.warn("Backend registration failed, falling back to LocalStorage mock:", err.message);
+                
+                const students = JSON.parse(localStorage.getItem('cae_students')) || [];
+                if (students.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+                    showFeedback('El correo ya está registrado en la plataforma.', 'error');
+                    return;
+                }
+                
+                const newStudent = {
+                    firstName,
+                    lastName,
+                    email,
+                    password: pass,
+                    career: "Ninguna",
+                    plan: "None",
+                    purchasedModules: [],
+                    purchasedCareers: [],
+                    status: "Activo"
+                };
+                
+                students.push(newStudent);
+                localStorage.setItem('cae_students', JSON.stringify(students));
+                
+                const sessionUser = {
+                    email,
+                    firstName,
+                    lastName,
+                    role: "alumno",
+                    career: "Ninguna",
+                    plan: "None",
+                    purchasedModules: [],
+                    purchasedCareers: []
+                };
+                
+                localStorage.setItem('cae_user', JSON.stringify(sessionUser));
+                showFeedback('¡Registro exitoso! Redirigiendo...', 'success');
+                setTimeout(() => {
+                    closeAuthModal();
+                    if (localStorage.getItem('cae_pending_purchase')) {
+                        window.location.reload();
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1200);
+            });
         });
     }
 

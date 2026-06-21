@@ -1,0 +1,100 @@
+{
+  "config": {
+    "public_key": "",
+    "private_key": ""
+  },
+  "users": [
+    {
+      "email": "alumno@cae.com",
+      "password": "password123",
+      "firstName": "Carlos",
+      "lastName": "García",
+      "career": "Electrónica",
+      "plan": "Profesional",
+      "purchasedModules": [],
+      "purchasedCareers": [
+        "electronica"
+      ],
+      "status": "Activo",
+      "role": "alumno"
+    },
+    {
+      "email": "maria.lopez@gmail.com",
+      "password": "password123",
+      "firstName": "María",
+      "lastName": "López",
+      "career": "Mecatrónica",
+      "plan": "Premium",
+      "purchasedModules": [],
+      "purchasedCareers": [
+        "electronica",
+        "mecatronica"
+      ],
+      "status": "Activo",
+      "role": "alumno"
+    },
+    {
+      "email": "jorge.m@yahoo.com",
+      "password": "password123",
+      "firstName": "Jorge",
+      "lastName": "Mendoza",
+      "career": "Electrónica",
+      "plan": "Básico",
+      "purchasedModules": [
+        "elec-m1"
+      ],
+      "purchasedCareers": [],
+      "status": "Bloqueado",
+      "role": "alumno"
+    },
+    {
+      "email": "admin@cae.com",
+      "password": "admin123",
+      "firstName": "Admin",
+      "lastName": "General",
+      "career": "Ambas",
+      "plan": "Premium",
+      "purchasedModules": [],
+      "purchasedCareers": [
+        "electronica",
+        "mecatronica"
+      ],
+      "status": "Activo",
+      "role": "administrador"
+    },
+    {
+      "email": "test_1781904931098@example.com",
+      "password": "password123",
+      "firstName": "John",
+      "lastName": "Doe",
+      "career": "Mecatrónica",
+      "plan": "Básico",
+      "purchasedModules": [
+        "meca-m1"
+      ],
+      "purchasedCareers": [],
+      "status": "Activo",
+      "role": "alumno"
+    }
+  ],
+  "orders": [
+    {
+      "id_pedido_comercio": "CAE-9312159",
+      "email": "test_1781904931098@example.com",
+      "plan": "Básico",
+      "career": "Mecatrónica",
+      "modules": [
+        "meca-m1"
+      ],
+      "monto_total": 350000,
+      "estado": "Completado",
+      "fecha": "2026-06-19T21:35:31.215Z",
+      "comprador": {
+        "ruc": "80012345-6",
+        "telefono": "0981777888",
+        "documento": "1234567"
+      },
+      "hash_pedido": "hash_test_sim_1781904931223"
+    }
+  ]
+}
