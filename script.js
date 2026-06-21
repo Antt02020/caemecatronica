@@ -85,6 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('cae_students', JSON.stringify(DEFAULT_STUDENTS));
     }
 
+    // Load Prices & Client IDs first
+    loadConfigAndPrices();
+
+    // Check Google Auth token redirect hash
+    checkGoogleCallback();
+
     // Initialize all standard components
     initHeaderScroll();
     initMobileNav();
@@ -97,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auth UI manager
     initAuthUI();
     checkUserSession();
+    initInterestModal();
 });
 
 /* ==========================================================================
@@ -450,22 +457,39 @@ function initNewsletterForm() {
    ========================================================================== */
 function initPricingActions() {
     const pricingButtons = document.querySelectorAll('.price-card .plan-btn');
+    const interestModal = document.getElementById('interest-modal-overlay');
     
     pricingButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             const planCard = e.target.closest('.price-card');
-            const planName = planCard.querySelector('.plan-name').textContent;
+            const planName = planCard.querySelector('.plan-name').textContent.trim();
             
-            // Check if logged in. If not, pop Register view selecting that plan!
             const loggedInUser = localStorage.getItem('cae_user');
             if (!loggedInUser) {
-                const planSelect = document.getElementById('reg-plan');
-                if (planSelect) {
-                    planSelect.value = planName;
-                }
-                openAuthModal('register');
+                // Unauthenticated: Cache plan and open login (Bienvenido de vuelta)
+                localStorage.setItem('cae_pending_purchase', JSON.stringify({
+                    plan: planName,
+                    career: planName === 'Premium' ? 'Ambas' : '',
+                    modules: []
+                }));
+                openAuthModal('login');
             } else {
-                showPremiumNotification(planName);
+                if (planName === 'Básico') {
+                    // Redirect Básico plan to select modules
+                    window.location.href = 'entrenamientos.html';
+                } else {
+                    // Open Interest Selection Modal for Profesional or Premium
+                    localStorage.setItem('cae_pending_purchase', JSON.stringify({
+                        plan: planName,
+                        career: '',
+                        modules: []
+                    }));
+                    if (interestModal) {
+                        interestModal.classList.add('open');
+                        interestModal.setAttribute('aria-hidden', 'false');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
             }
         });
     });
@@ -925,6 +949,40 @@ function initAuthUI() {
             }, 1000);
         });
     }
+
+    // Google & Apple OAuth click listeners
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            const config = JSON.parse(localStorage.getItem('cae_config')) || {};
+            const googleClientId = config.google_client_id || "";
+            if (!googleClientId) {
+                alert("Google OAuth Client ID no está configurado en el Panel de Administración.");
+                return;
+            }
+            const redirectUri = window.location.origin + '/';
+            const scope = 'email profile';
+            const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}`;
+            
+            window.location.href = googleAuthUrl;
+        });
+    }
+
+    const appleLoginBtn = document.getElementById('apple-login-btn');
+    if (appleLoginBtn) {
+        appleLoginBtn.addEventListener('click', () => {
+            const config = JSON.parse(localStorage.getItem('cae_config')) || {};
+            const appleClientId = config.apple_client_id || "";
+            if (!appleClientId) {
+                alert("Apple OAuth Services ID no está configurado en el Panel de Administración.");
+                return;
+            }
+            const redirectUri = config.apple_redirect_uri || (window.location.origin + '/api/auth/apple/callback');
+            const appleAuthUrl = `https://appleid.apple.com/auth/authorize?client_id=${encodeURIComponent(appleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code%20id_token&scope=name%20email&response_mode=form_post`;
+            
+            window.location.href = appleAuthUrl;
+        });
+    }
 }
 
 // Open modal wrapper helper
@@ -1074,4 +1132,165 @@ function checkUserSession() {
             }
         }
     }
+}
+
+/* ==========================================================================
+   CONFIG & PRICING LOADER (Dynamic prices from server)
+   ========================================================================== */
+function loadConfigAndPrices() {
+    fetch('/api/config')
+        .then(res => res.json())
+        .then(config => {
+            localStorage.setItem('cae_config', JSON.stringify(config));
+            
+            // Update Pricing cards in UI if they exist (index.html pricing section)
+            const basicCard = document.querySelector('.price-card[data-plan="Básico"]');
+            const profCard = document.querySelector('.price-card[data-plan="Profesional"]');
+            const premCard = document.querySelector('.price-card[data-plan="Premium"]');
+            
+            if (basicCard && config.price_basic !== undefined) {
+                basicCard.querySelector('.price').textContent = Number(config.price_basic).toLocaleString('es-PY');
+            }
+            if (profCard && config.price_profesional !== undefined) {
+                profCard.querySelector('.price').textContent = Number(config.price_profesional).toLocaleString('es-PY');
+            }
+            if (premCard && config.price_premium !== undefined) {
+                premCard.querySelector('.price').textContent = Number(config.price_premium).toLocaleString('es-PY');
+            }
+        })
+        .catch(err => {
+            console.warn("Failed to load backend config, using defaults:", err);
+        });
+}
+
+/* ==========================================================================
+   GOOGLE OAUTH CALLBACK CHECK
+   ========================================================================== */
+function checkGoogleCallback() {
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+            fetch('/api/auth/google-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ access_token: accessToken })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.user) {
+                    localStorage.setItem('cae_user', JSON.stringify(data.user));
+                    // Clean hash cleanly
+                    history.pushState("", document.title, window.location.pathname + window.location.search);
+                    alert(`Bienvenido, ${data.user.firstName}! Sesión iniciada con Google.`);
+                    
+                    const pending = localStorage.getItem('cae_pending_purchase');
+                    if (pending) {
+                        const intent = JSON.parse(pending);
+                        if (intent.plan === 'Básico') {
+                            window.location.href = 'entrenamientos.html';
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        window.location.href = data.user.role === 'administrador' ? 'admin.html' : 'dashboard.html';
+                    }
+                } else {
+                    alert("Error en el inicio de sesión con Google: " + (data.message || "Token inválido"));
+                }
+            })
+            .catch(err => {
+                console.error("Google authentication error:", err);
+            });
+        }
+    }
+}
+
+/* ==========================================================================
+   INTEREST MODAL SELECTION & SECURE CHECKOUT TRIGGER
+   ========================================================================== */
+function initInterestModal() {
+    const interestModal = document.getElementById('interest-modal-overlay');
+    const closeBtn = document.getElementById('interest-modal-close');
+    const mecaCard = document.getElementById('interest-card-meca');
+    const elecCard = document.getElementById('interest-card-elec');
+    
+    if (!interestModal) return;
+    
+    closeBtn.addEventListener('click', () => {
+        interestModal.classList.remove('open');
+        interestModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    });
+    
+    interestModal.addEventListener('click', (e) => {
+        if (e.target === interestModal) {
+            interestModal.classList.remove('open');
+            interestModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    const handleInterestSelection = (career) => {
+        const user = JSON.parse(localStorage.getItem('cae_user'));
+        if (!user) return;
+        
+        let pending = JSON.parse(localStorage.getItem('cae_pending_purchase')) || { plan: 'Premium' };
+        const plan = pending.plan || 'Premium';
+        
+        // Close modal
+        interestModal.classList.remove('open');
+        interestModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        
+        // Prompt for mandatory buyer info since we are checkout out from index page directly
+        const phone = window.prompt("Ingrese su número de teléfono (obligatorio):");
+        if (!phone) {
+            alert("El número de teléfono es obligatorio.");
+            return;
+        }
+        const doc = window.prompt("Ingrese su número de Cédula de Identidad (obligatorio):");
+        if (!doc) {
+            alert("El número de Cédula de Identidad es obligatorio.");
+            return;
+        }
+        const ruc = window.prompt("Ingrese su RUC (opcional):") || "";
+        
+        const payload = {
+            email: user.email,
+            plan: plan,
+            career: career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica',
+            modules: [],
+            comprador: {
+                ruc: ruc,
+                telefono: phone,
+                documento: doc
+            }
+        };
+        
+        showPremiumNotification(plan);
+        
+        fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.redirectUrl) {
+                localStorage.removeItem('cae_pending_purchase');
+                window.location.href = data.redirectUrl;
+            } else {
+                alert("Error al iniciar transacción: " + (data.error || "Respuesta inválida"));
+            }
+        })
+        .catch(err => {
+            console.error("Error on checkout:", err);
+            alert("Error al conectar con el servidor.");
+        });
+    };
+    
+    if (mecaCard) mecaCard.addEventListener('click', () => handleInterestSelection('mecatronica'));
+    if (elecCard) elecCard.addEventListener('click', () => handleInterestSelection('electronica'));
 }

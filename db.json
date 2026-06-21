@@ -1,7 +1,13 @@
 {
   "config": {
     "public_key": "",
-    "private_key": ""
+    "private_key": "",
+    "google_client_id": "",
+    "apple_client_id": "",
+    "apple_redirect_uri": "",
+    "price_basic": 350000,
+    "price_profesional": 990000,
+    "price_premium": 1490000
   },
   "users": [
     {
@@ -96,5 +102,6 @@
       },
       "hash_pedido": "hash_test_sim_1781904931223"
     }
-  ]
+  ],
+  "transactions": []
 }

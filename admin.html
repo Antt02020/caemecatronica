@@ -217,6 +217,13 @@
                 padding: 2.5rem 1.5rem;
             }
         }
+
+        .dashboard-tab {
+            display: none;
+        }
+        .dashboard-tab.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -293,21 +300,21 @@
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val" id="count-total-alumnos">3</span>
+                            <span class="widget-val" id="count-total-alumnos">0</span>
                             <span class="widget-lbl">Alumnos Registrados</span>
                         </div>
                     </div>
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$14,240</span>
+                            <span class="widget-val" id="dash-total-sales">Gs. 0</span>
                             <span class="widget-lbl">Ventas Totales</span>
                         </div>
                     </div>
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">68.4%</span>
+                            <span class="widget-val" id="dash-conversion-rate">0%</span>
                             <span class="widget-lbl">Tasa de Conversión</span>
                         </div>
                     </div>
@@ -564,21 +571,21 @@
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$14,240</span>
+                            <span class="widget-val" id="val-total-sales">Gs. 0</span>
                             <span class="widget-lbl">Ingresos Totales</span>
                         </div>
                     </div>
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$3,850</span>
+                            <span class="widget-val" id="val-monthly-sales">Gs. 0</span>
                             <span class="widget-lbl">Ingresos Mensuales</span>
                         </div>
                     </div>
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$46,200</span>
+                            <span class="widget-val" id="val-annual-sales">Gs. 0</span>
                             <span class="widget-lbl">Ingresos Anuales</span>
                         </div>
                     </div>
@@ -588,21 +595,21 @@
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$43.80</span>
+                            <span class="widget-val" id="val-ticket-promedio">Gs. 0</span>
                             <span class="widget-lbl">Ticket Promedio</span>
                         </div>
                     </div>
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$2,450</span>
+                            <span class="widget-val" id="val-mrr">Gs. 0</span>
                             <span class="widget-lbl">MRR (Recurrente Mensual)</span>
                         </div>
                     </div>
                     <div class="widget-card">
                         <div class="widget-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
                         <div class="widget-info">
-                            <span class="widget-val">$29,400</span>
+                            <span class="widget-val" id="val-arr">Gs. 0</span>
                             <span class="widget-lbl">ARR (Recurrente Anual)</span>
                         </div>
                     </div>
@@ -722,29 +729,103 @@
 
             <!-- TAB 6: CONFIGURACIÓN PAGOPAR -->
             <div class="dashboard-tab" id="tab-db-pagopar">
-                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Configuración de Pasarela Pagopar</h2>
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Configuración General del Ecosistema</h2>
                 
-                <div class="admin-form-box" id="pagopar-form-box" style="max-width: 600px;">
-                    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Credenciales de Integración</h3>
+                <div class="admin-form-box" id="pagopar-form-box" style="max-width: 750px;">
                     <form class="auth-form" id="pagopar-config-form">
-                        <div class="form-group">
-                            <label for="pagopar-public-key" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token Público (Public Key)</label>
-                            <input type="text" id="pagopar-public-key" required placeholder="Ej: 63820974a40fe7c5c5c5c53c429af8b25bed599dbf" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
-                        </div>
-                        <div class="form-group">
-                            <label for="pagopar-private-key" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token Privado (Private Key)</label>
-                            <input type="password" id="pagopar-private-key" placeholder="Dejar en blanco para no modificar" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                            <span id="private-key-status" style="font-size: 0.8rem; color: #a8b0c5; margin-bottom: 1.25rem; display: block;"></span>
-                        </div>
-                        
-                        <div style="background: rgba(124, 77, 255, 0.1); border: 1px solid rgba(124, 77, 255, 0.2); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-size: 0.85rem; color: #a8b0c5; line-height: 1.4;">
-                            ℹ️ <strong>Nota de Integración:</strong> Si las credenciales están vacías o incompletas, el sistema funcionará en modo <strong>Simulación Local</strong> para pruebas de desarrollo.
+                        <!-- Credenciales Pagopar -->
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">Pasarela de Pagos Pagopar</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="pagopar-public-key" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token Público (Public Key)</label>
+                                <input type="text" id="pagopar-public-key" required placeholder="Token Público" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="pagopar-private-key" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token Privado (Private Key)</label>
+                                <input type="password" id="pagopar-private-key" placeholder="Dejar en blanco para no modificar" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                <span id="private-key-status" style="font-size: 0.8rem; color: #a8b0c5; margin-bottom: 1.25rem; display: block;"></span>
+                            </div>
                         </div>
 
-                        <div class="action-btn-group">
-                            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Guardar Configuración</button>
+                        <!-- Autenticación Social -->
+                        <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">Autenticación Social (OAuth 2.0)</h3>
+                        <div class="form-group">
+                            <label for="google-client-id" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Google Client ID</label>
+                            <input type="text" id="google-client-id" placeholder="Ej: 782012589531-xxx.apps.googleusercontent.com" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="apple-client-id" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Apple Services ID (Client ID)</label>
+                                <input type="text" id="apple-client-id" placeholder="Ej: com.caemecatronica.services" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="apple-redirect-uri" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Apple Redirect URI (Callback)</label>
+                                <input type="text" id="apple-redirect-uri" placeholder="Ej: https://caemecatronica.com.py/api/auth/apple/callback" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                        </div>
+
+                        <!-- Configuración de Precios -->
+                        <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">Precios de Entrenamientos (Gs)</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="price-basic" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Precio Plan Básico (Por Módulo)</label>
+                                <input type="number" id="price-basic" required placeholder="350000" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="price-profesional" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Precio Plan Profesional (Carrera Completa)</label>
+                                <input type="number" id="price-profesional" required placeholder="990000" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="price-premium" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Precio Plan Premium (Acceso Total)</label>
+                                <input type="number" id="price-premium" required placeholder="1490000" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                        </div>
+
+                        <div class="action-btn-group" style="margin-top: 1rem;">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Guardar Toda la Configuración</button>
                         </div>
                     </form>
+                </div>
+
+                <!-- Webhooks y Retornos -->
+                <div class="admin-form-box" style="max-width: 750px; margin-top: 2rem;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">URLs de Integración y Retorno</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Webhook URL (IPN de Pagopar)</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="text" readonly id="url-webhook" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
+                                <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-webhook')">Copiar</button>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Retorno (Éxito / Pago Procesándose)</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="text" readonly id="url-success" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
+                                <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-success')">Copiar</button>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Cancelación</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="text" readonly id="url-cancel" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
+                                <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-cancel')">Copiar</button>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Error</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="text" readonly id="url-error" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
+                                <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-error')">Copiar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem;">
+                        <button type="button" class="btn btn-outline" id="btn-webhook-ping" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Prueba de Conectividad Webhook</button>
+                        <span id="webhook-ping-status" style="font-size: 0.85rem; font-weight: 500;"></span>
+                    </div>
                 </div>
             </div>
 
@@ -1333,19 +1414,77 @@
             });
 
             // ======================================================================
-            // PAGOPAR CONFIGURATION (Sub-agente 12 / Main Integration)
+            // PAGOPAR & ECOSYSTEM CONFIGURATION (OAuth, Pricing, Webhook)
             // ======================================================================
             const pagoparForm = document.getElementById('pagopar-config-form');
             const pubKeyInput = document.getElementById('pagopar-public-key');
             const privKeyInput = document.getElementById('pagopar-private-key');
             const privKeyStatus = document.getElementById('private-key-status');
+            
+            const googleClientIdInput = document.getElementById('google-client-id');
+            const appleClientIdInput = document.getElementById('apple-client-id');
+            const appleRedirectUriInput = document.getElementById('apple-redirect-uri');
+            
+            const priceBasicInput = document.getElementById('price-basic');
+            const priceProfesionalInput = document.getElementById('price-profesional');
+            const pricePremiumInput = document.getElementById('price-premium');
 
+            // Populate return URLs
+            document.getElementById('url-webhook').value = window.location.origin + '/api/pagopar-webhook';
+            document.getElementById('url-success').value = window.location.origin + '/payment-processing.html';
+            document.getElementById('url-cancel').value = window.location.origin + '/payment-cancelled.html';
+            document.getElementById('url-error').value = window.location.origin + '/payment-error.html';
+
+            // Copy to Clipboard helper
+            window.copyToClipboard = (id) => {
+                const el = document.getElementById(id);
+                el.select();
+                navigator.clipboard.writeText(el.value)
+                    .then(() => alert("Copiado al portapapeles: " + el.value))
+                    .catch(() => alert("Error al copiar."));
+            };
+
+            // Connectivity Test Ping
+            document.getElementById('btn-webhook-ping').addEventListener('click', () => {
+                const statusText = document.getElementById('webhook-ping-status');
+                statusText.textContent = "Probando conexión...";
+                statusText.style.color = "#a8b0c5";
+                
+                fetch('/api/pagopar-webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ping: true })
+                })
+                .then(res => {
+                    if (res.status === 400 || res.status === 200) {
+                        statusText.textContent = "✅ Conectividad Exitosa: Webhook activo.";
+                        statusText.style.color = "#00E676";
+                    } else {
+                        statusText.textContent = `❌ Error: El Webhook retornó código ${res.status}`;
+                        statusText.style.color = "#FF5252";
+                    }
+                })
+                .catch(err => {
+                    statusText.textContent = "❌ Error de Red: Webhook inalcanzable.";
+                    statusText.style.color = "#FF5252";
+                });
+            });
+
+            // Load config parameters
             const loadPagoparConfig = async () => {
                 try {
                     const res = await fetch('/api/admin/config');
                     if (res.ok) {
                         const data = await res.json();
                         pubKeyInput.value = data.public_key || '';
+                        googleClientIdInput.value = data.google_client_id || '';
+                        appleClientIdInput.value = data.apple_client_id || '';
+                        appleRedirectUriInput.value = data.apple_redirect_uri || '';
+                        
+                        priceBasicInput.value = data.price_basic !== undefined ? data.price_basic : 350000;
+                        priceProfesionalInput.value = data.price_profesional !== undefined ? data.price_profesional : 990000;
+                        pricePremiumInput.value = data.price_premium !== undefined ? data.price_premium : 1490000;
+
                         if (data.has_private_key) {
                             privKeyStatus.textContent = '🔒 Clave privada configurada y guardada de forma segura.';
                             privKeyStatus.style.color = '#00E676';
@@ -1353,38 +1492,34 @@
                             privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
                             privKeyStatus.style.color = '#FF5252';
                         }
-                    } else {
-                        // Fallback to localStorage configuration if server is not running
-                        const localConfig = JSON.parse(localStorage.getItem('cae_pagopar_config')) || { public_key: '', private_key: '' };
-                        pubKeyInput.value = localConfig.public_key || '';
-                        if (localConfig.private_key) {
-                            privKeyStatus.textContent = '🔒 Clave privada configurada en almacenamiento local.';
-                            privKeyStatus.style.color = '#00E676';
-                        } else {
-                            privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
-                            privKeyStatus.style.color = '#FF5252';
-                        }
                     }
                 } catch (e) {
-                    console.error("Error loading config from API, trying localStorage fallback:", e);
-                    const localConfig = JSON.parse(localStorage.getItem('cae_pagopar_config')) || { public_key: '', private_key: '' };
-                    pubKeyInput.value = localConfig.public_key || '';
-                    if (localConfig.private_key) {
-                        privKeyStatus.textContent = '🔒 Clave privada configurada en almacenamiento local.';
-                        privKeyStatus.style.color = '#00E676';
-                    } else {
-                        privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
-                        privKeyStatus.style.color = '#FF5252';
-                    }
+                    console.error("Error loading config from API:", e);
                 }
             };
 
+            // Save config parameters
             pagoparForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const public_key = pubKeyInput.value.trim();
                 const private_key = privKeyInput.value.trim();
+                const google_client_id = googleClientIdInput.value.trim();
+                const apple_client_id = appleClientIdInput.value.trim();
+                const apple_redirect_uri = appleRedirectUriInput.value.trim();
+                
+                const price_basic = Number(priceBasicInput.value);
+                const price_profesional = Number(priceProfesionalInput.value);
+                const price_premium = Number(pricePremiumInput.value);
 
-                const payload = { public_key };
+                const payload = { 
+                    public_key, 
+                    google_client_id, 
+                    apple_client_id, 
+                    apple_redirect_uri,
+                    price_basic,
+                    price_profesional,
+                    price_premium
+                };
                 if (private_key) {
                     payload.private_key = private_key;
                 }
@@ -1404,25 +1539,46 @@
                         throw new Error("API return error state");
                     }
                 } catch (err) {
-                    console.error("Error saving to API, updating localStorage fallback:", err);
-                    // Fallback to local storage if server is offline or not running
-                    const localConfig = JSON.parse(localStorage.getItem('cae_pagopar_config')) || { public_key: '', private_key: '' };
-                    localConfig.public_key = public_key;
-                    if (private_key) {
-                        localConfig.private_key = private_key;
-                    }
-                    localStorage.setItem('cae_pagopar_config', JSON.stringify(localConfig));
-                    alert("Configuración guardada localmente (Modo offline).");
-                    privKeyInput.value = '';
-                    loadPagoparConfig();
+                    console.error("Error saving to API:", err);
+                    alert("Error al conectar con el servidor.");
                 }
             });
+
+            // Load Ecosystem Financial Stats (Real source of truth)
+            const loadEcosystemStats = async () => {
+                try {
+                    const res = await fetch('/api/admin/stats');
+                    if (res.ok) {
+                        const data = await res.json();
+                        
+                        // Main Dashboard widgets
+                        document.getElementById('count-total-alumnos').textContent = data.totalStudents || 0;
+                        document.getElementById('dash-total-sales').textContent = `Gs. ${(data.totalSales || 0).toLocaleString('es-PY')}`;
+                        
+                        const convRate = data.orders && data.orders.length > 0
+                            ? ((data.transactions ? data.transactions.length : 0) / data.orders.length * 100).toFixed(1)
+                            : "0.0";
+                        document.getElementById('dash-conversion-rate').textContent = `${convRate}%`;
+                        
+                        // Financial tab widgets
+                        document.getElementById('val-total-sales').textContent = `Gs. ${(data.totalSales || 0).toLocaleString('es-PY')}`;
+                        document.getElementById('val-monthly-sales').textContent = `Gs. ${(data.monthlySales || 0).toLocaleString('es-PY')}`;
+                        document.getElementById('val-annual-sales').textContent = `Gs. ${(data.annualSales || 0).toLocaleString('es-PY')}`;
+                        document.getElementById('val-ticket-promedio').textContent = `Gs. ${(data.ticketPromedio || 0).toLocaleString('es-PY')}`;
+                        document.getElementById('val-mrr').textContent = `Gs. ${(data.mrr || 0).toLocaleString('es-PY')}`;
+                        document.getElementById('val-arr').textContent = `Gs. ${(data.arr || 0).toLocaleString('es-PY')}`;
+                    }
+                } catch (e) {
+                    console.error("Error loading stats from API:", e);
+                }
+            };
 
             // Initial renders
             renderStudentsTable();
             renderLessonsTable();
             renderBlogTable();
             loadPagoparConfig();
+            loadEcosystemStats();
         });
     </script>
 

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesando Pago - CAE</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-base);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+
+        .processing-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2.5rem;
+            width: 90%;
+            max-width: 460px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(124, 77, 255, 0.25), 0 30px 60px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Pulse animation loader */
+        .pulse-loader {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pulse-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--grad-primary);
+            opacity: 0.15;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .pulse-circle:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .pulse-core {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--grad-primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .pulse-core svg {
+            color: #fff;
+            animation: rotate-spinner 2s linear infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.5); opacity: 0.5; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        @keyframes rotate-spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--grad-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .processing-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+        }
+
+        .status-badge.verifying {
+            color: var(--accent);
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.05);
+            animation: pulse-text 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-text {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Particles -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <div class="processing-card">
+        <div class="pulse-loader">
+            <div class="pulse-circle"></div>
+            <div class="pulse-circle"></div>
+            <div class="pulse-core">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="6.34" y1="17.66" x2="9.17" y2="14.83"></line><line x1="14.83" y1="9.17" x2="17.66" y2="6.34"></line></svg>
+            </div>
+        </div>
+        
+        <h2 class="processing-title">Verificando tu pago</h2>
+        <p class="processing-text" id="status-message">Estamos validando la confirmación de tu pago con Pagopar. Esto puede tomar unos segundos, por favor no cierres esta ventana.</p>
+        
+        <div class="status-badge verifying" id="status-badge">Verificando...</div>
+    </div>
+
+    <!-- Polling Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hash = urlParams.get('hash_pedido');
+            const statusMessage = document.getElementById('status-message');
+            const statusBadge = document.getElementById('status-badge');
+            
+            if (!hash) {
+                alert("Código de transacción inválido o faltante.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            let attempts = 0;
+            const maxAttempts = 24; // 1 minute maximum (2.5s interval)
+            
+            const checkStatus = () => {
+                attempts++;
+                
+                fetch('/api/payment-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ hash_pedido: hash })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("API status check error");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success && data.resultado && data.resultado[0]) {
+                        const tx = data.resultado[0];
+                        
+                        if (tx.pagado) {
+                            // Payment confirmed! Update status badge and redirect
+                            statusBadge.textContent = "¡Pago Confirmado!";
+                            statusBadge.className = "status-badge";
+                            statusBadge.style.cssText = "color:#00E676; border-color:rgba(0,230,118,0.3); background:rgba(0,230,118,0.05);";
+                            statusMessage.innerHTML = '¡Tu pago ha sido validado exitosamente! Desbloqueando tu acceso académico e iniciando sesión...';
+                            
+                            // Re-fetch user session details and save to localStorage
+                            const user = JSON.parse(localStorage.getItem('cae_user'));
+                            if (user) {
+                                fetch(`/api/user/profile?email=${encodeURIComponent(user.email)}`)
+                                    .then(r => r.json())
+                                    .then(profileData => {
+                                        if (profileData.success) {
+                                            localStorage.setItem('cae_user', JSON.stringify(profileData.user));
+                                        }
+                                        setTimeout(() => {
+                                            window.location.href = 'dashboard.html?payment=success';
+                                        }, 2000);
+                                    })
+                                    .catch(() => {
+                                        // Fallback redirect
+                                        setTimeout(() => {
+                                            window.location.href = 'dashboard.html?payment=success';
+                                        }, 2000);
+                                    });
+                            } else {
+                                setTimeout(() => {
+                                    window.location.href = 'dashboard.html?payment=success';
+                                }, 2000);
+                            }
+                            return;
+                        }
+                    }
+                    
+                    // If not paid yet, check attempts limit
+                    if (attempts >= maxAttempts) {
+                        statusBadge.textContent = "Pendiente";
+                        statusBadge.className = "status-badge";
+                        statusMessage.innerHTML = 'Tu pago aún está siendo procesado por Pagopar o la red de cobranzas. En cuanto se acredite, tendrás acceso completo al campus. Puedes cerrar esta pestaña si lo deseas.';
+                    } else {
+                        // Poll again
+                        setTimeout(checkStatus, 2500);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error polling payment status:", err);
+                    if (attempts >= maxAttempts) {
+                        window.location.href = 'payment-error.html';
+                    } else {
+                        setTimeout(checkStatus, 2500);
+                    }
+                });
+            };
+            
+            // Start polling loop
+            setTimeout(checkStatus, 1500);
+        });
+    </script>
+
+    <!-- Canvas Particles -->
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            
+            class P {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedY = Math.random() * -0.2 - 0.05;
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.y += this.speedY;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = 'rgba(124, 77, 255, 0.25)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            for(let i=0; i<30; i++) particles.push(new P());
+            
+            const anim = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(anim);
+            };
+            anim();
+        }
+    </script>
+</body>
+</html>

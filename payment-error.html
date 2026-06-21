@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error en Pago - CAE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: var(--bg-base);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+        .status-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2.5rem;
+            width: 95%;
+            max-width: 460px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(255, 82, 82, 0.15), 0 30px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 82, 82, 0.1);
+            border: 2px solid #FF5252;
+            color: #FF5252;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #FF5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-card">
+        <div class="status-icon">⚠</div>
+        <h2 class="status-title">Error en el Pago</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Hubo un inconveniente al procesar tu pago con la pasarela. Por favor verifica tus credenciales o saldo e inténtalo nuevamente. Si el problema persiste, contacta a soporte técnico.</p>
+        <a href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-full" style="justify-content:center; padding:0.75rem;">Contactar Soporte</a>
+        <a href="entrenamientos.html" class="btn btn-outline w-full" style="justify-content:center; padding:0.75rem;">Volver a Entrenamientos</a>
+    </div>
+</body>
+</html>
