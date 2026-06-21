@@ -3,6 +3,7 @@
     "public_key": "",
     "private_key": "",
     "google_client_id": "",
+    "google_client_secret": "",
     "apple_client_id": "",
     "apple_redirect_uri": "",
     "price_basic": 350000,

@@ -749,9 +749,16 @@
 
                         <!-- Autenticación Social -->
                         <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">Autenticación Social (OAuth 2.0)</h3>
-                        <div class="form-group">
-                            <label for="google-client-id" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Google Client ID</label>
-                            <input type="text" id="google-client-id" placeholder="Ej: 782012589531-xxx.apps.googleusercontent.com" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="google-client-id" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Google Client ID</label>
+                                <input type="text" id="google-client-id" placeholder="Ej: 782012589531-xxx.apps.googleusercontent.com" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="google-client-secret" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Google Client Secret</label>
+                                <input type="password" id="google-client-secret" placeholder="Dejar en blanco para no modificar" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                <span id="google-client-secret-status" style="font-size: 0.8rem; color: #a8b0c5; margin-bottom: 1.25rem; display: block;"></span>
+                            </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -884,6 +891,33 @@
                 window.location.href = 'dashboard.html';
                 return;
             }
+
+            // Verify session cookie status and role asynchronously on backend
+            fetch('/api/me')
+                .then(res => {
+                    if (!res.ok) throw new Error("Sesión expirada");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success && data.user) {
+                        if (data.user.role !== 'administrador') {
+                            localStorage.setItem('cae_user', JSON.stringify(data.user));
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            const freshUserStr = JSON.stringify(data.user);
+                            if (localStorage.getItem('cae_user') !== freshUserStr) {
+                                localStorage.setItem('cae_user', freshUserStr);
+                                window.location.reload();
+                            }
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.warn("Validación de sesión administrativa fallida:", err);
+                    localStorage.removeItem('cae_user');
+                    alert("Tu sesión administrativa ha expirado o es inválida. Redirigiendo al inicio.");
+                    window.location.href = 'index.html#login';
+                });
 
             // Tab Switching logic
             const menuItems = document.querySelectorAll('.sidebar-item');
@@ -1422,6 +1456,8 @@
             const privKeyStatus = document.getElementById('private-key-status');
             
             const googleClientIdInput = document.getElementById('google-client-id');
+            const googleClientSecretInput = document.getElementById('google-client-secret');
+            const googleClientSecretStatus = document.getElementById('google-client-secret-status');
             const appleClientIdInput = document.getElementById('apple-client-id');
             const appleRedirectUriInput = document.getElementById('apple-redirect-uri');
             
@@ -1492,6 +1528,14 @@
                             privKeyStatus.textContent = '⚠️ Clave privada no configurada. Ejecutando en modo simulación.';
                             privKeyStatus.style.color = '#FF5252';
                         }
+
+                        if (data.has_google_client_secret) {
+                            googleClientSecretStatus.textContent = '🔒 Secreto de cliente configurado.';
+                            googleClientSecretStatus.style.color = '#00E676';
+                        } else {
+                            googleClientSecretStatus.textContent = '⚠️ Secreto de cliente no configurado.';
+                            googleClientSecretStatus.style.color = '#FF5252';
+                        }
                     }
                 } catch (e) {
                     console.error("Error loading config from API:", e);
@@ -1504,6 +1548,7 @@
                 const public_key = pubKeyInput.value.trim();
                 const private_key = privKeyInput.value.trim();
                 const google_client_id = googleClientIdInput.value.trim();
+                const google_client_secret = googleClientSecretInput.value.trim();
                 const apple_client_id = appleClientIdInput.value.trim();
                 const apple_redirect_uri = appleRedirectUriInput.value.trim();
                 
@@ -1523,6 +1568,9 @@
                 if (private_key) {
                     payload.private_key = private_key;
                 }
+                if (google_client_secret) {
+                    payload.google_client_secret = google_client_secret;
+                }
 
                 try {
                     const res = await fetch('/api/admin/config', {
@@ -1534,6 +1582,7 @@
                     if (res.ok) {
                         alert("Configuración guardada exitosamente en el servidor.");
                         privKeyInput.value = '';
+                        googleClientSecretInput.value = '';
                         loadPagoparConfig();
                     } else {
                         throw new Error("API return error state");

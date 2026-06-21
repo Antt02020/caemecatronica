@@ -88,9 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load Prices & Client IDs first
     loadConfigAndPrices();
 
-    // Check Google Auth token redirect hash
-    checkGoogleCallback();
-
     // Initialize all standard components
     initHeaderScroll();
     initMobileNav();
@@ -677,9 +674,12 @@ function initAuthUI() {
     const logoutBtn = document.getElementById('nav-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('cae_user');
-            window.location.hash = '';
-            window.location.reload();
+            fetch('/api/auth/logout', { method: 'POST' })
+                .finally(() => {
+                    localStorage.removeItem('cae_user');
+                    window.location.hash = '';
+                    window.location.href = 'index.html';
+                });
         });
     }
 
@@ -950,21 +950,66 @@ function initAuthUI() {
         });
     }
 
+    // Helpers for PKCE generation
+    function generateRandomString(length) {
+        const array = new Uint8Array(length);
+        window.crypto.getRandomValues(array);
+        // Base64URL encode directly to get a valid URL-safe string
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(array[i] % chars.length);
+        }
+        return result;
+    }
+
+    async function sha256(plain) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(plain);
+        return await window.crypto.subtle.digest('SHA-256', data);
+    }
+
+    function base64urlencode(a) {
+        let str = "";
+        const bytes = new Uint8Array(a);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+            str += String.fromCharCode(bytes[i]);
+        }
+        return btoa(str)
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+    }
+
     // Google & Apple OAuth click listeners
     const googleLoginBtn = document.getElementById('google-login-btn');
     if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
+        googleLoginBtn.addEventListener('click', async () => {
             const config = JSON.parse(localStorage.getItem('cae_config')) || {};
             const googleClientId = config.google_client_id || "";
             if (!googleClientId) {
                 alert("Google OAuth Client ID no está configurado en el Panel de Administración.");
                 return;
             }
-            const redirectUri = window.location.origin + '/';
-            const scope = 'email profile';
-            const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}`;
             
-            window.location.href = googleAuthUrl;
+            // Generate PKCE components
+            const codeVerifier = generateRandomString(64);
+            sessionStorage.setItem('google_oauth_code_verifier', codeVerifier);
+            
+            try {
+                const hash = await sha256(codeVerifier);
+                const codeChallenge = base64urlencode(hash);
+                
+                const redirectUri = window.location.origin + '/auth/google/callback';
+                const scope = 'email profile';
+                const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+                
+                window.location.href = googleAuthUrl;
+            } catch (err) {
+                console.error("Error generating PKCE credentials:", err);
+                alert("Error de seguridad al iniciar sesión con Google.");
+            }
         });
     }
 
@@ -1050,8 +1095,7 @@ function clearFeedback() {
 /* ==========================================================================
    SESSION CHECK & CATALOG LOCK LOGIC (Career based access)
    ========================================================================== */
-function checkUserSession() {
-    const loggedInUser = localStorage.getItem('cae_user');
+function updateUserSessionUI(user) {
     const guestActions = document.getElementById('auth-guest-actions');
     const userBadge = document.getElementById('user-profile-badge');
     const initialsSpan = document.getElementById('user-avatar-initials');
@@ -1069,7 +1113,7 @@ function checkUserSession() {
     const elecBtn = document.getElementById('btn-elec-action');
     const mecaBtn = document.getElementById('btn-meca-action');
     
-    if (!loggedInUser) {
+    if (!user) {
         // No session active
         if (guestActions) guestActions.style.display = 'flex';
         if (userBadge) userBadge.style.display = 'none';
@@ -1077,10 +1121,17 @@ function checkUserSession() {
         // Ensure locks are hidden on landing page for guest previewing
         if (elecLock) elecLock.style.display = 'none';
         if (mecaLock) mecaLock.style.display = 'none';
+        
+        if (elecBtn) {
+            elecBtn.textContent = 'Ver entrenamientos';
+            elecBtn.href = '#courses';
+        }
+        if (mecaBtn) {
+            mecaBtn.textContent = 'Ver entrenamientos';
+            mecaBtn.href = '#courses';
+        }
         return;
     }
-    
-    const user = JSON.parse(loggedInUser);
     
     // User session active
     if (guestActions) guestActions.style.display = 'none';
@@ -1111,27 +1162,106 @@ function checkUserSession() {
             mecaBtn.href = 'course.html?c=mecatronica';
         }
     } else {
-        // Student locking rules:
-        if (user.career === "Electrónica") {
-            // Unlock Electronica, Lock Mecatronica
+        // Student locking rules based on plans and career permissions
+        if (user.plan === "Premium") {
             if (elecLock) elecLock.style.display = 'none';
-            if (mecaLock) mecaLock.style.display = 'flex';
-            
+            if (mecaLock) mecaLock.style.display = 'none';
             if (elecBtn) {
                 elecBtn.textContent = 'Ir a mi Aula de Electrónica';
                 elecBtn.href = 'course.html?c=electronica';
             }
-        } else if (user.career === "Mecatrónica") {
-            // Unlock Mecatronica, Lock Electronica
-            if (elecLock) elecLock.style.display = 'flex';
-            if (mecaLock) mecaLock.style.display = 'none';
-            
             if (mecaBtn) {
                 mecaBtn.textContent = 'Ir a mi Aula de Mecatrónica';
                 mecaBtn.href = 'course.html?c=mecatronica';
             }
+        } else if (user.plan === "Profesional") {
+            const purchased = user.purchasedCareers || [];
+            const hasElec = purchased.includes('electronica');
+            const hasMeca = purchased.includes('mecatronica');
+            
+            if (elecLock) elecLock.style.display = hasElec ? 'none' : 'flex';
+            if (mecaLock) mecaLock.style.display = hasMeca ? 'none' : 'flex';
+            
+            if (elecBtn) {
+                elecBtn.textContent = hasElec ? 'Ir a mi Aula de Electrónica' : 'Comprar Carrera';
+                elecBtn.href = hasElec ? 'course.html?c=electronica' : 'entrenamientos.html';
+            }
+            if (mecaBtn) {
+                mecaBtn.textContent = hasMeca ? 'Ir a mi Aula de Mecatrónica' : 'Comprar Carrera';
+                mecaBtn.href = hasMeca ? 'course.html?c=mecatronica' : 'entrenamientos.html';
+            }
+        } else if (user.plan === "Básico") {
+            const purchasedModules = user.purchasedModules || [];
+            const hasAnyElec = purchasedModules.some(m => m.startsWith('elec-'));
+            const hasAnyMeca = purchasedModules.some(m => m.startsWith('meca-'));
+            
+            if (elecLock) elecLock.style.display = hasAnyElec ? 'none' : 'flex';
+            if (mecaLock) mecaLock.style.display = hasAnyMeca ? 'none' : 'flex';
+            
+            if (elecBtn) {
+                elecBtn.textContent = hasAnyElec ? 'Ir a mi Aula de Electrónica' : 'Comprar Módulos';
+                elecBtn.href = hasAnyElec ? 'course.html?c=electronica' : 'entrenamientos.html';
+            }
+            if (mecaBtn) {
+                mecaBtn.textContent = hasAnyMeca ? 'Ir a mi Aula de Mecatrónica' : 'Comprar Módulos';
+                mecaBtn.href = hasAnyMeca ? 'course.html?c=mecatronica' : 'entrenamientos.html';
+            }
+        } else {
+            if (elecLock) elecLock.style.display = 'flex';
+            if (mecaLock) mecaLock.style.display = 'flex';
+            if (elecBtn) {
+                elecBtn.textContent = 'Comprar Carrera';
+                elecBtn.href = 'entrenamientos.html';
+            }
+            if (mecaBtn) {
+                mecaBtn.textContent = 'Comprar Carrera';
+                mecaBtn.href = 'entrenamientos.html';
+            }
         }
     }
+}
+
+function checkUserSession() {
+    const loggedInUser = localStorage.getItem('cae_user');
+    
+    if (loggedInUser) {
+        try {
+            updateUserSessionUI(JSON.parse(loggedInUser));
+        } catch (e) {
+            updateUserSessionUI(null);
+        }
+    } else {
+        updateUserSessionUI(null);
+    }
+    
+    fetch('/api/me')
+        .then(res => {
+            if (!res.ok) throw new Error("Sesión inválida");
+            return res.json();
+        })
+        .then(data => {
+            if (data.success && data.user) {
+                const freshUserStr = JSON.stringify(data.user);
+                const currentUserStr = localStorage.getItem('cae_user');
+                if (currentUserStr !== freshUserStr) {
+                    localStorage.setItem('cae_user', freshUserStr);
+                    updateUserSessionUI(data.user);
+                }
+            } else {
+                throw new Error("No success payload");
+            }
+        })
+        .catch(err => {
+            console.warn("[SESSION] Server session check failed. Logging out client...", err);
+            localStorage.removeItem('cae_user');
+            updateUserSessionUI(null);
+            
+            const protectedPages = ['dashboard.html', 'course.html', 'admin.html'];
+            const currentPage = window.location.pathname.split('/').pop();
+            if (protectedPages.some(page => currentPage.startsWith(page))) {
+                window.location.href = 'index.html';
+            }
+        });
 }
 
 /* ==========================================================================

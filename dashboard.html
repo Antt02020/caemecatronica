@@ -712,6 +712,28 @@
                 return;
             }
 
+            // Verify session cookie status asynchronously on backend
+            fetch('/api/me')
+                .then(res => {
+                    if (!res.ok) throw new Error("Sesión expirada");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success && data.user) {
+                        const freshUserStr = JSON.stringify(data.user);
+                        if (localStorage.getItem('cae_user') !== freshUserStr) {
+                            localStorage.setItem('cae_user', freshUserStr);
+                            window.location.reload();
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.warn("Validación de sesión de servidor fallida:", err);
+                    localStorage.removeItem('cae_user');
+                    alert("Tu sesión ha expirado o es inválida. Redirigiendo al inicio.");
+                    window.location.href = 'index.html#login';
+                });
+
             // Check if user has active permissions
             const hasElecModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('elec-'));
             const hasMecaModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('meca-'));

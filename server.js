@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const http = require('http');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,20 +39,116 @@ function writeDB(data) {
     }
 }
 
+
 // SHA1 function
 function sha1(str) {
     return crypto.createHash('sha1').update(str).digest('hex');
 }
 
+// Session secrets and signature helpers
+function getSessionSecret() {
+    const db = readDB();
+    return db.config.private_key || "cae_fallback_session_secret_key_123456";
+}
+
+function hmacSha256(data, secret) {
+    return crypto.createHmac('sha256', secret).update(data).digest('hex');
+}
+
+function parseCookies(cookieHeader) {
+    const list = {};
+    if (!cookieHeader) return list;
+    cookieHeader.split(';').forEach(cookie => {
+        const parts = cookie.split('=');
+        if (parts.length >= 2) {
+            list[parts.shift().trim()] = decodeURIComponent(parts.join('='));
+        }
+    });
+    return list;
+}
+
+function createSessionToken(email, role) {
+    const payload = JSON.stringify({
+        email: email.toLowerCase(),
+        role: role,
+        expires: Date.now() + 86400000 * 7 // 7 days
+    });
+    const payloadBase64 = Buffer.from(payload).toString('base64');
+    const signature = hmacSha256(payloadBase64, getSessionSecret());
+    return `${payloadBase64}.${signature}`;
+}
+
+function verifySessionToken(token) {
+    if (!token) return null;
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+    
+    const [payloadBase64, signature] = parts;
+    const expectedSignature = hmacSha256(payloadBase64, getSessionSecret());
+    if (signature !== expectedSignature) return null;
+    
+    try {
+        const payload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf8'));
+        if (payload.expires < Date.now()) return null;
+        return payload;
+    } catch (e) {
+        return null;
+    }
+}
+
+function setSessionCookie(res, email, role) {
+    const token = createSessionToken(email, role);
+    res.setHeader('Set-Cookie', `cae_session=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=604800`);
+}
+
+function clearSessionCookie(res) {
+    res.setHeader('Set-Cookie', 'cae_session=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+}
+
+function authenticate(req, res, next) {
+    const cookies = parseCookies(req.headers.cookie);
+    const token = cookies['cae_session'];
+    const session = verifySessionToken(token);
+    
+    if (!session) {
+        return res.status(401).json({ success: false, error: "No autenticado. Por favor inicia sesión." });
+    }
+    
+    const db = readDB();
+    const user = db.users.find(u => u.email.toLowerCase() === session.email);
+    
+    if (!user) {
+        return res.status(401).json({ success: false, error: "Usuario no encontrado." });
+    }
+    
+    if (user.status === "Bloqueado") {
+        return res.status(403).json({ success: false, error: "Tu cuenta ha sido bloqueada. Contacta a soporte." });
+    }
+    
+    req.user = user;
+    next();
+}
+
+function requireAdmin(req, res, next) {
+    authenticate(req, res, () => {
+        if (req.user.role !== 'administrador') {
+            return res.status(403).json({ success: false, error: "Acceso denegado. Se requieren permisos de administrador." });
+        }
+        next();
+    });
+}
+
+
 // ==========================================================================
 // CONFIGURATION ENDPOINTS
 // ==========================================================================
-app.get('/api/admin/config', (req, res) => {
+app.get('/api/admin/config', requireAdmin, (req, res) => {
     const db = readDB();
     res.json({
         public_key: db.config.public_key || "",
         has_private_key: !!db.config.private_key,
         google_client_id: db.config.google_client_id || "",
+        has_google_client_secret: !!db.config.google_client_secret,
         apple_client_id: db.config.apple_client_id || "",
         apple_redirect_uri: db.config.apple_redirect_uri || "",
         price_basic: db.config.price_basic !== undefined ? db.config.price_basic : 350000,
@@ -60,14 +157,17 @@ app.get('/api/admin/config', (req, res) => {
     });
 });
 
-app.post('/api/admin/config', (req, res) => {
-    const { public_key, private_key, google_client_id, apple_client_id, apple_redirect_uri, price_basic, price_profesional, price_premium } = req.body;
+app.post('/api/admin/config', requireAdmin, (req, res) => {
+    const { public_key, private_key, google_client_id, google_client_secret, apple_client_id, apple_redirect_uri, price_basic, price_profesional, price_premium } = req.body;
     const db = readDB();
     db.config.public_key = public_key || "";
     if (private_key) {
         db.config.private_key = private_key;
     }
     db.config.google_client_id = google_client_id || "";
+    if (google_client_secret) {
+        db.config.google_client_secret = google_client_secret;
+    }
     db.config.apple_client_id = apple_client_id || "";
     db.config.apple_redirect_uri = apple_redirect_uri || "";
     
@@ -109,6 +209,7 @@ app.post('/api/auth/login', (req, res) => {
             career: "Ambas",
             plan: "Premium"
         };
+        setSessionCookie(res, adminUser.email, adminUser.role);
         return res.json({ success: true, user: adminUser });
     }
     
@@ -119,6 +220,7 @@ app.post('/api/auth/login', (req, res) => {
             return res.status(403).json({ success: false, message: "Tu cuenta ha sido bloqueada. Contacta a soporte." });
         }
         if (user.password === password) {
+            setSessionCookie(res, user.email, user.role);
             return res.json({ success: true, user });
         }
     }
@@ -148,12 +250,24 @@ app.post('/api/auth/register', (req, res) => {
     
     db.users.push(newUser);
     writeDB(db);
+    setSessionCookie(res, newUser.email, newUser.role);
     res.json({ success: true, user: newUser });
 });
 
-app.get('/api/user/profile', (req, res) => {
-    const email = req.query.email;
-    if (!email) return res.status(400).json({ error: "Email is required" });
+app.get('/api/me', authenticate, (req, res) => {
+    res.json({ success: true, user: req.user });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+    clearSessionCookie(res);
+    res.json({ success: true, message: "Sesión cerrada correctamente." });
+});
+
+app.get('/api/user/profile', authenticate, (req, res) => {
+    const email = req.query.email || req.user.email;
+    if (email.toLowerCase() !== req.user.email.toLowerCase() && req.user.role !== 'administrador') {
+        return res.status(403).json({ success: false, error: "Acceso denegado." });
+    }
     
     const db = readDB();
     const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -167,14 +281,11 @@ app.get('/api/user/profile', (req, res) => {
 // ==========================================================================
 // CHECKOUT & WEBHOOK
 // ==========================================================================
-app.post('/api/checkout', (req, res) => {
-    const { email, plan, career, modules, comprador } = req.body;
+app.post('/api/checkout', authenticate, (req, res) => {
+    const { plan, career, modules, comprador } = req.body;
+    const user = req.user;
+    const email = user.email;
     const db = readDB();
-    
-    const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (!user) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-    }
     
     // Calculate pricing in Guaraníes (PYG) using configurable prices
     const priceBasic = db.config.price_basic !== undefined ? db.config.price_basic : 350000;
@@ -417,7 +528,7 @@ app.post('/api/pagopar-webhook', (req, res) => {
 });
 
 // Sincronización POST /api/payment-status
-app.post('/api/payment-status', (req, res) => {
+app.post('/api/payment-status', authenticate, (req, res) => {
     const { hash_pedido } = req.body;
     if (!hash_pedido) {
         return res.status(400).json({ error: "Falta hash_pedido" });
@@ -459,6 +570,9 @@ app.post('/api/payment-status', (req, res) => {
                     
                     if (tx.pagado) {
                         const localOrder = db.orders.find(o => o.id === tx.numero_pedido || o.hashPedido === hash_pedido);
+                        if (localOrder && localOrder.email.toLowerCase() !== req.user.email.toLowerCase() && req.user.role !== 'administrador') {
+                            return res.status(403).json({ error: "No tienes permiso para consultar este pedido." });
+                        }
                         if (localOrder && localOrder.estado !== "Completado") {
                             localOrder.estado = "Completado";
                             localOrder.status = "paid";
@@ -524,7 +638,7 @@ app.post('/api/payment-status', (req, res) => {
 });
 
 // Admin panel dashboard stats endpoint
-app.get('/api/admin/stats', (req, res) => {
+app.get('/api/admin/stats', requireAdmin, (req, res) => {
     const db = readDB();
     const txList = db.transactions || [];
     const students = db.users.filter(u => u.role === "alumno");
@@ -603,61 +717,119 @@ app.get('/api/admin/stats', (req, res) => {
     });
 });
 
-// Google Sign-In verification endpoint
+// Google OAuth callback page
+app.get('/auth/google/callback', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth-google-callback.html'));
+});
+
+// Google Sign-In verification endpoint using PKCE
 app.post('/api/auth/google-login', (req, res) => {
-    const { access_token } = req.body;
-    if (!access_token) return res.status(400).json({ error: "Falta access_token" });
+    const { code, code_verifier } = req.body;
+    if (!code || !code_verifier) {
+        return res.status(400).json({ error: "Faltan code o code_verifier" });
+    }
     
-    const options = {
-        hostname: 'www.googleapis.com',
-        path: `/oauth2/v3/userinfo?access_token=${access_token}`,
-        method: 'GET'
+    const db = readDB();
+    const googleClientId = db.config.google_client_id;
+    const googleClientSecret = db.config.google_client_secret || "";
+    
+    const postData = new URLSearchParams({
+        code: code,
+        client_id: googleClientId,
+        client_secret: googleClientSecret,
+        code_verifier: code_verifier,
+        grant_type: 'authorization_code',
+        redirect_uri: `${req.headers.origin || 'http://localhost:3000'}/auth/google/callback`
+    }).toString();
+    
+    const tokenOptions = {
+        hostname: 'oauth2.googleapis.com',
+        path: '/token',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(postData)
+        }
     };
     
-    const request = http.request(options, (response) => {
-        let body = '';
-        response.on('data', chunk => body += chunk);
-        response.on('end', () => {
+    const tokenReq = https.request(tokenOptions, (tokenRes) => {
+        let tokenBody = '';
+        tokenRes.on('data', chunk => tokenBody += chunk);
+        tokenRes.on('end', () => {
             try {
-                const googleUser = JSON.parse(body);
-                if (googleUser.email) {
-                    const db = readDB();
-                    let user = db.users.find(u => u.email.toLowerCase() === googleUser.email.toLowerCase());
-                    
-                    if (!user) {
-                        user = {
-                            email: googleUser.email,
-                            firstName: googleUser.given_name || "Usuario",
-                            lastName: googleUser.family_name || "Google",
-                            career: "Ninguna",
-                            plan: "None",
-                            purchasedModules: [],
-                            purchasedCareers: [],
-                            status: "Activo",
-                            role: "alumno"
-                        };
-                        db.users.push(user);
-                        writeDB(db);
-                    }
-                    
-                    if (user.status === "Bloqueado") {
-                        return res.status(403).json({ success: false, message: "Tu cuenta ha sido bloqueada." });
-                    }
-                    
-                    res.json({ success: true, user });
-                } else {
-                    res.status(400).json({ success: false, message: "Token de Google inválido." });
+                const tokenData = JSON.parse(tokenBody);
+                if (tokenData.error) {
+                    console.error("[GOOGLE LOGIN] Token exchange error:", tokenData);
+                    return res.status(400).json({ success: false, message: "Error al intercambiar código: " + (tokenData.error_description || tokenData.error) });
                 }
+                
+                const accessToken = tokenData.access_token;
+                
+                const userinfoOptions = {
+                    hostname: 'www.googleapis.com',
+                    path: `/oauth2/v3/userinfo?access_token=${accessToken}`,
+                    method: 'GET'
+                };
+                
+                const userinfoReq = https.request(userinfoOptions, (userinfoRes) => {
+                    let userinfoBody = '';
+                    userinfoRes.on('data', chunk => userinfoBody += chunk);
+                    userinfoRes.on('end', () => {
+                        try {
+                            const googleUser = JSON.parse(userinfoBody);
+                            if (googleUser.email) {
+                                const db = readDB();
+                                let user = db.users.find(u => u.email.toLowerCase() === googleUser.email.toLowerCase());
+                                
+                                if (!user) {
+                                    user = {
+                                        email: googleUser.email,
+                                        firstName: googleUser.given_name || "Usuario",
+                                        lastName: googleUser.family_name || "Google",
+                                        career: "Ninguna",
+                                        plan: "None",
+                                        purchasedModules: [],
+                                        purchasedCareers: [],
+                                        status: "Activo",
+                                        role: "alumno"
+                                    };
+                                    db.users.push(user);
+                                    writeDB(db);
+                                }
+                                
+                                if (user.status === "Bloqueado") {
+                                    return res.status(403).json({ success: false, message: "Tu cuenta ha sido bloqueada." });
+                                }
+                                
+                                setSessionCookie(res, user.email, user.role);
+                                res.json({ success: true, user });
+                            } else {
+                                res.status(400).json({ success: false, message: "No se pudo obtener el email de Google." });
+                            }
+                        } catch (e) {
+                            res.status(500).json({ error: "Error al verificar perfil de Google" });
+                        }
+                    });
+                });
+                
+                userinfoReq.on('error', (err) => {
+                    res.status(500).json({ error: "Error al consultar perfil en Google" });
+                });
+                
+                userinfoReq.end();
             } catch (e) {
-                res.status(500).json({ error: "Error al verificar token con Google" });
+                res.status(500).json({ error: "Error al procesar tokens de Google" });
             }
         });
     });
     
-    request.on('error', (err) => {
+    tokenReq.on('error', (err) => {
+        console.error("[GOOGLE LOGIN] Connection error during code exchange:", err);
         res.status(500).json({ error: "Error de comunicación con Google" });
     });
-    request.end();
+    
+    tokenReq.write(postData);
+    tokenReq.end();
 });
 
 // Apple Sign-In callback handler (Form Post)
@@ -701,6 +873,7 @@ app.post('/api/auth/apple/callback', (req, res) => {
             return res.status(403).send("Tu cuenta ha sido bloqueada. Contacta a soporte.");
         }
         
+        setSessionCookie(res, user.email, user.role);
         res.send(`
             <script>
                 localStorage.setItem('cae_user', JSON.stringify(${JSON.stringify(user)}));
