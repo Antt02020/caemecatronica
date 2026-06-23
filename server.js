@@ -46,9 +46,17 @@ function sha1(str) {
 }
 
 // Session secrets and signature helpers
+// IMPORTANT: this secret is independent of db.config.private_key (que es la
+// clave privada de Pagopar). Antes se reutilizaba ese mismo campo, por lo que
+// cada vez que se guardaba la configuración de Pagopar se invalidaban todas
+// las sesiones activas (de ahí el error "Tu sesión ha expirado o es inválida").
 function getSessionSecret() {
     const db = readDB();
-    return db.config.private_key || "cae_fallback_session_secret_key_123456";
+    if (!db.config.session_secret) {
+        db.config.session_secret = crypto.randomBytes(32).toString('hex');
+        writeDB(db);
+    }
+    return db.config.session_secret;
 }
 
 function hmacSha256(data, secret) {
