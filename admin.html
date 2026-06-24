@@ -797,34 +797,21 @@
                 <!-- Webhooks y Retornos -->
                 <div class="admin-form-box" style="max-width: 750px; margin-top: 2rem;">
                     <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">URLs de Integración y Retorno</h3>
-                    
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Pagopar solo admite dos URLs en su panel "Integrar con mi sitio web": la de Confirmación (webhook, server-to-server) y la de Redireccionamiento (a donde vuelve el comprador). No existen URLs separadas de éxito/cancelación/error en su sistema — el estado real se determina consultando la API después de la redirección.</p>
+
                     <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem;">
                         <div>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Webhook URL (IPN de Pagopar)</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Confirmación (Webhook / Respuesta)</span>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <input type="text" readonly id="url-webhook" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
                                 <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-webhook')">Copiar</button>
                             </div>
                         </div>
                         <div>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Retorno (Éxito / Pago Procesándose)</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Redireccionamiento (incluye el atributo $hash que pide Pagopar)</span>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <input type="text" readonly id="url-success" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
                                 <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-success')">Copiar</button>
-                            </div>
-                        </div>
-                        <div>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Cancelación</span>
-                            <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                <input type="text" readonly id="url-cancel" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
-                                <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-cancel')">Copiar</button>
-                            </div>
-                        </div>
-                        <div>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">URL de Error</span>
-                            <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                <input type="text" readonly id="url-error" style="flex-grow: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem;" value="">
-                                <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="copyToClipboard('url-error')">Copiar</button>
                             </div>
                         </div>
                     </div>
@@ -1465,11 +1452,9 @@
             const priceProfesionalInput = document.getElementById('price-profesional');
             const pricePremiumInput = document.getElementById('price-premium');
 
-            // Populate return URLs
+            // Populate return URLs (Pagopar solo soporta estas 2 — Confirmación y Redireccionamiento)
             document.getElementById('url-webhook').value = window.location.origin + '/api/pagopar-webhook';
-            document.getElementById('url-success').value = window.location.origin + '/payment-processing.html';
-            document.getElementById('url-cancel').value = window.location.origin + '/payment-cancelled.html';
-            document.getElementById('url-error').value = window.location.origin + '/payment-error.html';
+            document.getElementById('url-success').value = window.location.origin + '/payment-processing.html?hash_pedido=$hash';
 
             // Copy to Clipboard helper
             window.copyToClipboard = (id) => {
