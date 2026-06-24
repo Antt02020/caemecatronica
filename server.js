@@ -406,7 +406,7 @@ app.post('/api/checkout', authenticate, (req, res) => {
         }
     };
     
-    const request = http.request(options, (response) => {
+    const request = https.request(options, (response) => {
         let body = '';
         response.on('data', chunk => body += chunk);
         response.on('end', () => {
@@ -430,19 +430,23 @@ app.post('/api/checkout', authenticate, (req, res) => {
                         redirectUrl: `https://www.pagopar.com/pagos/${hashPedido}`
                     });
                 } else {
-                    console.error("[CHECKOUT] Pagopar API returned error:", result);
+                    console.error("[CHECKOUT] Pagopar API returned error. Status:", response.statusCode, "Body:", body);
                     res.status(500).json({ error: "Error de la API de Pagopar: " + (result.resultado || "Respuesta inválida") });
                 }
             } catch (e) {
-                console.error("[CHECKOUT] JSON parse error on Pagopar response:", e, body);
-                res.status(500).json({ error: "Respuesta de pasarela corrupta o inválida" });
+                console.error("[CHECKOUT] JSON parse error on Pagopar response. Status:", response.statusCode, "Headers:", JSON.stringify(response.headers), "Raw body:", body);
+                res.status(500).json({
+                    error: "Respuesta de pasarela corrupta o inválida",
+                    debug_status: response.statusCode,
+                    debug_body: (body || "").slice(0, 500)
+                });
             }
         });
     });
     
     request.on('error', (err) => {
-        console.error("[CHECKOUT] Connection error to Pagopar API:", err);
-        res.status(500).json({ error: "Error de comunicación con la pasarela de pagos" });
+        console.error("[CHECKOUT] Connection error to Pagopar API:", err.code, err.message, err);
+        res.status(500).json({ error: "Error de comunicación con la pasarela de pagos", debug_code: err.code, debug_message: err.message });
     });
     
     request.write(JSON.stringify(payload));
@@ -567,7 +571,7 @@ app.post('/api/payment-status', authenticate, (req, res) => {
         }
     };
     
-    const request = http.request(options, (response) => {
+    const request = https.request(options, (response) => {
         let body = '';
         response.on('data', chunk => body += chunk);
         response.on('end', () => {

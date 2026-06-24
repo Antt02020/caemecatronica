@@ -1412,7 +1412,11 @@ function initInterestModal() {
                 localStorage.removeItem('cae_pending_purchase');
                 window.location.href = data.redirectUrl;
             } else {
-                alert("Error al iniciar transacción: " + (data.error || "Respuesta inválida"));
+                let msg = "Error al iniciar transacción: " + (data.error || "Respuesta inválida");
+                if (data.debug_status || data.debug_body || data.debug_code) {
+                    msg += `\n\n[Debug] status: ${data.debug_status || data.debug_code || "?"}\n${data.debug_body || data.debug_message || ""}`;
+                }
+                alert(msg);
             }
         })
         .catch(err => {

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Shared Styles -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     
     <style>
         body {
@@ -144,7 +144,7 @@
         <h2 class="callback-title" id="callback-title">Autenticando...</h2>
         <p class="callback-text" id="callback-text">Estamos verificando tus credenciales con Google y sincronizando tu sesión de forma segura. Por favor, no cierres esta ventana.</p>
         
-        <a href="index.html" class="btn-home" id="btn-home">Volver al Inicio</a>
+        <a href="/index.html" class="btn-home" id="btn-home">Volver al Inicio</a>
     </div>
 
     <!-- Callback Code Exchange Script -->
@@ -210,12 +210,12 @@
                         if (pending) {
                             const intent = JSON.parse(pending);
                             if (intent.plan === 'Básico') {
-                                window.location.href = 'entrenamientos.html';
+                                window.location.href = '/entrenamientos.html';
                             } else {
-                                window.location.href = 'index.html';
+                                window.location.href = '/index.html';
                             }
                         } else {
-                            window.location.href = data.user.role === 'administrador' ? 'admin.html' : 'dashboard.html';
+                            window.location.href = data.user.role === 'administrador' ? '/admin.html' : '/dashboard.html';
                         }
                     }, 1200);
                 } else {
