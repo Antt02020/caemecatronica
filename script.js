@@ -76,6 +76,14 @@ const DEFAULT_STUDENTS = [
     { email: "jorge.m@yahoo.com", firstName: "Jorge", lastName: "Mendoza", career: "Electrónica", plan: "Básico", status: "Bloqueado" }
 ];
 
+function safeInit(fn, label) {
+    try {
+        fn();
+    } catch (err) {
+        console.error(`[init] Error en ${label}:`, err);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Database initialization in LocalStorage
     if (!localStorage.getItem('cae_courses')) {
@@ -85,23 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('cae_students', JSON.stringify(DEFAULT_STUDENTS));
     }
 
-    // Load Prices & Client IDs first
-    loadConfigAndPrices();
-
-    // Initialize all standard components
-    initHeaderScroll();
-    initMobileNav();
-    initScrollReveal();
-    initParticlesCanvas();
-    initNewsletterForm();
-    initPricingActions();
-    initActiveNavOnScroll();
-    initCleanUrlNavigation();
-    
-    // Auth UI manager
-    initAuthUI();
-    checkUserSession();
-    initInterestModal();
+    // safeInit calls in prioritized order
+    safeInit(initCleanUrlNavigation, 'initCleanUrlNavigation');
+    safeInit(loadConfigAndPrices, 'loadConfigAndPrices');
+    safeInit(initHeaderScroll, 'initHeaderScroll');
+    safeInit(initMobileNav, 'initMobileNav');
+    safeInit(initScrollReveal, 'initScrollReveal');
+    safeInit(initParticlesCanvas, 'initParticlesCanvas');
+    safeInit(initNewsletterForm, 'initNewsletterForm');
+    safeInit(initPricingActions, 'initPricingActions');
+    safeInit(initActiveNavOnScroll, 'initActiveNavOnScroll');
+    safeInit(initAuthUI, 'initAuthUI');
+    safeInit(checkUserSession, 'checkUserSession');
+    safeInit(initInterestModal, 'initInterestModal');
 });
 
 /* ==========================================================================

@@ -56,7 +56,13 @@ Object.entries(cleanRoutes).forEach(([route, file]) => {
     });
 });
 
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+            res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        }
+    }
+}));
 
 const DB_PATH = path.join(__dirname, 'db.json');
 
