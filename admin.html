@@ -38,7 +38,125 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            z-index: 100;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-logo .logo-accent {
+            color: var(--accent);
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-item {
+            width: 100%;
+        }
+
+        .sidebar-item button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.25rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item button svg {
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item button:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-item button:hover svg {
+            color: #fff;
+        }
+
+        /* Active sidebar tab */
+        .sidebar-item.active button {
+            background: rgba(124, 77, 255, 0.15);
+            border-color: rgba(124, 77, 255, 0.4);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(124, 77, 255, 0.15);
+        }
+
+        .sidebar-item.active button svg {
+            color: var(--accent);
+            filter: drop-shadow(0 0 5px var(--accent));
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-footer button {
+            cursor: pointer;
+        }
+
+        .sidebar-toggle-btn {
+            display: none;
+            background: rgba(124, 77, 255, 0.15);
+            border: 1px solid rgba(124, 77, 255, 0.35);
+            color: #fff;
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: rgba(124, 77, 255, 0.25);
+            border-color: rgba(124, 77, 255, 0.6);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 999;
         }
 
         .main-content {
@@ -207,14 +325,39 @@
                 flex-direction: column;
             }
             .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid rgba(124, 77, 255, 0.25);
-                height: auto;
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1000;
+                box-shadow: 20px 0 40px rgba(0, 0, 0, 0.5);
+                border-right: 1px solid rgba(124, 77, 255, 0.25);
+                border-bottom: none;
+            }
+            .sidebar.open {
+                transform: translateX(0);
             }
             .main-content {
                 max-width: 100%;
-                padding: 2.5rem 1.5rem;
+                padding: 2rem 1.5rem;
+            }
+            .sidebar-toggle-btn {
+                display: flex;
+                margin-right: 1rem;
+            }
+            .panel-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                background: rgba(10, 16, 48, 0.5);
+                padding: 1rem;
+                border-radius: var(--radius-lg);
+                border: 1px solid rgba(255, 255, 255, 0.05);
             }
         }
 
@@ -284,9 +427,15 @@
             </div>
         </aside>
 
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
         <!-- Main Workspace -->
         <main class="main-content">
             <div class="panel-header">
+                <button class="sidebar-toggle-btn" aria-label="Abrir menú" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
                 <div>
                     <h1 class="welcome-title">Panel de Control General</h1>
                     <p class="welcome-subtitle" id="admin-subheading">Gestión centralizada del ecosistema educativo.</p>
@@ -906,6 +1055,29 @@
                     window.location.href = 'index.html#login';
                 });
 
+            // Mobile Sidebar drawer menu toggle
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const toggleBtns = document.querySelectorAll('.sidebar-toggle-btn');
+
+            function toggleSidebar() {
+                const isOpen = sidebar.classList.contains('open');
+                if (isOpen) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                    toggleBtns.forEach(btn => btn.setAttribute('aria-expanded', 'false'));
+                } else {
+                    sidebar.classList.add('open');
+                    sidebarOverlay.classList.add('active');
+                    toggleBtns.forEach(btn => btn.setAttribute('aria-expanded', 'true'));
+                }
+            }
+
+            toggleBtns.forEach(btn => btn.addEventListener('click', toggleSidebar));
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
+
             // Tab Switching logic
             const menuItems = document.querySelectorAll('.sidebar-item');
             const subhead = document.getElementById('admin-subheading');
@@ -935,6 +1107,11 @@
                         subhead.textContent = 'Reportes de inteligencia financiera, ventas y conversiones.';
                     } else if (tabId === 'db-pagopar') {
                         subhead.textContent = 'Configurar credenciales y tokens seguros para la pasarela de pagos.';
+                    }
+
+                    // Close sidebar on item click on mobile screens
+                    if (window.innerWidth <= 991) {
+                        toggleSidebar();
                     }
                 });
             });

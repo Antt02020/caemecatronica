@@ -1146,6 +1146,18 @@ function updateUserSessionUI(user) {
     if (dropdownName) dropdownName.textContent = `${user.firstName} ${user.lastName}`;
     if (dropdownRole) dropdownRole.textContent = `Plan ${user.plan || 'Profesional'}`;
     if (dropdownCareer) dropdownCareer.textContent = `Carrera: ${user.career}`;
+
+    // Handle dynamic header navigation button based on user role
+    const navRoleBtn = document.getElementById('nav-role-btn');
+    if (navRoleBtn) {
+        if (user.role === 'administrador') {
+            navRoleBtn.textContent = 'Panel de administración';
+            navRoleBtn.href = 'admin.html';
+        } else {
+            navRoleBtn.textContent = 'Dashboard de alumnos';
+            navRoleBtn.href = 'dashboard.html';
+        }
+    }
     
     // Handle specific locks based on selected career
     if (user.role === "administrador") {

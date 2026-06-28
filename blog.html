@@ -12,6 +12,7 @@
     
     <!-- Custom stylesheet shared -->
     <link rel="stylesheet" href="style.v5.css">
+    <script src="script.js" defer></script>
     
     <style>
         body {
@@ -229,19 +230,58 @@
     <!-- Particles Underlying -->
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
-    <!-- Header Navigation (Simplified Landing static block) -->
+    <!-- Header Navigation -->
     <header class="main-header scrolled" id="header">
         <div class="header-container">
-            <a href="index.html" class="logo"><span class="logo-accent">C</span>AE</a>
-            <nav class="primary-nav">
-                <ul class="nav-list">
+            <a href="index.html" class="logo" id="logo" aria-label="CAE Inicio">
+                <img src="/assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" />
+            </a>
+            
+            <button class="mobile-nav-toggle" id="mobile-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Menú de navegación">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <nav class="primary-nav" id="primary-navigation">
+                <ul class="nav-list" id="nav-list">
                     <li><a href="index.html#hero" class="nav-link">Inicio</a></li>
                     <li><a href="index.html#about" class="nav-link">Sobre CAE</a></li>
                     <li><a href="entrenamientos.html" class="nav-link">Entrenamientos</a></li>
+                    <li><a href="index.html#benefits" class="nav-link">Ventajas</a></li>
+                    <li><a href="index.html#process" class="nav-link">Pasos</a></li>
                     <li><a href="index.html#pricing" class="nav-link">Precios</a></li>
                     <li><a href="blog.html" class="nav-link active">Blog</a></li>
                     <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+
+                    <li class="more-menu" id="more-menu">
+                        <button class="more-btn">
+                            Ver más
+                        </button>
+                        <ul class="more-dropdown" id="more-dropdown"></ul>
+                    </li>
                 </ul>
+                <div class="nav-actions">
+                    <div class="auth-guest-actions" id="auth-guest-actions">
+                        <a href="#login" class="btn btn-outline" id="nav-login-btn">Iniciar sesión</a>
+                        <a href="#register" class="btn btn-primary" id="nav-register-btn">Registrarse</a>
+                    </div>
+                    <div class="user-profile-badge" id="user-profile-badge" style="display: none;">
+                        <a href="dashboard.html" class="btn btn-outline nav-role-btn" id="nav-role-btn" style="margin-right: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">Dashboard de alumnos</a>
+                        <button class="avatar-btn" id="avatar-btn" aria-label="Menú de usuario">
+                            <span class="user-avatar" id="user-avatar-initials">U</span>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown" aria-hidden="true">
+                            <div class="user-dropdown-info">
+                                <span class="user-dropdown-name" id="user-dropdown-name">Usuario</span>
+                                <span class="user-dropdown-role" id="user-dropdown-role">Plan Profesional</span>
+                                <span class="user-dropdown-career" id="user-dropdown-career">Electrónica</span>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <button class="dropdown-item" id="nav-logout-btn">Cerrar sesión</button>
+                        </div>
+                    </div>
+                </div>
             </nav>
         </div>
     </header>
@@ -314,9 +354,63 @@
         </main>
     </div>
 
-    <!-- Footer block standard -->
+    <!-- Footer -->
     <footer class="main-footer">
         <div class="container footer-container">
+            <div class="footer-grid">
+                <!-- Column 1: CAE -->
+                <div class="footer-column col-info scroll-reveal fade-in-up">
+                    <a href="index.html#hero" class="footer-logo" aria-label="CAE Inicio">
+                        <img src="/assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" />
+                    </a>
+                    <p class="footer-desc">CAE es una plataforma educativa online especializada en Electrónica y Mecatrónica.</p>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="footer-column scroll-reveal fade-in-up" style="animation-delay: 0.1s;">
+                    <h4 class="footer-col-title">Enlaces rápidos</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="index.html#hero" class="footer-link">Inicio</a></li>
+                        <li><a href="index.html#about" class="footer-link">Sobre CAE</a></li>
+                        <li><a href="entrenamientos.html" class="footer-link">Entrenamientos</a></li>
+                        <li><a href="index.html#benefits" class="footer-link">Ventajas</a></li>
+                        <li><a href="index.html#process" class="footer-link">Pasos</a></li>
+                        <li><a href="index.html#pricing" class="footer-link">Planes y Precios</a></li>
+                        <li><a href="blog.html" class="footer-link">Blog</a></li>
+                        <li><a href="index.html#contacto" class="footer-link">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Support -->
+                <div class="footer-column scroll-reveal fade-in-up" style="animation-delay: 0.2s;">
+                    <h4 class="footer-col-title">Soporte</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="index.html#faq" class="footer-link">Preguntas frecuentes</a></li>
+                        <li><a href="index.html#privacy" class="footer-link">Políticas de privacidad</a></li>
+                        <li><a href="index.html#terms" class="footer-link">Términos y condiciones</a></li>
+                        <li><a href="index.html#support" class="footer-link">Soporte técnico</a></li>
+                        <li><a href="https://wa.me/595985881265" target="_blank" rel="noopener noreferrer" class="footer-link">WhatsApp</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter -->
+                <div class="footer-column col-newsletter scroll-reveal fade-in-up" style="animation-delay: 0.3s;">
+                    <h4 class="footer-col-title">Suscríbete al boletín</h4>
+                    <p class="footer-desc">Recibe noticias, nuevos entrenamientos y promociones exclusivas.</p>
+                    <form class="newsletter-form" id="newsletter-form" novalidate>
+                        <div class="input-group">
+                            <label for="newsletter-email" class="sr-only">Correo electrónico</label>
+                            <input type="email" id="newsletter-email" placeholder="Tu correo electrónico" required aria-required="true">
+                            <button type="submit" class="btn btn-primary btn-icon" aria-label="Suscribirse">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <span class="form-feedback" id="newsletter-feedback" aria-live="polite"></span>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
             <div class="footer-bottom">
                 <p class="copyright">© 2024 CAE - Capacitación Avanzada en Electrónica. Todos los derechos reservados.</p>
             </div>
@@ -558,5 +652,159 @@
             anim();
         }
     </script>
+
+    <!-- Auth Modal Container -->
+    <div class="auth-modal-overlay" id="auth-modal-overlay" aria-hidden="true">
+        <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+            <button class="auth-modal-close" id="auth-modal-close" aria-label="Cerrar modal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <!-- VIEW 1: LOGIN -->
+            <div class="auth-view" id="auth-view-login">
+                <h3 class="auth-modal-title" id="auth-modal-title">Bienvenido de vuelta</h3>
+                <p class="auth-modal-subtitle">Accede a tu aula virtual y continúa aprendiendo.</p>
+                <form class="auth-form" id="login-form" novalidate>
+                    <div class="form-group">
+                        <label for="login-email">Correo electrónico</label>
+                        <input type="email" id="login-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label for="login-password">Contraseña</label>
+                            <button type="button" class="form-link-btn" id="to-forgot-btn">¿Olvidaste tu contraseña?</button>
+                        </div>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Iniciar sesión</button>
+                    
+                    <div class="social-auth-separator">o</div>
+                    
+                    <div class="social-auth-buttons">
+                        <button type="button" class="btn-social btn-google" id="google-login-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                            </svg>
+                            Continuar con Google
+                        </button>
+                        <button type="button" class="btn-social btn-apple" id="apple-login-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-apple" viewBox="0 0 16 16">
+                                <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282"/>
+                            </svg>
+                            Continuar con Apple
+                        </button>
+                    </div>
+                </form>
+                <p class="auth-modal-footer">¿No tienes cuenta? <button type="button" class="form-link-btn" id="to-register-btn">Regístrate aquí</button></p>
+            </div>
+
+            <!-- VIEW 2: REGISTER -->
+            <div class="auth-view" id="auth-view-register" style="display: none;">
+                <h3 class="auth-modal-title">Crear cuenta</h3>
+                <p class="auth-modal-subtitle">Comienza tu formación en tecnología hoy mismo.</p>
+                <form class="auth-form" id="register-form" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-firstname">Nombre</label>
+                            <input type="text" id="reg-firstname" required placeholder="Juan">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-lastname">Apellido</label>
+                            <input type="text" id="reg-lastname" required placeholder="Pérez">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Correo electrónico</label>
+                        <input type="email" id="reg-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-password">Contraseña</label>
+                            <input type="password" id="reg-password" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-password">Confirmar contraseña</label>
+                            <input type="password" id="reg-confirm-password" required placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="form-checkbox-group">
+                        <input type="checkbox" id="reg-terms" required>
+                        <label for="reg-terms" style="color:#A8B0C5; font-size:0.85rem;">Acepto los <a href="#terms" style="color:#7C4DFF; text-decoration:none;">términos y condiciones</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Registrarse</button>
+                </form>
+                <p class="auth-modal-footer">¿Ya tienes cuenta? <button type="button" class="form-link-btn" id="to-login-btn">Inicia sesión</button></p>
+            </div>
+
+            <!-- VIEW 3: FORGOT PASSWORD -->
+            <div class="auth-view" id="auth-view-forgot" style="display: none;">
+                <h3 class="auth-modal-title">Recuperar contraseña</h3>
+                <p class="auth-modal-subtitle">Ingresa tu correo y te enviaremos un enlace de recuperación.</p>
+                <form class="auth-form" id="forgot-form" novalidate>
+                    <div class="form-group">
+                        <label for="forgot-email">Correo electrónico</label>
+                        <input type="email" id="forgot-email" required placeholder="correo@ejemplo.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Enviar enlace</button>
+                </form>
+                <p class="auth-modal-footer">Volver a <button type="button" class="form-link-btn" id="to-login-from-forgot-btn">Iniciar sesión</button></p>
+            </div>
+
+            <!-- VIEW 4: RESET PASSWORD -->
+            <div class="auth-view" id="auth-view-reset" style="display: none;">
+                <h3 class="auth-modal-title">Restablecer contraseña</h3>
+                <p class="auth-modal-subtitle">Escribe tu nueva contraseña de acceso.</p>
+                <form class="auth-form" id="reset-form" novalidate>
+                    <div class="form-group">
+                        <label for="reset-password">Nueva contraseña</label>
+                        <input type="password" id="reset-password" required placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-confirm-password">Confirmar nueva contraseña</label>
+                        <input type="password" id="reset-confirm-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Guardar contraseña</button>
+                </form>
+                <p class="auth-modal-footer">Volver a <button type="button" class="form-link-btn" id="to-login-from-reset-btn">Iniciar sesión</button></p>
+            </div>
+            
+            <div class="auth-feedback" id="auth-feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <!-- Interest Selection Modal Container -->
+    <div class="auth-modal-overlay" id="interest-modal-overlay" aria-hidden="true">
+        <div class="auth-modal-card" style="max-width: 540px;" role="dialog" aria-modal="true" aria-labelledby="interest-modal-title">
+            <button class="auth-modal-close" id="interest-modal-close" aria-label="Cerrar modal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <h3 class="auth-modal-title" id="interest-modal-title" style="margin-bottom: 0.5rem; text-align: center; background: var(--grad-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">¿Qué entrenamiento te interesa?</h3>
+            <p class="auth-modal-subtitle" style="margin-bottom: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Selecciona una especialidad para continuar.</p>
+            
+            <div class="interest-cards-grid">
+                <div class="interest-card" id="interest-card-meca" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: var(--transition-smooth); display: flex; flex-direction: column; height: 100%;">
+                    <div class="interest-image-wrapper" style="height: 140px; overflow: hidden; position: relative; border-bottom: 1px solid rgba(124, 77, 255, 0.15);">
+                        <img src="assets/images/study_mecatronica.png" alt="Mecatrónica" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="interest-info" style="padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; gap: 0.35rem;">
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Mecatrónica</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Robótica, automatización y control industrial.</p>
+                    </div>
+                </div>
+                <div class="interest-card" id="interest-card-elec" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: var(--transition-smooth); display: flex; flex-direction: column; height: 100%;">
+                    <div class="interest-image-wrapper" style="height: 140px; overflow: hidden; position: relative; border-bottom: 1px solid rgba(124, 77, 255, 0.15);">
+                        <img src="assets/images/study_electronics.png" alt="Electrónica" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="interest-info" style="padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; gap: 0.35rem;">
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Electrónica</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Microcontroladores, diseño de PCB y circuitos analógicos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
