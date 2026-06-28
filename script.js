@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNewsletterForm();
     initPricingActions();
     initActiveNavOnScroll();
+    initCleanUrlNavigation();
     
     // Auth UI manager
     initAuthUI();
@@ -288,7 +289,9 @@ function initActiveNavOnScroll() {
             if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
                 navLinks.forEach(link => {
                     link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${sectionId}`) {
+                    const href = link.getAttribute('href');
+                    const scrollTarget = link.getAttribute('data-scroll-target');
+                    if (href === `#${sectionId}` || scrollTarget === sectionId) {
                         link.classList.add('active');
                     }
                 });
@@ -297,6 +300,74 @@ function initActiveNavOnScroll() {
     };
     
     window.addEventListener('scroll', handleActiveLink, { passive: true });
+}
+
+/* ==========================================================================
+   CLEAN URL & JAVASCRIPT SMOOTH SCROLL NAVIGATION WITH OFFSET
+   ========================================================================== */
+function smoothScrollTo(element) {
+    if (!element) return;
+    const offset = 100;
+    const top = element.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({
+        top: Math.max(top, 0),
+        behavior: 'smooth'
+    });
+}
+
+function initCleanUrlNavigation() {
+    // 1. Intercept scroll targets and auth modal triggers
+    document.addEventListener('click', (e) => {
+        const scrollLink = e.target.closest('[data-scroll-target]');
+        if (scrollLink) {
+            e.preventDefault();
+            const targetId = scrollLink.getAttribute('data-scroll-target');
+            const targetEl = document.getElementById(targetId);
+            smoothScrollTo(targetEl);
+            
+            // Close mobile menu if open
+            const primaryNav = document.getElementById('primary-navigation');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            if (primaryNav && primaryNav.classList.contains('open')) {
+                primaryNav.classList.remove('open');
+                if (mobileToggle) mobileToggle.setAttribute('aria-expanded', 'false');
+            }
+            return;
+        }
+
+        const authLink = e.target.closest('[data-auth-action]');
+        if (authLink) {
+            e.preventDefault();
+            const action = authLink.getAttribute('data-auth-action');
+            openAuthModal(action);
+        }
+    });
+
+    // 2. Handle search parameters on load (?scroll=section or ?auth=modal)
+    const urlParams = new URLSearchParams(window.location.search);
+    const scrollTarget = urlParams.get('scroll');
+    const authTarget = urlParams.get('auth');
+
+    if (scrollTarget) {
+        setTimeout(() => {
+            const targetEl = document.getElementById(scrollTarget);
+            smoothScrollTo(targetEl);
+            
+            // Clean URL query parameters
+            const cleanUrl = window.location.pathname + window.location.search.replace(/[?&]scroll=[^&]+/, '').replace(/^\?$/, '');
+            window.history.replaceState({}, document.title, cleanUrl);
+        }, 150);
+    }
+
+    if (authTarget === 'login' || authTarget === 'register') {
+        setTimeout(() => {
+            openAuthModal(authTarget);
+            
+            // Clean URL query parameters
+            const cleanUrl = window.location.pathname + window.location.search.replace(/[?&]auth=[^&]+/, '').replace(/^\?$/, '');
+            window.history.replaceState({}, document.title, cleanUrl);
+        }, 150);
+    }
 }
 
 /* ==========================================================================
@@ -473,7 +544,7 @@ function initPricingActions() {
             } else {
                 if (planName === 'Básico') {
                     // Redirect Básico plan to select modules
-                    window.location.href = 'entrenamientos.html';
+                    window.location.href = '/entrenamientos';
                 } else {
                     // Open Interest Selection Modal for Profesional or Premium
                     localStorage.setItem('cae_pending_purchase', JSON.stringify({
@@ -678,7 +749,7 @@ function initAuthUI() {
                 .finally(() => {
                     localStorage.removeItem('cae_user');
                     window.location.hash = '';
-                    window.location.href = 'index.html';
+                    window.location.href = '/';
                 });
         });
     }
@@ -720,7 +791,7 @@ function initAuthUI() {
                         if (localStorage.getItem('cae_pending_purchase')) {
                             window.location.reload();
                         } else {
-                            window.location.href = data.user.role === 'administrador' ? 'admin.html' : 'dashboard.html';
+                            window.location.href = data.user.role === 'administrador' ? '/admin' : '/dashboard';
                         }
                     }, 1000);
                 }
@@ -745,7 +816,7 @@ function initAuthUI() {
                     showFeedback('¡Ingreso exitoso! Redirigiendo al panel...', 'success');
                     setTimeout(() => {
                         closeAuthModal();
-                        window.location.href = 'admin.html';
+                        window.location.href = '/admin';
                     }, 1000);
                     return;
                 }
@@ -775,7 +846,7 @@ function initAuthUI() {
                         if (localStorage.getItem('cae_pending_purchase')) {
                             window.location.reload();
                         } else {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = '/dashboard';
                         }
                     }, 1000);
                 } else {
@@ -841,7 +912,7 @@ function initAuthUI() {
                         if (localStorage.getItem('cae_pending_purchase')) {
                             window.location.reload();
                         } else {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = '/dashboard';
                         }
                     }, 1200);
                 }
@@ -888,7 +959,7 @@ function initAuthUI() {
                     if (localStorage.getItem('cae_pending_purchase')) {
                         window.location.reload();
                     } else {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = '/dashboard';
                     }
                 }, 1200);
             });
@@ -1152,10 +1223,10 @@ function updateUserSessionUI(user) {
     if (navRoleBtn) {
         if (user.role === 'administrador') {
             navRoleBtn.textContent = 'Panel de administración';
-            navRoleBtn.href = 'admin.html';
+            navRoleBtn.href = '/admin';
         } else {
             navRoleBtn.textContent = 'Dashboard de alumnos';
-            navRoleBtn.href = 'dashboard.html';
+            navRoleBtn.href = '/dashboard';
         }
     }
     
@@ -1167,11 +1238,11 @@ function updateUserSessionUI(user) {
         
         if (elecBtn) {
             elecBtn.textContent = 'Ver Aula de Electrónica';
-            elecBtn.href = 'course.html?c=electronica';
+            elecBtn.href = '/course?c=electronica';
         }
         if (mecaBtn) {
             mecaBtn.textContent = 'Ver Aula de Mecatrónica';
-            mecaBtn.href = 'course.html?c=mecatronica';
+            mecaBtn.href = '/course?c=mecatronica';
         }
     } else {
         // Student locking rules based on plans and career permissions
@@ -1180,11 +1251,11 @@ function updateUserSessionUI(user) {
             if (mecaLock) mecaLock.style.display = 'none';
             if (elecBtn) {
                 elecBtn.textContent = 'Ir a mi Aula de Electrónica';
-                elecBtn.href = 'course.html?c=electronica';
+                elecBtn.href = '/course?c=electronica';
             }
             if (mecaBtn) {
                 mecaBtn.textContent = 'Ir a mi Aula de Mecatrónica';
-                mecaBtn.href = 'course.html?c=mecatronica';
+                mecaBtn.href = '/course?c=mecatronica';
             }
         } else if (user.plan === "Profesional") {
             const purchased = user.purchasedCareers || [];
@@ -1196,11 +1267,11 @@ function updateUserSessionUI(user) {
             
             if (elecBtn) {
                 elecBtn.textContent = hasElec ? 'Ir a mi Aula de Electrónica' : 'Comprar Carrera';
-                elecBtn.href = hasElec ? 'course.html?c=electronica' : 'entrenamientos.html';
+                elecBtn.href = hasElec ? '/course?c=electronica' : '/entrenamientos';
             }
             if (mecaBtn) {
                 mecaBtn.textContent = hasMeca ? 'Ir a mi Aula de Mecatrónica' : 'Comprar Carrera';
-                mecaBtn.href = hasMeca ? 'course.html?c=mecatronica' : 'entrenamientos.html';
+                mecaBtn.href = hasMeca ? '/course?c=mecatronica' : '/entrenamientos';
             }
         } else if (user.plan === "Básico") {
             const purchasedModules = user.purchasedModules || [];
@@ -1212,22 +1283,22 @@ function updateUserSessionUI(user) {
             
             if (elecBtn) {
                 elecBtn.textContent = hasAnyElec ? 'Ir a mi Aula de Electrónica' : 'Comprar Módulos';
-                elecBtn.href = hasAnyElec ? 'course.html?c=electronica' : 'entrenamientos.html';
+                elecBtn.href = hasAnyElec ? '/course?c=electronica' : '/entrenamientos';
             }
             if (mecaBtn) {
                 mecaBtn.textContent = hasAnyMeca ? 'Ir a mi Aula de Mecatrónica' : 'Comprar Módulos';
-                mecaBtn.href = hasAnyMeca ? 'course.html?c=mecatronica' : 'entrenamientos.html';
+                mecaBtn.href = hasAnyMeca ? '/course?c=mecatronica' : '/entrenamientos';
             }
         } else {
             if (elecLock) elecLock.style.display = 'flex';
             if (mecaLock) mecaLock.style.display = 'flex';
             if (elecBtn) {
                 elecBtn.textContent = 'Comprar Carrera';
-                elecBtn.href = 'entrenamientos.html';
+                elecBtn.href = '/entrenamientos';
             }
             if (mecaBtn) {
                 mecaBtn.textContent = 'Comprar Carrera';
-                mecaBtn.href = 'entrenamientos.html';
+                mecaBtn.href = '/entrenamientos';
             }
         }
     }
@@ -1268,10 +1339,10 @@ function checkUserSession() {
             localStorage.removeItem('cae_user');
             updateUserSessionUI(null);
             
-            const protectedPages = ['dashboard.html', 'course.html', 'admin.html'];
+            const protectedPages = ['/dashboard', '/course', '/admin'];
             const currentPage = window.location.pathname.split('/').pop();
             if (protectedPages.some(page => currentPage.startsWith(page))) {
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }
         });
 }
@@ -1331,12 +1402,12 @@ function checkGoogleCallback() {
                     if (pending) {
                         const intent = JSON.parse(pending);
                         if (intent.plan === 'Básico') {
-                            window.location.href = 'entrenamientos.html';
+                            window.location.href = '/entrenamientos';
                         } else {
                             window.location.reload();
                         }
                     } else {
-                        window.location.href = data.user.role === 'administrador' ? 'admin.html' : 'dashboard.html';
+                        window.location.href = data.user.role === 'administrador' ? '/admin' : '/dashboard';
                     }
                 } else {
                     alert("Error en el inicio de sesión con Google: " + (data.message || "Token inválido"));

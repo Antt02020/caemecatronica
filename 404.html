@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>404 - Módulo no encontrado - CAE</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/style.v6.css">
+    
+    <!-- JavaScript -->
+    <script src="/script.js" defer></script>
+</head>
+<body class="error-404-page">
+    <!-- Particle Background Canvas -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- Glowing Background Lights -->
+    <div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+
+    <!-- Header Navigation -->
+    <header class="main-header" id="header">
+        <div class="header-container">
+            <a href="/" class="logo" id="logo" aria-label="CAE Inicio">
+                <img src="/assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" alt="CAE Logo" />
+            </a>
+            
+            <button class="mobile-nav-toggle" id="mobile-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Menú de navegación">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <nav class="primary-nav" id="primary-navigation">
+                <ul class="nav-list" id="nav-list">
+                    <li><a href="/" class="nav-link">Inicio</a></li>
+                    <li><a href="/?scroll=about" class="nav-link">Sobre CAE</a></li>
+                    <li><a href="/entrenamientos" class="nav-link">Entrenamientos</a></li>
+                    <li><a href="/?scroll=benefits" class="nav-link">Ventajas</a></li>
+                    <li><a href="/?scroll=process" class="nav-link">Pasos</a></li>
+                    <li><a href="/?scroll=pricing" class="nav-link">Precios</a></li>
+                    <li><a href="/blog" class="nav-link">Blog</a></li>
+                    <li><a href="/?scroll=contacto" class="nav-link">Contacto</a></li>
+
+                    <li class="more-menu" id="more-menu">
+                        <button class="more-btn">Ver más</button>
+                        <ul class="more-dropdown" id="more-dropdown"></ul>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <div class="auth-guest-actions" id="auth-guest-actions">
+                        <a href="#" data-auth-action="login" class="btn btn-outline" id="nav-login-btn">Iniciar sesión</a>
+                        <a href="#" data-auth-action="register" class="btn btn-primary" id="nav-register-btn">Registrarse</a>
+                    </div>
+                    <div class="user-profile-badge" id="user-profile-badge" style="display: none;">
+                        <a href="/dashboard" class="btn btn-outline nav-role-btn" id="nav-role-btn" style="margin-right: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">Dashboard de alumnos</a>
+                        <button class="avatar-btn" id="avatar-btn" aria-label="Menú de usuario">
+                            <span class="user-avatar" id="user-avatar-initials">U</span>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown" aria-hidden="true">
+                            <div class="user-dropdown-info">
+                                <span class="user-dropdown-name" id="user-dropdown-name">Usuario</span>
+                                <span class="user-dropdown-role" id="user-dropdown-role">Plan Profesional</span>
+                                <span class="user-dropdown-career" id="user-dropdown-career">Electrónica</span>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <button class="dropdown-item" id="nav-logout-btn">Cerrar sesión</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main style="min-height: calc(100vh - 280px); display: flex; align-items: center; justify-content: center; padding: 180px 0 100px 0;">
+        <div class="container" style="max-width: 600px; text-align: center; position: relative; z-index: 10;">
+            <div style="font-size: 6.5rem; font-weight: 800; background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 1.5rem; text-shadow: 0 0 40px rgba(124, 77, 255, 0.2);">404</div>
+            <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-primary);">Módulo no encontrado</h1>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2.5rem; font-size: 1.1rem;">La página o el recurso de aprendizaje que estás buscando no existe, o ha sido movido de manera permanente.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: center; width: 100%;">
+                <a href="/" class="btn btn-primary" style="padding: 0.85rem 2rem; justify-content: center; width: 240px; max-width: 100%;">Ir al Inicio</a>
+                <a href="/entrenamientos" class="btn btn-outline" style="padding: 0.85rem 2rem; justify-content: center; width: 240px; max-width: 100%;">Ver Entrenamientos</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-container">
+            <div class="footer-grid">
+                <!-- Column 1: CAE -->
+                <div class="footer-column col-info">
+                    <a href="/" class="footer-logo" aria-label="CAE Inicio">
+                        <img src="/assets/images/logo-de-cae-mecatronica-asuncion-paraguay.png" class="logo-img" alt="CAE Logo" />
+                    </a>
+                    <p class="footer-desc">CAE es una plataforma educativa online especializada en Electrónica y Mecatrónica.</p>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="footer-column">
+                    <h4 class="footer-col-title">Enlaces rápidos</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="/" class="footer-link">Inicio</a></li>
+                        <li><a href="/?scroll=about" class="footer-link">Sobre CAE</a></li>
+                        <li><a href="/entrenamientos" class="footer-link">Entrenamientos</a></li>
+                        <li><a href="/?scroll=benefits" class="footer-link">Ventajas</a></li>
+                        <li><a href="/?scroll=process" class="footer-link">Pasos</a></li>
+                        <li><a href="/?scroll=pricing" class="footer-link">Planes y Precios</a></li>
+                        <li><a href="/blog" class="footer-link">Blog</a></li>
+                        <li><a href="/?scroll=contacto" class="footer-link">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Support -->
+                <div class="footer-column">
+                    <h4 class="footer-col-title">Soporte</h4>
+                    <ul class="footer-links-list" role="list">
+                        <li><a href="/?scroll=faq" class="footer-link">Preguntas frecuentes</a></li>
+                        <li><a href="/?scroll=privacy" class="footer-link">Políticas de privacidad</a></li>
+                        <li><a href="/?scroll=terms" class="footer-link">Términos y condiciones</a></li>
+                        <li><a href="/?scroll=support" class="footer-link">Soporte técnico</a></li>
+                        <li><a href="https://wa.me/595985881265" target="_blank" rel="noopener noreferrer" class="footer-link">WhatsApp</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter -->
+                <div class="footer-column col-newsletter">
+                    <h4 class="footer-col-title">Suscríbete al boletín</h4>
+                    <p class="footer-desc">Recibe noticias, nuevos entrenamientos y promociones exclusivas.</p>
+                    <form class="newsletter-form" id="newsletter-form" novalidate>
+                        <div class="input-group">
+                            <label for="newsletter-email" class="sr-only">Correo electrónico</label>
+                            <input type="email" id="newsletter-email" placeholder="Tu correo electrónico" required aria-required="true">
+                            <button type="submit" class="btn btn-primary btn-icon" aria-label="Suscribirse">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <span class="form-feedback" id="newsletter-feedback" aria-live="polite"></span>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="copyright">© 2024 CAE - Capacitación Avanzada en Electrónica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal Container -->
+    <div class="auth-modal-overlay" id="auth-modal-overlay" aria-hidden="true">
+        <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button class="auth-close-btn" id="auth-close-btn" aria-label="Cerrar modal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <div class="auth-modal-header">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tab-login-btn">Iniciar Sesión</button>
+                    <button class="auth-tab" id="tab-register-btn">Registrarse</button>
+                </div>
+            </div>
+            <div class="auth-modal-body">
+                <!-- Login form -->
+                <div class="auth-view active" id="view-login">
+                    <h2 class="auth-title" id="modal-title">Bienvenido de vuelta</h2>
+                    <form class="auth-form" id="login-form" novalidate>
+                        <div class="form-group">
+                            <label for="login-email">Correo Electrónico</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Contraseña</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full">Ingresar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

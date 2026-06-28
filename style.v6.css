@@ -3141,7 +3141,7 @@ body {
    DASHBOARD & ADMIN SPECIFIC STYLES
    ========================================================================== */
 /* --- Admin Panel --- */
-body {
+body.admin-page, body.dashboard-page {
             background-color: var(--bg-base);
             display: flex;
             min-height: 100vh;
@@ -3497,7 +3497,7 @@ body {
 
 /* --- Student Dashboard --- */
 /* Specific Dashboard Layout Styles */
-        body {
+        body.admin-page, body.dashboard-page {
             background-color: var(--bg-base);
             display: flex;
             min-height: 100vh;
@@ -3901,7 +3901,7 @@ body {
         }
 
         @media (max-width: 991px) {
-            body {
+            body.admin-page, body.dashboard-page {
                 flex-direction: column;
                 padding-top: 70px;
             }

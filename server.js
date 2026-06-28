@@ -12,6 +12,50 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Clean HTML routes mapping
+const cleanRoutes = {
+    '/': 'index.html',
+    '/blog': 'blog.html',
+    '/entrenamientos': 'entrenamientos.html',
+    '/admin': 'admin.html',
+    '/dashboard': 'dashboard.html',
+    '/course': 'course.html',
+    '/electronica': 'electronica.html',
+    '/mecatronica': 'mecatronica.html',
+    '/certificate': 'certificate.html',
+    '/payment-cancelled': 'payment-cancelled.html',
+    '/payment-error': 'payment-error.html',
+    '/payment-processing': 'payment-processing.html'
+};
+
+// Normalize URL queries, slashes and redirect .html extensions
+app.use((req, res, next) => {
+    // Redirect .html requests to clean URLs
+    if (req.path.endsWith('.html') && req.method === 'GET') {
+        const cleanPath = req.path.slice(0, -5); // remove .html
+        const query = req.url.slice(req.path.length); // preserve query params
+        if (cleanPath === '/auth-google-callback') {
+            return res.redirect(301, '/auth/google/callback' + query);
+        }
+        return res.redirect(301, cleanPath === '/index' ? '/' + query : cleanPath + query);
+    }
+    // Redirect trailing slashes on non-root clean paths
+    if (req.path !== '/' && req.path.endsWith('/') && req.method === 'GET') {
+        const cleanPath = req.path.slice(0, -1);
+        const query = req.url.slice(req.path.length);
+        return res.redirect(301, cleanPath + query);
+    }
+    next();
+});
+
+// Map clean routes to serve HTML files
+Object.entries(cleanRoutes).forEach(([route, file]) => {
+    app.get(route, (req, res) => {
+        res.sendFile(path.join(__dirname, file));
+    });
+});
+
 app.use(express.static(path.join(__dirname)));
 
 const DB_PATH = path.join(__dirname, 'db.json');
@@ -897,12 +941,12 @@ app.post('/api/auth/apple/callback', (req, res) => {
     }
 });
 
-// Default status catch
-app.get('*', (req, res, next) => {
+// Default status catch / 404 Fallback
+app.get('*', (req, res) => {
     if (req.url.startsWith('/api/')) {
         res.status(404).json({ error: "Not Found" });
     } else {
-        next();
+        res.status(404).sendFile(path.join(__dirname, '404.html'));
     }
 });
 

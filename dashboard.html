@@ -13,14 +13,14 @@
     <!-- Custom stylesheet shared -->
     <link rel="stylesheet" href="style.v6.css">
 </head>
-<body>
+<body class="dashboard-page">
 
     <!-- Particle Background Canvas -->
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
     <!-- Mobile Header Navigation -->
     <div class="mobile-header">
-        <a href="index.html" class="logo"><span class="logo-accent">C</span>AE</a>
+        <a href="/" class="logo"><span class="logo-accent">C</span>AE</a>
         <button class="mobile-nav-toggle" id="db-mobile-toggle" aria-label="Abrir menú">
             <span class="hamburger-bar"></span>
             <span class="hamburger-bar"></span>
@@ -31,7 +31,7 @@
     <div class="dashboard-container">
         <!-- Sidebar Menu Panel -->
         <aside class="sidebar" id="db-sidebar">
-            <a href="index.html" class="sidebar-logo"><span class="logo-accent">C</span>AE</a>
+            <a href="/" class="sidebar-logo"><span class="logo-accent">C</span>AE</a>
             
             <nav>
                 <ul class="sidebar-menu">
@@ -150,7 +150,7 @@
                         <h4 style="font-size: 1.25rem; margin-bottom: 0.25rem;" id="widget-last-activity-title">Módulo 1: Ley de Ohm y Leyes de Kirchhoff</h4>
                         <p style="font-size: 0.9rem;" id="widget-last-activity-course">Carrera de Electrónica</p>
                     </div>
-                    <a href="course.html?c=electronica" class="btn btn-primary" id="btn-last-activity-action">Continuar clase</a>
+                    <a href="/course?c=electronica" class="btn btn-primary" id="btn-last-activity-action">Continuar clase</a>
                 </div>
 
                 <!-- Featured Course catalog -->
@@ -296,7 +296,7 @@
                     <div style="font-size:3.5rem; margin-bottom:1.5rem; filter:drop-shadow(0 0 15px rgba(124,77,255,0.4));">🔒</div>
                     <h3 style="font-size:1.75rem; font-weight:800; margin-bottom:1rem; color:#fff; font-family:var(--font-sans);">Tu Aula Virtual está Bloqueada</h3>
                     <p style="color:var(--text-muted); font-size:0.95rem; max-width:460px; margin:0 auto 2rem auto; line-height:1.6;">Aún no tienes ningún entrenamiento o módulo individual adquirido. Inscríbete en uno de nuestros programas especializados para desbloquear tu material académico.</p>
-                    <a href="entrenamientos.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.8rem 2rem; text-decoration:none; justify-content:center;">Ver Catálogo de Entrenamientos</a>
+                    <a href="/entrenamientos" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.8rem 2rem; text-decoration:none; justify-content:center;">Ver Catálogo de Entrenamientos</a>
                 </div>
                 `;
                 
@@ -315,7 +315,7 @@
                     <div style="font-size:3.5rem; margin-bottom:1.5rem; filter:drop-shadow(0 0 15px rgba(124,77,255,0.4));">🔒</div>
                     <h3 style="font-size:1.75rem; font-weight:800; margin-bottom:1rem; color:#fff; font-family:var(--font-sans);">Certificados no Disponibles</h3>
                     <p style="color:var(--text-muted); font-size:0.95rem; max-width:460px; margin:0 auto 2rem auto; line-height:1.6;">Debes completar el 100% de un entrenamiento para emitir un certificado de especialización.</p>
-                    <a href="entrenamientos.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.8rem 2rem; text-decoration:none; justify-content:center;">Ver Catálogo de Entrenamientos</a>
+                    <a href="/entrenamientos" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.8rem 2rem; text-decoration:none; justify-content:center;">Ver Catálogo de Entrenamientos</a>
                 </div>
                 `;
             }
@@ -536,14 +536,14 @@
                                         <div class="progress-bar-fill" style="width: ${elecPercent}%;"></div>
                                     </div>
                                 </div>
-                                <a href="course.html?c=electronica" class="btn btn-primary w-full" style="text-align: center;">Acceder al Aula</a>
+                                <a href="/course?c=electronica" class="btn btn-primary w-full" style="text-align: center;">Acceder al Aula</a>
                             </div>
                             ${isElecLocked ? `
                             <div class="locked-blur-cover">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 <h4>Material Bloqueado</h4>
                                 <p>Este material pertenece a la carrera de Electrónica.</p>
-                                <a href="entrenamientos.html#electronica" class="btn btn-primary btn-sm" style="text-decoration:none;">Adquirir Entrenamiento</a>
+                                <a href="/entrenamientos?scroll=electronica" class="btn btn-primary btn-sm" style="text-decoration:none;">Adquirir Entrenamiento</a>
                             </div>
                             ` : ''}
                         </div>
@@ -570,14 +570,14 @@
                                         <div class="progress-bar-fill" style="width: ${mecaPercent}%;"></div>
                                     </div>
                                 </div>
-                                <a href="course.html?c=mecatronica" class="btn btn-primary w-full" style="text-align: center;">Acceder al Aula</a>
+                                <a href="/course?c=mecatronica" class="btn btn-primary w-full" style="text-align: center;">Acceder al Aula</a>
                             </div>
                             ${isMecaLocked ? `
                             <div class="locked-blur-cover">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 <h4>Material Bloqueado</h4>
                                 <p>Este material pertenece a la carrera de Mecatrónica.</p>
-                                <a href="entrenamientos.html#mecatronica" class="btn btn-primary btn-sm" style="text-decoration:none;">Adquirir Entrenamiento</a>
+                                <a href="/entrenamientos?scroll=mecatronica" class="btn btn-primary btn-sm" style="text-decoration:none;">Adquirir Entrenamiento</a>
                             </div>
                             ` : ''}
                         </div>
