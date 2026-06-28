@@ -131,6 +131,12 @@
             to { opacity: 1; }
         }
     </style>
+
+    <!-- Firebase SDK Compat -->
+    <script src="/__/firebase/10.8.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/10.8.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
 </head>
 <body>
 
@@ -162,88 +168,72 @@
             
             if (!hash) {
                 alert("Código de transacción inválido o faltante.");
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 return;
             }
 
-            let attempts = 0;
-            const maxAttempts = 24; // 1 minute maximum (2.5s interval)
+            const db = firebase.firestore();
             
-            const checkStatus = () => {
-                attempts++;
-                
-                fetch('/api/payment-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ hash_pedido: hash })
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error("API status check error");
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.success && data.resultado && data.resultado[0]) {
-                        const tx = data.resultado[0];
-                        
-                        if (tx.pagado) {
-                            // Payment confirmed! Update status badge and redirect
-                            statusBadge.textContent = "¡Pago Confirmado!";
-                            statusBadge.className = "status-badge";
-                            statusBadge.style.cssText = "color:#00E676; border-color:rgba(0,230,118,0.3); background:rgba(0,230,118,0.05);";
-                            statusMessage.innerHTML = '¡Tu pago ha sido validado exitosamente! Desbloqueando tu acceso académico e iniciando sesión...';
-                            
-                            // Re-fetch user session details and save to localStorage
-                            const user = JSON.parse(localStorage.getItem('cae_user'));
-                            if (user) {
-                                fetch(`/api/user/profile?email=${encodeURIComponent(user.email)}`)
-                                    .then(r => r.json())
-                                    .then(profileData => {
-                                        if (profileData.success) {
-                                            localStorage.setItem('cae_user', JSON.stringify(profileData.user));
-                                        }
-                                        setTimeout(() => {
-                                            window.location.href = 'dashboard.html?payment=success';
-                                        }, 2000);
-                                    })
-                                    .catch(() => {
-                                        // Fallback redirect
-                                        setTimeout(() => {
-                                            window.location.href = 'dashboard.html?payment=success';
-                                        }, 2000);
-                                    });
-                            } else {
-                                setTimeout(() => {
-                                    window.location.href = 'dashboard.html?payment=success';
-                                }, 2000);
-                            }
-                            return;
-                        }
+            const processSimulation = async () => {
+                try {
+                    const orderDoc = await db.collection('orders').doc(hash).get();
+                    if (!orderDoc.exists) {
+                        statusBadge.textContent = "Error";
+                        statusMessage.innerHTML = 'No se encontró la orden especificada en el sistema.';
+                        return;
                     }
                     
-                    // If not paid yet, check attempts limit
-                    if (attempts >= maxAttempts) {
-                        statusBadge.textContent = "Pendiente";
-                        statusBadge.className = "status-badge";
-                        statusMessage.innerHTML = 'Tu pago aún está siendo procesado por Pagopar o la red de cobranzas. En cuanto se acredite, tendrás acceso completo al campus. Puedes cerrar esta pestaña si lo deseas.';
-                    } else {
-                        // Poll again
-                        setTimeout(checkStatus, 2500);
+                    const order = orderDoc.data();
+                    
+                    statusBadge.textContent = "Procesando...";
+                    await new Promise(r => setTimeout(r, 3000));
+                    
+                    // Update order status in Firestore
+                    await db.collection('orders').doc(hash).update({ status: 'Completado' });
+                    
+                    // Unlock the courses in the user's profile in Firestore
+                    const userUid = order.userId;
+                    const userDoc = await db.collection('users').doc(userUid).get();
+                    if (userDoc.exists) {
+                        const profile = userDoc.data();
+                        const unlocked = profile.coursesUnlocked || [];
+                        
+                        if (order.plan === "Premium") {
+                            if (!unlocked.includes('electronica')) unlocked.push('electronica');
+                            if (!unlocked.includes('mecatronica')) unlocked.push('mecatronica');
+                        } else {
+                            const careerKey = order.courseId;
+                            if (!unlocked.includes(careerKey)) unlocked.push(careerKey);
+                        }
+                        
+                        const updatedProfile = {
+                            ...profile,
+                            plan: order.plan,
+                            career: order.career,
+                            coursesUnlocked: unlocked
+                        };
+                        
+                        await db.collection('users').doc(userUid).set(updatedProfile);
+                        localStorage.setItem('cae_user', JSON.stringify(updatedProfile));
                     }
-                })
-                .catch(err => {
-                    console.error("Error polling payment status:", err);
-                    if (attempts >= maxAttempts) {
-                        window.location.href = 'payment-error.html';
-                    } else {
-                        setTimeout(checkStatus, 2500);
-                    }
-                });
+                    
+                    statusBadge.textContent = "¡Pago Confirmado!";
+                    statusBadge.className = "status-badge";
+                    statusBadge.style.cssText = "color:#00E676; border-color:rgba(0,230,118,0.3); background:rgba(0,230,118,0.05);";
+                    statusMessage.innerHTML = '¡Tu pago ha sido validado exitosamente! Desbloqueando tu acceso académico...';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dashboard?payment=success';
+                    }, 2000);
+                    
+                } catch (err) {
+                    console.error("Error processing transaction:", err);
+                    statusBadge.textContent = "Error";
+                    statusMessage.innerHTML = 'Ocurrió un error al validar tu pago: ' + err.message;
+                }
             };
             
-            // Start polling loop
-            setTimeout(checkStatus, 1500);
+            setTimeout(processSimulation, 1000);
         });
     </script>
 

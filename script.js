@@ -2,6 +2,14 @@
    CAE - PREMIUM LANDING PAGE & STATE MANAGER
    ========================================================================== */
 
+let auth, db;
+try {
+    auth = firebase.auth();
+    db = firebase.firestore();
+} catch (e) {
+    console.warn("Firebase global SDK not initialized yet:", e);
+}
+
 // Mock Database Initializer (for Courses, Modules, Lessons, Users, and Metrics)
 const DEFAULT_COURSES = {
     electronica: {
@@ -749,17 +757,21 @@ function initAuthUI() {
     const logoutBtn = document.getElementById('nav-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            fetch('/api/auth/logout', { method: 'POST' })
-                .finally(() => {
+            if (auth) {
+                auth.signOut().finally(() => {
                     localStorage.removeItem('cae_user');
                     window.location.hash = '';
                     window.location.href = '/';
                 });
+            } else {
+                localStorage.removeItem('cae_user');
+                window.location.href = '/';
+            }
         });
     }
 
     // ======================================================================
-    // MOCK LOGIN FORM LOGIC
+    // FIREBASE LOGIN FORM LOGIC
     // ======================================================================
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
@@ -774,94 +786,37 @@ function initAuthUI() {
                 return;
             }
             
-            // Attempt calling Express Server API
-            fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password: pass })
-            })
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(err => { throw new Error(err.message || 'Error de autenticación'); });
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    localStorage.setItem('cae_user', JSON.stringify(data.user));
+            showFeedback('Validando credenciales...', 'info');
+            
+            auth.signInWithEmailAndPassword(email, pass)
+            .then(async (userCredential) => {
+                const firebaseUser = userCredential.user;
+                const doc = await db.collection('users').doc(firebaseUser.uid).get();
+                if (doc.exists) {
+                    const profile = doc.data();
+                    localStorage.setItem('cae_user', JSON.stringify(profile));
                     showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
                     setTimeout(() => {
                         closeAuthModal();
                         if (localStorage.getItem('cae_pending_purchase')) {
                             window.location.reload();
                         } else {
-                            window.location.href = data.user.role === 'administrador' ? '/admin' : '/dashboard';
-                        }
-                    }, 1000);
-                }
-            })
-            .catch(err => {
-                console.warn("Backend auth failed, falling back to LocalStorage mock:", err.message);
-                
-                // Local fallback
-                const students = JSON.parse(localStorage.getItem('cae_students')) || [];
-                if (email === "admin@cae.com" && pass === "admin123") {
-                    const sessionUser = {
-                        email: email,
-                        firstName: "Admin",
-                        lastName: "General",
-                        role: "administrador",
-                        career: "Ambas",
-                        plan: "Premium",
-                        purchasedModules: [],
-                        purchasedCareers: ["electronica", "mecatronica"]
-                    };
-                    localStorage.setItem('cae_user', JSON.stringify(sessionUser));
-                    showFeedback('¡Ingreso exitoso! Redirigiendo al panel...', 'success');
-                    setTimeout(() => {
-                        closeAuthModal();
-                        window.location.href = '/admin';
-                    }, 1000);
-                    return;
-                }
-                
-                const studentMatch = students.find(s => s.email.toLowerCase() === email.toLowerCase());
-                if (studentMatch) {
-                    if (studentMatch.status === "Bloqueado") {
-                        showFeedback('Tu cuenta ha sido bloqueada. Contacta a soporte.', 'error');
-                        return;
-                    }
-                    
-                    const sessionUser = {
-                        email: studentMatch.email,
-                        firstName: studentMatch.firstName,
-                        lastName: studentMatch.lastName,
-                        role: "alumno",
-                        career: studentMatch.career || "Ninguna",
-                        plan: studentMatch.plan || "None",
-                        purchasedModules: studentMatch.purchasedModules || [],
-                        purchasedCareers: studentMatch.purchasedCareers || []
-                    };
-                    
-                    localStorage.setItem('cae_user', JSON.stringify(sessionUser));
-                    showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
-                    setTimeout(() => {
-                        closeAuthModal();
-                        if (localStorage.getItem('cae_pending_purchase')) {
-                            window.location.reload();
-                        } else {
-                            window.location.href = '/dashboard';
+                            window.location.href = profile.role === 'admin' ? '/admin' : '/dashboard';
                         }
                     }, 1000);
                 } else {
-                    showFeedback('Credenciales incorrectas o usuario no registrado.', 'error');
+                    showFeedback('Error: No se encontró perfil de usuario.', 'error');
                 }
+            })
+            .catch(err => {
+                console.error("Login failed:", err);
+                showFeedback(err.message || 'Error de autenticación.', 'error');
             });
         });
     }
 
     // ======================================================================
-    // MOCK REGISTRATION FORM LOGIC
+    // FIREBASE REGISTRATION FORM LOGIC
     // ======================================================================
     if (registerForm) {
         registerForm.addEventListener('submit', (e) => {
@@ -895,68 +850,28 @@ function initAuthUI() {
                 return;
             }
             
-            // Attempt calling Express Server API
-            fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ firstName, lastName, email, password: pass })
-            })
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(err => { throw new Error(err.message || 'Error de registro'); });
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    localStorage.setItem('cae_user', JSON.stringify(data.user));
-                    showFeedback('¡Registro exitoso! Redirigiendo...', 'success');
-                    setTimeout(() => {
-                        closeAuthModal();
-                        if (localStorage.getItem('cae_pending_purchase')) {
-                            window.location.reload();
-                        } else {
-                            window.location.href = '/dashboard';
-                        }
-                    }, 1200);
-                }
-            })
-            .catch(err => {
-                console.warn("Backend registration failed, falling back to LocalStorage mock:", err.message);
-                
-                const students = JSON.parse(localStorage.getItem('cae_students')) || [];
-                if (students.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-                    showFeedback('El correo ya está registrado en la plataforma.', 'error');
-                    return;
-                }
-                
-                const newStudent = {
-                    firstName,
-                    lastName,
-                    email,
-                    password: pass,
-                    career: "Ninguna",
+            showFeedback('Registrando cuenta...', 'info');
+            
+            auth.createUserWithEmailAndPassword(email, pass)
+            .then(async (userCredential) => {
+                const firebaseUser = userCredential.user;
+                const role = (email.toLowerCase() === 'admin@cae.com') ? 'admin' : 'student';
+                const profile = {
+                    uid: firebaseUser.uid,
+                    name: `${firstName} ${lastName}`,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    role: role,
                     plan: "None",
-                    purchasedModules: [],
-                    purchasedCareers: [],
-                    status: "Activo"
+                    career: "Ninguna",
+                    createdAt: new Date().toISOString(),
+                    coursesUnlocked: []
                 };
                 
-                students.push(newStudent);
-                localStorage.setItem('cae_students', JSON.stringify(students));
+                await db.collection('users').doc(firebaseUser.uid).set(profile);
+                localStorage.setItem('cae_user', JSON.stringify(profile));
                 
-                const sessionUser = {
-                    email,
-                    firstName,
-                    lastName,
-                    role: "alumno",
-                    career: "Ninguna",
-                    plan: "None",
-                    purchasedModules: [],
-                    purchasedCareers: []
-                };
-                
-                localStorage.setItem('cae_user', JSON.stringify(sessionUser));
                 showFeedback('¡Registro exitoso! Redirigiendo...', 'success');
                 setTimeout(() => {
                     closeAuthModal();
@@ -966,12 +881,16 @@ function initAuthUI() {
                         window.location.href = '/dashboard';
                     }
                 }, 1200);
+            })
+            .catch(err => {
+                console.error("Registration failed:", err);
+                showFeedback(err.message || 'Error de registro.', 'error');
             });
         });
     }
 
     // ======================================================================
-    // MOCK FORGOT PASSWORD FORM LOGIC
+    // FIREBASE FORGOT PASSWORD FORM LOGIC
     // ======================================================================
     if (forgotForm) {
         forgotForm.addEventListener('submit', (e) => {
@@ -984,123 +903,64 @@ function initAuthUI() {
                 return;
             }
             
-            showFeedback('Enviando enlace...', '');
+            showFeedback('Enviando enlace...', 'info');
             
-            setTimeout(() => {
+            auth.sendPasswordResetEmail(email)
+            .then(() => {
                 showFeedback('Se ha enviado el enlace de restablecimiento a tu correo.', 'success');
-                // Simulate transition to reset view after mail delivery
-                setTimeout(() => {
-                    switchView('reset');
-                }, 1500);
-            }, 1000);
+            })
+            .catch(err => {
+                console.error("Password reset failed:", err);
+                showFeedback(err.message || 'Error al enviar enlace.', 'error');
+            });
         });
     }
 
-    // ======================================================================
-    // MOCK RESET PASSWORD FORM LOGIC
-    // ======================================================================
-    if (resetForm) {
-        resetForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            clearFeedback();
-            const pass = document.getElementById('reset-password').value;
-            const confirmPass = document.getElementById('reset-confirm-password').value;
-            
-            if (!pass || !confirmPass) {
-                showFeedback('Por favor, completa ambos campos.', 'error');
-                return;
-            }
-            if (pass !== confirmPass) {
-                showFeedback('Las contraseñas no coinciden.', 'error');
-                return;
-            }
-            
-            showFeedback('Guardando contraseña...', '');
-            setTimeout(() => {
-                showFeedback('¡Contraseña actualizada! Ya puedes iniciar sesión.', 'success');
-                setTimeout(() => {
-                    switchView('login');
-                }, 1500);
-            }, 1000);
-        });
-    }
-
-    // Helpers for PKCE generation
-    function generateRandomString(length) {
-        const array = new Uint8Array(length);
-        window.crypto.getRandomValues(array);
-        // Base64URL encode directly to get a valid URL-safe string
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(array[i] % chars.length);
-        }
-        return result;
-    }
-
-    async function sha256(plain) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(plain);
-        return await window.crypto.subtle.digest('SHA-256', data);
-    }
-
-    function base64urlencode(a) {
-        let str = "";
-        const bytes = new Uint8Array(a);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-            str += String.fromCharCode(bytes[i]);
-        }
-        return btoa(str)
-            .replace(/\+/g, "-")
-            .replace(/\//g, "_")
-            .replace(/=+$/, "");
-    }
-
-    // Google & Apple OAuth click listeners
+    // Google Sign-In listener
     const googleLoginBtn = document.getElementById('google-login-btn');
     if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', async () => {
-            const config = JSON.parse(localStorage.getItem('cae_config')) || {};
-            const googleClientId = config.google_client_id || "";
-            if (!googleClientId) {
-                alert("Google OAuth Client ID no está configurado en el Panel de Administración.");
-                return;
-            }
-            
-            // Generate PKCE components
-            const codeVerifier = generateRandomString(64);
-            sessionStorage.setItem('google_oauth_code_verifier', codeVerifier);
-            
-            try {
-                const hash = await sha256(codeVerifier);
-                const codeChallenge = base64urlencode(hash);
-                
-                const redirectUri = window.location.origin + '/auth/google/callback';
-                const scope = 'email profile';
-                const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-                
-                window.location.href = googleAuthUrl;
-            } catch (err) {
-                console.error("Error generating PKCE credentials:", err);
-                alert("Error de seguridad al iniciar sesión con Google.");
-            }
-        });
-    }
-
-    const appleLoginBtn = document.getElementById('apple-login-btn');
-    if (appleLoginBtn) {
-        appleLoginBtn.addEventListener('click', () => {
-            const config = JSON.parse(localStorage.getItem('cae_config')) || {};
-            const appleClientId = config.apple_client_id || "";
-            if (!appleClientId) {
-                alert("Apple OAuth Services ID no está configurado en el Panel de Administración.");
-                return;
-            }
-            const redirectUri = config.apple_redirect_uri || (window.location.origin + '/api/auth/apple/callback');
-            const appleAuthUrl = `https://appleid.apple.com/auth/authorize?client_id=${encodeURIComponent(appleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code%20id_token&scope=name%20email&response_mode=form_post`;
-            
-            window.location.href = appleAuthUrl;
+        googleLoginBtn.addEventListener('click', () => {
+            if (!auth) return;
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+            .then(async (result) => {
+                const firebaseUser = result.user;
+                const doc = await db.collection('users').doc(firebaseUser.uid).get();
+                let profile;
+                if (doc.exists) {
+                    profile = doc.data();
+                } else {
+                    const names = (firebaseUser.displayName || "").split(" ");
+                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@cae.com') ? 'admin' : 'student';
+                    profile = {
+                        uid: firebaseUser.uid,
+                        name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                        firstName: names[0] || "",
+                        lastName: names.slice(1).join(" ") || "",
+                        email: firebaseUser.email,
+                        role: role,
+                        plan: "None",
+                        career: "Ninguna",
+                        createdAt: new Date().toISOString(),
+                        coursesUnlocked: []
+                    };
+                    await db.collection('users').doc(firebaseUser.uid).set(profile);
+                }
+                localStorage.setItem('cae_user', JSON.stringify(profile));
+                showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
+                setTimeout(() => {
+                    closeAuthModal();
+                    if (localStorage.getItem('cae_pending_purchase')) {
+                        window.location.reload();
+                    } else {
+                        window.location.href = profile.role === 'admin' ? '/admin' : '/dashboard';
+                    }
+                }, 1000);
+            })
+            .catch(err => {
+                console.error("Google sign in failed:", err);
+                alert("Error al iniciar sesión con Google: " + err.message);
+            });
         });
     }
 }
@@ -1214,18 +1074,20 @@ function updateUserSessionUI(user) {
     
     // Set user profile info
     if (initialsSpan) {
-        const initials = ((user.firstName ? user.firstName[0] : '') + (user.lastName ? user.lastName[0] : '')).toUpperCase();
+        const firstName = user.firstName || (user.name ? user.name.split(' ')[0] : '');
+        const lastName = user.lastName || (user.name ? user.name.split(' ').slice(1).join(' ') : '');
+        const initials = ((firstName ? firstName[0] : '') + (lastName ? lastName[0] : '')).toUpperCase();
         initialsSpan.textContent = initials || 'U';
     }
     
-    if (dropdownName) dropdownName.textContent = `${user.firstName} ${user.lastName}`;
-    if (dropdownRole) dropdownRole.textContent = `Plan ${user.plan || 'Profesional'}`;
-    if (dropdownCareer) dropdownCareer.textContent = `Carrera: ${user.career}`;
+    if (dropdownName) dropdownName.textContent = user.name || `${user.firstName || ''} ${user.lastName || ''}`;
+    if (dropdownRole) dropdownRole.textContent = user.role === 'admin' ? 'Administrador' : `Plan ${user.plan || 'Ninguno'}`;
+    if (dropdownCareer) dropdownCareer.textContent = `Carrera: ${user.career || 'Ninguna'}`;
 
     // Handle dynamic header navigation button based on user role
     const navRoleBtn = document.getElementById('nav-role-btn');
     if (navRoleBtn) {
-        if (user.role === 'administrador') {
+        if (user.role === 'admin') {
             navRoleBtn.textContent = 'Panel de administración';
             navRoleBtn.href = '/admin';
         } else {
@@ -1235,7 +1097,7 @@ function updateUserSessionUI(user) {
     }
     
     // Handle specific locks based on selected career
-    if (user.role === "administrador") {
+    if (user.role === 'admin') {
         // Admin has unlock permissions to everything
         if (elecLock) elecLock.style.display = 'none';
         if (mecaLock) mecaLock.style.display = 'none';
@@ -1250,7 +1112,12 @@ function updateUserSessionUI(user) {
         }
     } else {
         // Student locking rules based on plans and career permissions
-        if (user.plan === "Premium") {
+        const unlocked = user.coursesUnlocked || [];
+        const plan = user.plan || "None";
+        const hasElec = unlocked.includes('electronica') || plan === "Premium" || user.career === "Electrónica" || user.career === "Ambas";
+        const hasMeca = unlocked.includes('mecatronica') || plan === "Premium" || user.career === "Mecatrónica" || user.career === "Ambas";
+        
+        if (plan === "Premium") {
             if (elecLock) elecLock.style.display = 'none';
             if (mecaLock) mecaLock.style.display = 'none';
             if (elecBtn) {
@@ -1261,11 +1128,7 @@ function updateUserSessionUI(user) {
                 mecaBtn.textContent = 'Ir a mi Aula de Mecatrónica';
                 mecaBtn.href = '/course?c=mecatronica';
             }
-        } else if (user.plan === "Profesional") {
-            const purchased = user.purchasedCareers || [];
-            const hasElec = purchased.includes('electronica');
-            const hasMeca = purchased.includes('mecatronica');
-            
+        } else if (plan === "Profesional") {
             if (elecLock) elecLock.style.display = hasElec ? 'none' : 'flex';
             if (mecaLock) mecaLock.style.display = hasMeca ? 'none' : 'flex';
             
@@ -1277,10 +1140,10 @@ function updateUserSessionUI(user) {
                 mecaBtn.textContent = hasMeca ? 'Ir a mi Aula de Mecatrónica' : 'Comprar Carrera';
                 mecaBtn.href = hasMeca ? '/course?c=mecatronica' : '/entrenamientos';
             }
-        } else if (user.plan === "Básico") {
+        } else if (plan === "Básico") {
             const purchasedModules = user.purchasedModules || [];
-            const hasAnyElec = purchasedModules.some(m => m.startsWith('elec-'));
-            const hasAnyMeca = purchasedModules.some(m => m.startsWith('meca-'));
+            const hasAnyElec = hasElec || purchasedModules.some(m => m.startsWith('elec-'));
+            const hasAnyMeca = hasMeca || purchasedModules.some(m => m.startsWith('meca-'));
             
             if (elecLock) elecLock.style.display = hasAnyElec ? 'none' : 'flex';
             if (mecaLock) mecaLock.style.display = hasAnyMeca ? 'none' : 'flex';
@@ -1321,43 +1184,71 @@ function checkUserSession() {
         updateUserSessionUI(null);
     }
     
-    fetch('/api/me')
-        .then(res => {
-            if (!res.ok) throw new Error("Sesión inválida");
-            return res.json();
-        })
-        .then(data => {
-            if (data.success && data.user) {
-                const freshUserStr = JSON.stringify(data.user);
-                const currentUserStr = localStorage.getItem('cae_user');
-                if (currentUserStr !== freshUserStr) {
-                    localStorage.setItem('cae_user', freshUserStr);
-                    updateUserSessionUI(data.user);
+    if (!auth) return;
+    auth.onAuthStateChanged(async (firebaseUser) => {
+        if (firebaseUser) {
+            try {
+                const doc = await db.collection('users').doc(firebaseUser.uid).get();
+                if (doc.exists) {
+                    const profile = doc.data();
+                    localStorage.setItem('cae_user', JSON.stringify(profile));
+                    updateUserSessionUI(profile);
+                } else {
+                    // Auto-create profile if missing (e.g. Google auth first time)
+                    const names = (firebaseUser.displayName || "").split(" ");
+                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@cae.com') ? 'admin' : 'student';
+                    const profile = {
+                        uid: firebaseUser.uid,
+                        name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                        email: firebaseUser.email,
+                        role: role,
+                        createdAt: new Date().toISOString(),
+                        coursesUnlocked: []
+                    };
+                    await db.collection('users').doc(firebaseUser.uid).set(profile);
+                    localStorage.setItem('cae_user', JSON.stringify(profile));
+                    updateUserSessionUI(profile);
                 }
-            } else {
-                throw new Error("No success payload");
+            } catch (err) {
+                console.error("[SESSION] Error loading user profile:", err);
             }
-        })
-        .catch(err => {
-            console.warn("[SESSION] Server session check failed. Logging out client...", err);
+        } else {
             localStorage.removeItem('cae_user');
             updateUserSessionUI(null);
             
             const protectedPages = ['/dashboard', '/course', '/admin'];
-            const currentPage = window.location.pathname.split('/').pop();
-            if (protectedPages.some(page => currentPage.startsWith(page))) {
+            const path = window.location.pathname;
+            if (protectedPages.some(page => path.includes(page))) {
                 window.location.href = '/';
             }
-        });
+        }
+    });
 }
 
 /* ==========================================================================
-   CONFIG & PRICING LOADER (Dynamic prices from server)
+   CONFIG & PRICING LOADER (Dynamic prices from Firestore)
    ========================================================================== */
 function loadConfigAndPrices() {
-    fetch('/api/config')
-        .then(res => res.json())
-        .then(config => {
+    if (!db) return;
+    db.collection('config').doc('global').get()
+        .then(doc => {
+            let config = {
+                price_basic: 350000,
+                price_profesional: 990000,
+                price_premium: 1490000,
+                public_key: "",
+                private_key: "",
+                google_client_id: "",
+                apple_client_id: "",
+                apple_redirect_uri: ""
+            };
+            if (doc.exists) {
+                config = { ...config, ...doc.data() };
+            } else {
+                // Seed default global config
+                db.collection('config').doc('global').set(config).catch(err => console.error("Error setting default config:", err));
+            }
+            
             localStorage.setItem('cae_config', JSON.stringify(config));
             
             // Update Pricing cards in UI if they exist (index.html pricing section)
@@ -1376,7 +1267,13 @@ function loadConfigAndPrices() {
             }
         })
         .catch(err => {
-            console.warn("Failed to load backend config, using defaults:", err);
+            console.warn("Failed to load config from Firestore, loading local fallback:", err);
+            const config = JSON.parse(localStorage.getItem('cae_config')) || {
+                price_basic: 350000,
+                price_profesional: 990000,
+                price_premium: 1490000
+            };
+            localStorage.setItem('cae_config', JSON.stringify(config));
         });
 }
 
@@ -1474,41 +1371,51 @@ function initInterestModal() {
         }
         const ruc = window.prompt("Ingrese su RUC (opcional):") || "";
         
-        const payload = {
-            email: user.email,
+        const orderId = `CAE-${Math.floor(Math.random() * 9000000 + 1000000)}`;
+        const firebaseUser = auth ? auth.currentUser : null;
+        if (!firebaseUser) {
+            alert("Debes iniciar sesión para realizar una compra.");
+            return;
+        }
+
+        const config = JSON.parse(localStorage.getItem('cae_config')) || {
+            price_basic: 350000,
+            price_profesional: 990000,
+            price_premium: 1490000
+        };
+        let amount = 0;
+        if (plan === "Premium") amount = config.price_premium;
+        else if (plan === "Profesional") amount = config.price_profesional;
+        else amount = config.price_basic;
+
+        const newOrder = {
+            id: orderId,
+            id_pedido_comercio: orderId,
+            userId: firebaseUser.uid,
+            email: firebaseUser.email,
             plan: plan,
+            courseId: career,
             career: career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica',
-            modules: [],
+            amount: amount,
+            status: "Pendiente",
+            createdAt: new Date().toISOString(),
             comprador: {
                 ruc: ruc,
                 telefono: phone,
                 documento: doc
             }
         };
-        
+
         showPremiumNotification(plan);
-        
-        fetch('/api/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.redirectUrl) {
-                localStorage.removeItem('cae_pending_purchase');
-                window.location.href = data.redirectUrl;
-            } else {
-                let msg = "Error al iniciar transacción: " + (data.error || "Respuesta inválida");
-                if (data.debug_status || data.debug_body || data.debug_code) {
-                    msg += `\n\n[Debug] status: ${data.debug_status || data.debug_code || "?"}\n${data.debug_body || data.debug_message || ""}`;
-                }
-                alert(msg);
-            }
+
+        db.collection('orders').doc(orderId).set(newOrder)
+        .then(() => {
+            localStorage.removeItem('cae_pending_purchase');
+            window.location.href = `/payment-processing?hash_pedido=${orderId}`;
         })
         .catch(err => {
-            console.error("Error on checkout:", err);
-            alert("Error al conectar con el servidor.");
+            console.error("Error creating order in Firestore:", err);
+            alert("Error al iniciar la simulación de transacción: " + err.message);
         });
     };
     

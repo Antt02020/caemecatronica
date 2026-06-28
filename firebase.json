@@ -1,0 +1,40 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "southamerica-east1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      { "source": "/admin", "destination": "/admin.html" },
+      { "source": "/dashboard", "destination": "/dashboard.html" },
+      { "source": "/entrenamientos", "destination": "/entrenamientos.html" },
+      { "source": "/blog", "destination": "/blog.html" },
+      { "source": "/course", "destination": "/course.html" },
+      { "source": "/electronica", "destination": "/electronica.html" },
+      { "source": "/mecatronica", "destination": "/mecatronica.html" },
+      { "source": "/payment-processing", "destination": "/payment-processing.html" },
+      { "source": "/payment-error", "destination": "/payment-error.html" },
+      { "source": "/payment-cancelled", "destination": "/payment-cancelled.html" },
+      { "source": "/certificate", "destination": "/certificate.html" },
+      { "source": "/auth/google/callback", "destination": "/auth-google-callback.html" }
+    ]
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "CAE Mecatrónica",
+        "supportEmail": "contacto@caemecatronica.com.py"
+      }
+    }
+  }
+}

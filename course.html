@@ -281,6 +281,12 @@
             }
         }
     </style>
+
+    <!-- Firebase SDK Compat -->
+    <script src="/__/firebase/10.8.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/10.8.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
 </head>
 <body>
 
@@ -351,33 +357,39 @@
             // Guard Session: redirect if not logged in
             const session = localStorage.getItem('cae_user');
             if (!session) {
-                window.location.href = 'index.html#login';
+                window.location.href = '/?auth=login';
                 return;
             }
             
             const user = JSON.parse(session);
             
-            // Verify session cookie status asynchronously on backend
-            fetch('/api/me')
-                .then(res => {
-                    if (!res.ok) throw new Error("Sesión expirada");
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.success && data.user) {
-                        const freshUserStr = JSON.stringify(data.user);
+            // Verify session status with Firebase Auth and Firestore
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            
+            auth.onAuthStateChanged(async (firebaseUser) => {
+                if (!firebaseUser) {
+                    localStorage.removeItem('cae_user');
+                    window.location.href = '/?auth=login';
+                    return;
+                }
+                
+                try {
+                    const doc = await db.collection('users').doc(firebaseUser.uid).get();
+                    if (doc.exists) {
+                        const freshUser = doc.data();
+                        const freshUserStr = JSON.stringify(freshUser);
                         if (localStorage.getItem('cae_user') !== freshUserStr) {
                             localStorage.setItem('cae_user', freshUserStr);
                             window.location.reload();
                         }
+                    } else {
+                        window.location.href = '/?auth=login';
                     }
-                })
-                .catch(err => {
-                    console.warn("Validación de sesión de servidor fallida:", err);
-                    localStorage.removeItem('cae_user');
-                    alert("Tu sesión ha expirado o es inválida. Redirigiendo al inicio.");
-                    window.location.href = 'index.html#login';
-                });
+                } catch (err) {
+                    console.error("Error checking session in Firestore:", err);
+                }
+            });
 
             document.getElementById('user-initials').textContent = ((user.firstName ? user.firstName[0] : '') + (user.lastName ? user.lastName[0] : '')).toUpperCase();
             document.getElementById('user-name-span').textContent = user.firstName;
@@ -388,14 +400,14 @@
             
             // Updated Career Guard for Plan Básico: allow if has purchased modules in this career
             const hasPurchasedModulesInCourse = user.purchasedModules && user.purchasedModules.some(m => m.startsWith(courseKey === 'mecatronica' ? 'meca-' : 'elec-'));
-            const hasAccessToCourse = (user.role === 'administrador') || 
+            const hasAccessToCourse = (user.role === 'admin') || 
                                       (user.plan === 'Premium') ||
                                       (user.plan === 'Profesional' && user.career.toLowerCase() === courseKey.toLowerCase()) ||
                                       (user.plan === 'Básico' && hasPurchasedModulesInCourse);
                                       
             if (!hasAccessToCourse) {
                 alert(`No tienes acceso a los cursos de ${courseKey.toUpperCase()}. Serás redirigido a tu panel.`);
-                window.location.href = 'dashboard.html';
+                window.location.href = '/dashboard';
                 return;
             }
 
@@ -406,7 +418,7 @@
 
             // Helper to check if a specific module is unlocked
             const isModuleUnlocked = (mId) => {
-                if (user.role === 'administrador') return true;
+                if (user.role === 'admin') return true;
                 if (user.plan === 'Premium') return true;
                 if (user.plan === 'Profesional' && user.career.toLowerCase() === courseKey.toLowerCase()) return true;
                 if (user.plan === 'Básico' && user.purchasedModules && user.purchasedModules.includes(mId)) return true;

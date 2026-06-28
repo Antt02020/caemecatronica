@@ -126,6 +126,12 @@
             box-shadow: 0 6px 20px rgba(124, 77, 255, 0.6);
         }
     </style>
+
+    <!-- Firebase SDK Compat -->
+    <script src="/__/firebase/10.8.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/10.8.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
 </head>
 <body>
 
@@ -147,96 +153,9 @@
         <a href="/index.html" class="btn-home" id="btn-home">Volver al Inicio</a>
     </div>
 
-    <!-- Callback Code Exchange Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const error = urlParams.get('error');
-            
-            const titleEl = document.getElementById('callback-title');
-            const textEl = document.getElementById('callback-text');
-            const homeBtn = document.getElementById('btn-home');
-            const loaderIcon = document.getElementById('loader-icon');
-
-            if (error) {
-                showError("Error de Google: " + error);
-                return;
-            }
-
-            if (!code) {
-                showError("Código de autorización faltante de Google.");
-                return;
-            }
-
-            // Retrieve code_verifier from sessionStorage
-            const codeVerifier = sessionStorage.getItem('google_oauth_code_verifier');
-            if (!codeVerifier) {
-                showError("No se encontró la clave de seguridad del inicio de sesión (PKCE code_verifier). Por favor, intenta de nuevo.");
-                return;
-            }
-
-            // Exchange code and verifier
-            fetch('/api/auth/google-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    code: code,
-                    code_verifier: codeVerifier
-                })
-            })
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(data => { throw new Error(data.message || "Error del servidor") });
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data.success && data.user) {
-                    // Save UX helper details in localStorage
-                    localStorage.setItem('cae_user', JSON.stringify(data.user));
-                    
-                    // Clear verifier from storage
-                    sessionStorage.removeItem('google_oauth_code_verifier');
-                    
-                    titleEl.textContent = "¡Sesión Iniciada!";
-                    textEl.textContent = "Autenticación exitosa. Redirigiéndote al campus virtual...";
-                    
-                    // Settle pending purchase redirects
-                    const pending = localStorage.getItem('cae_pending_purchase');
-                    setTimeout(() => {
-                        if (pending) {
-                            const intent = JSON.parse(pending);
-                            if (intent.plan === 'Básico') {
-                                window.location.href = '/entrenamientos.html';
-                            } else {
-                                window.location.href = '/index.html';
-                            }
-                        } else {
-                            window.location.href = data.user.role === 'administrador' ? '/admin.html' : '/dashboard.html';
-                        }
-                    }, 1200);
-                } else {
-                    showError(data.message || "No se pudo completar el inicio de sesión.");
-                }
-            })
-            .catch(err => {
-                showError(err.message || "Error de red al comunicarse con el servidor.");
-            });
-
-            function showError(msg) {
-                titleEl.textContent = "Error de Autenticación";
-                titleEl.style.background = "none";
-                titleEl.style.color = "#FF5252";
-                textEl.textContent = msg;
-                loaderIcon.style.display = "none";
-                homeBtn.style.display = "inline-block";
-                
-                // Clear state to avoid loops
-                sessionStorage.removeItem('google_oauth_code_verifier');
-            }
+            window.location.href = '/';
         });
     </script>
 
