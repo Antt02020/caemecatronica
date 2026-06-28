@@ -14,10 +14,10 @@
     <link rel="stylesheet" href="style.v6.css?v=20260628">
 
     <!-- Firebase SDK Compat -->
-    <script src="/__/firebase/10.8.0/firebase-app-compat.js"></script>
-    <script src="/__/firebase/10.8.0/firebase-auth-compat.js"></script>
-    <script src="/__/firebase/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="/__/firebase/init.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="/firebase-config.js"></script>
 </head>
 <body class="admin-page">
 
@@ -664,40 +664,41 @@
                 localStorage.setItem('cae_blog_posts', JSON.stringify(DEFAULT_BLOG_POSTS));
             }
 
-            // Guard admin access checking user session and role in Firebase
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-            
+            // GUARDIA DE SEGURIDAD — aislada y con fail-closed
+            let auth, db;
+            try {
+                auth = firebase.auth();
+                db = firebase.firestore();
+            } catch (err) {
+                console.error("Firebase no se pudo inicializar:", err);
+                alert("No se pudo verificar tu sesión. Por seguridad, serás redirigido.");
+                window.location.href = '/?auth=login';
+                return; // detener TODA ejecución posterior — no mostrar el panel
+            }
+
             auth.onAuthStateChanged(async (firebaseUser) => {
                 if (!firebaseUser) {
                     localStorage.removeItem('cae_user');
                     window.location.href = '/?auth=login';
                     return;
                 }
-                
                 try {
                     const doc = await db.collection('users').doc(firebaseUser.uid).get();
-                    if (doc.exists) {
-                        const profile = doc.data();
-                        if (profile.role !== 'admin') {
-                            alert("Acceso denegado. No posees privilegios administrativos.");
-                            window.location.href = '/dashboard';
-                            return;
-                        }
-                        
-                        const freshUserStr = JSON.stringify(profile);
-                        if (localStorage.getItem('cae_user') !== freshUserStr) {
-                            localStorage.setItem('cae_user', freshUserStr);
-                            window.location.reload();
-                        }
-                    } else {
-                        window.location.href = '/?auth=login';
+                    if (!doc.exists || doc.data().role !== 'admin') {
+                        alert("Acceso denegado. No posees privilegios administrativos.");
+                        window.location.href = '/dashboard';
+                        return;
                     }
+                    // Solo si la validación pasó, inicializar el resto del panel
+                    initAdminPanelUI(auth, db);
                 } catch (err) {
-                    console.error("Error validating admin session in Firestore:", err);
-                    window.location.href = '/';
+                    console.error("Error validando sesión de admin en Firestore:", err);
+                    window.location.href = '/'; // fail closed también en error de red/permisos
                 }
             });
+        });
+
+        function initAdminPanelUI(auth, db) {
 
             // Mobile Sidebar drawer menu toggle
             const sidebar = document.querySelector('.sidebar');
@@ -1461,7 +1462,7 @@
             renderBlogTable();
             loadPagoparConfig();
             loadEcosystemStats();
-        });
+        }
     </script>
 
     <!-- Shared Particles Script -->

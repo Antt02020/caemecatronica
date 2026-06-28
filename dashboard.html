@@ -14,10 +14,10 @@
     <link rel="stylesheet" href="style.v6.css?v=20260628">
 
     <!-- Firebase SDK Compat -->
-    <script src="/__/firebase/10.8.0/firebase-app-compat.js"></script>
-    <script src="/__/firebase/10.8.0/firebase-auth-compat.js"></script>
-    <script src="/__/firebase/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="/__/firebase/init.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="/firebase-config.js"></script>
 </head>
 <body class="dashboard-page">
 
@@ -262,9 +262,17 @@
                 return;
             }
 
-            // Real-time verification with Firebase Auth and Firestore
-            const auth = firebase.auth();
-            const db = firebase.firestore();
+            // GUARDIA DE SEGURIDAD — aislada y con fail-closed
+            let auth, db;
+            try {
+                auth = firebase.auth();
+                db = firebase.firestore();
+            } catch (err) {
+                console.error("Firebase no se pudo inicializar:", err);
+                alert("No se pudo verificar tu sesión. Por seguridad, serás redirigido.");
+                window.location.href = '/?auth=login';
+                return; // detener TODA ejecución posterior — no mostrar el campus
+            }
             
             auth.onAuthStateChanged(async (firebaseUser) => {
                 if (!firebaseUser) {
@@ -288,13 +296,20 @@
                             localStorage.setItem('cae_user', freshUserStr);
                             window.location.reload();
                         }
+                        
+                        // Solo si la validación pasó, inicializar el resto del campus
+                        initDashboardUI(auth, db, freshUser);
                     } else {
                         window.location.href = '/?auth=login';
                     }
                 } catch (err) {
                     console.error("Error validating session on Firestore:", err);
+                    window.location.href = '/'; // fail closed
                 }
             });
+        });
+
+        function initDashboardUI(auth, db, user) {
 
             // Check if user has active permissions
             const hasElecModules = user.purchasedModules && user.purchasedModules.some(m => m.startsWith('elec-'));
@@ -628,7 +643,7 @@
                     }
                 }
             }
-        });
+        }
     </script>
     
     <!-- Shared Particles Script -->

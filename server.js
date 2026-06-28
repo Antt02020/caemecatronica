@@ -253,6 +253,8 @@ app.get('/api/config', (req, res) => {
 // ==========================================================================
 // AUTHENTICATION ENDPOINTS
 // ==========================================================================
+// ⚠️ DEPRECADO: Este endpoint ya no es llamado por el frontend desde la migración a Firebase.
+// Se mantiene únicamente como fallback.
 app.post('/api/auth/login', (req, res) => {
     const { email, password } = req.body;
     const db = readDB();
@@ -285,6 +287,8 @@ app.post('/api/auth/login', (req, res) => {
     res.status(401).json({ success: false, message: "Credenciales incorrectas o usuario no registrado." });
 });
 
+// ⚠️ DEPRECADO: Este endpoint ya no es llamado por el frontend desde la migración a Firebase.
+// Se mantiene únicamente como fallback.
 app.post('/api/auth/register', (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     const db = readDB();
