@@ -855,7 +855,7 @@ function initAuthUI() {
             auth.createUserWithEmailAndPassword(email, pass)
             .then(async (userCredential) => {
                 const firebaseUser = userCredential.user;
-                const role = (email.toLowerCase() === 'admin@cae.com') ? 'admin' : 'student';
+                const role = (email.toLowerCase() === 'admin@caemecatronica.com.py') ? 'admin' : 'student';
                 const profile = {
                     uid: firebaseUser.uid,
                     name: `${firstName} ${lastName}`,
