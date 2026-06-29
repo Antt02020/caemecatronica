@@ -931,7 +931,7 @@ function initAuthUI() {
                     profile = doc.data();
                 } else {
                     const names = (firebaseUser.displayName || "").split(" ");
-                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@cae.com') ? 'admin' : 'student';
+                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@caemecatronica.com.py') ? 'admin' : 'student';
                     profile = {
                         uid: firebaseUser.uid,
                         name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
@@ -1196,7 +1196,7 @@ function checkUserSession() {
                 } else {
                     // Auto-create profile if missing (e.g. Google auth first time)
                     const names = (firebaseUser.displayName || "").split(" ");
-                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@cae.com') ? 'admin' : 'student';
+                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@caemecatronica.com.py') ? 'admin' : 'student';
                     const profile = {
                         uid: firebaseUser.uid,
                         name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
