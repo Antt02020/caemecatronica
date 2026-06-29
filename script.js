@@ -1238,9 +1238,7 @@ function loadConfigAndPrices() {
                 price_premium: 1490000,
                 public_key: "",
                 private_key: "",
-                google_client_id: "",
-                apple_client_id: "",
-                apple_redirect_uri: ""
+                google_client_id: ""
             };
             if (doc.exists) {
                 config = { ...config, ...doc.data() };

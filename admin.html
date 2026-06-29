@@ -559,16 +559,7 @@
                                 <span id="google-client-secret-status" style="font-size: 0.8rem; color: #a8b0c5; margin-bottom: 1.25rem; display: block;"></span>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="apple-client-id" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Apple Services ID (Client ID)</label>
-                                <input type="text" id="apple-client-id" placeholder="Ej: com.caemecatronica.services" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label for="apple-redirect-uri" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Apple Redirect URI (Callback)</label>
-                                <input type="text" id="apple-redirect-uri" placeholder="Ej: https://caemecatronica.com.py/api/auth/apple/callback" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #fff; font-size: 0.9rem; margin-bottom: 1.25rem;">
-                            </div>
-                        </div>
+
 
                         <!-- Configuración de Precios -->
                         <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">Precios de Entrenamientos (Gs)</h3>
@@ -1301,8 +1292,7 @@
             const googleClientIdInput = document.getElementById('google-client-id');
             const googleClientSecretInput = document.getElementById('google-client-secret');
             const googleClientSecretStatus = document.getElementById('google-client-secret-status');
-            const appleClientIdInput = document.getElementById('apple-client-id');
-            const appleRedirectUriInput = document.getElementById('apple-redirect-uri');
+
             
             const priceBasicInput = document.getElementById('price-basic');
             const priceProfesionalInput = document.getElementById('price-profesional');
@@ -1341,8 +1331,7 @@
                         const data = doc.data();
                         pubKeyInput.value = data.public_key || '';
                         googleClientIdInput.value = data.google_client_id || '';
-                        appleClientIdInput.value = data.apple_client_id || '';
-                        appleRedirectUriInput.value = data.apple_redirect_uri || '';
+
                         
                         priceBasicInput.value = data.price_basic !== undefined ? data.price_basic : 350000;
                         priceProfesionalInput.value = data.price_profesional !== undefined ? data.price_profesional : 990000;
@@ -1376,8 +1365,7 @@
                 const private_key = privKeyInput.value.trim();
                 const google_client_id = googleClientIdInput.value.trim();
                 const google_client_secret = googleClientSecretInput.value.trim();
-                const apple_client_id = appleClientIdInput.value.trim();
-                const apple_redirect_uri = appleRedirectUriInput.value.trim();
+
                 
                 const price_basic = Number(priceBasicInput.value);
                 const price_profesional = Number(priceProfesionalInput.value);
@@ -1390,8 +1378,7 @@
                     const payload = { 
                         public_key, 
                         google_client_id, 
-                        apple_client_id, 
-                        apple_redirect_uri,
+
                         price_basic,
                         price_profesional,
                         price_premium,

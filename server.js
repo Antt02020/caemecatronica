@@ -207,8 +207,6 @@ app.get('/api/admin/config', requireAdmin, (req, res) => {
         has_private_key: !!db.config.private_key,
         google_client_id: db.config.google_client_id || "",
         has_google_client_secret: !!db.config.google_client_secret,
-        apple_client_id: db.config.apple_client_id || "",
-        apple_redirect_uri: db.config.apple_redirect_uri || "",
         price_basic: db.config.price_basic !== undefined ? db.config.price_basic : 350000,
         price_profesional: db.config.price_profesional !== undefined ? db.config.price_profesional : 990000,
         price_premium: db.config.price_premium !== undefined ? db.config.price_premium : 1490000
@@ -216,7 +214,7 @@ app.get('/api/admin/config', requireAdmin, (req, res) => {
 });
 
 app.post('/api/admin/config', requireAdmin, (req, res) => {
-    const { public_key, private_key, google_client_id, google_client_secret, apple_client_id, apple_redirect_uri, price_basic, price_profesional, price_premium } = req.body;
+    const { public_key, private_key, google_client_id, google_client_secret, price_basic, price_profesional, price_premium } = req.body;
     const db = readDB();
     db.config.public_key = public_key || "";
     if (private_key) {
@@ -226,8 +224,6 @@ app.post('/api/admin/config', requireAdmin, (req, res) => {
     if (google_client_secret) {
         db.config.google_client_secret = google_client_secret;
     }
-    db.config.apple_client_id = apple_client_id || "";
-    db.config.apple_redirect_uri = apple_redirect_uri || "";
     
     if (price_basic !== undefined) db.config.price_basic = Number(price_basic);
     if (price_profesional !== undefined) db.config.price_profesional = Number(price_profesional);
@@ -242,8 +238,6 @@ app.get('/api/config', (req, res) => {
     res.json({
         public_key: db.config.public_key || "",
         google_client_id: db.config.google_client_id || "",
-        apple_client_id: db.config.apple_client_id || "",
-        apple_redirect_uri: db.config.apple_redirect_uri || "",
         price_basic: db.config.price_basic !== undefined ? db.config.price_basic : 350000,
         price_profesional: db.config.price_profesional !== undefined ? db.config.price_profesional : 990000,
         price_premium: db.config.price_premium !== undefined ? db.config.price_premium : 1490000
@@ -898,58 +892,7 @@ app.post('/api/auth/google-login', (req, res) => {
     tokenReq.end();
 });
 
-// Apple Sign-In callback handler (Form Post)
-app.post('/api/auth/apple/callback', (req, res) => {
-    const { id_token } = req.body;
-    if (!id_token) {
-        return res.status(400).send("Falta id_token de Apple");
-    }
-    
-    try {
-        const parts = id_token.split('.');
-        if (parts.length !== 3) throw new Error("JWT corrupto");
-        
-        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-        const email = payload.email;
-        
-        if (!email) {
-            return res.status(400).send("No se pudo obtener el email del token de Apple");
-        }
-        
-        const db = readDB();
-        let user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-        
-        if (!user) {
-            user = {
-                email: email,
-                firstName: "Usuario",
-                lastName: "Apple",
-                career: "Ninguna",
-                plan: "None",
-                purchasedModules: [],
-                purchasedCareers: [],
-                status: "Activo",
-                role: "alumno"
-            };
-            db.users.push(user);
-            writeDB(db);
-        }
-        
-        if (user.status === "Bloqueado") {
-            return res.status(403).send("Tu cuenta ha sido bloqueada. Contacta a soporte.");
-        }
-        
-        setSessionCookie(res, user.email, user.role);
-        res.send(`
-            <script>
-                localStorage.setItem('cae_user', JSON.stringify(${JSON.stringify(user)}));
-                window.location.href = '${user.role === "administrador" ? "/admin.html" : "/dashboard.html"}';
-            </script>
-        `);
-    } catch (e) {
-        res.status(500).send("Error de decodificación de Apple ID Token: " + e.message);
-    }
-});
+
 
 // Default status catch / 404 Fallback
 app.get('*', (req, res) => {
