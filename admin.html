@@ -690,6 +690,26 @@
         });
 
         function initAdminPanelUI(auth, db) {
+            // ── Timeout de inactividad para admin: 30 minutos ──
+            const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 minutos
+            let inactivityTimer;
+
+            const resetInactivityTimer = () => {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(() => {
+                    alert("Tu sesión de administrador expiró por inactividad.");
+                    auth.signOut().then(() => {
+                        localStorage.removeItem('cae_user');
+                        window.location.href = '/';
+                    });
+                }, INACTIVITY_LIMIT_MS);
+            };
+
+            // Reiniciar el timer ante cualquier interacción del usuario
+            ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+                document.addEventListener(event, resetInactivityTimer, { passive: true });
+            });
+            resetInactivityTimer(); // iniciar timer al entrar al panel
 
             // Mobile Sidebar drawer menu toggle
             const sidebar = document.querySelector('.sidebar');
@@ -754,8 +774,16 @@
 
             // Logout trigger
             document.getElementById('admin-logout-btn').addEventListener('click', () => {
-                localStorage.removeItem('cae_user');
-                window.location.href = 'index.html';
+                auth.signOut()
+                    .then(() => {
+                        localStorage.removeItem('cae_user');
+                        window.location.href = '/';
+                    })
+                    .catch(err => {
+                        console.error("Error al cerrar sesión:", err);
+                        localStorage.removeItem('cae_user');
+                        window.location.href = '/';
+                    });
             });
 
             // ======================================================================

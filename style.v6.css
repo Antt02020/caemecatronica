@@ -2235,6 +2235,7 @@ p {
 
 .form-row .form-group {
     flex: 1;
+    min-width: 0;
 }
 
 .form-label-row {
@@ -2261,6 +2262,7 @@ p {
     font-family: var(--font-sans);
     font-size: 0.9rem;
     transition: var(--transition-fast);
+    width: 100%;
 }
 
 .auth-form select {

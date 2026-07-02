@@ -963,6 +963,53 @@ function initAuthUI() {
             });
         });
     }
+
+    const googleRegisterBtn = document.getElementById('google-register-btn');
+    if (googleRegisterBtn) {
+        googleRegisterBtn.addEventListener('click', () => {
+            if (!auth) return;
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+            .then(async (result) => {
+                const firebaseUser = result.user;
+                const doc = await db.collection('users').doc(firebaseUser.uid).get();
+                let profile;
+                if (doc.exists) {
+                    profile = doc.data();
+                } else {
+                    const names = (firebaseUser.displayName || "").split(" ");
+                    const role = (firebaseUser.email && firebaseUser.email.toLowerCase() === 'admin@caemecatronica.com.py') ? 'admin' : 'student';
+                    profile = {
+                        uid: firebaseUser.uid,
+                        name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                        firstName: names[0] || "",
+                        lastName: names.slice(1).join(" ") || "",
+                        email: firebaseUser.email,
+                        role: role,
+                        plan: "None",
+                        career: "Ninguna",
+                        createdAt: new Date().toISOString(),
+                        coursesUnlocked: []
+                    };
+                    await db.collection('users').doc(firebaseUser.uid).set(profile);
+                }
+                localStorage.setItem('cae_user', JSON.stringify(profile));
+                showFeedback('¡Ingreso exitoso! Redirigiendo...', 'success');
+                setTimeout(() => {
+                    closeAuthModal();
+                    if (localStorage.getItem('cae_pending_purchase')) {
+                        window.location.reload();
+                    } else {
+                        window.location.href = profile.role === 'admin' ? '/admin' : '/dashboard';
+                    }
+                }, 1000);
+            })
+            .catch(err => {
+                console.error("Google sign in failed:", err);
+                alert("Error al iniciar sesión con Google: " + err.message);
+            });
+        });
+    }
 }
 
 // Open modal wrapper helper
@@ -1351,31 +1398,11 @@ function initInterestModal() {
         let pending = JSON.parse(localStorage.getItem('cae_pending_purchase')) || { plan: 'Premium' };
         const plan = pending.plan || 'Premium';
         
-        // Close modal
+        // Close selection modal
         interestModal.classList.remove('open');
         interestModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
         
-        // Prompt for mandatory buyer info since we are checkout out from index page directly
-        const phone = window.prompt("Ingrese su número de teléfono (obligatorio):");
-        if (!phone) {
-            alert("El número de teléfono es obligatorio.");
-            return;
-        }
-        const doc = window.prompt("Ingrese su número de Cédula de Identidad (obligatorio):");
-        if (!doc) {
-            alert("El número de Cédula de Identidad es obligatorio.");
-            return;
-        }
-        const ruc = window.prompt("Ingrese su RUC (opcional):") || "";
-        
-        const orderId = `CAE-${Math.floor(Math.random() * 9000000 + 1000000)}`;
-        const firebaseUser = auth ? auth.currentUser : null;
-        if (!firebaseUser) {
-            alert("Debes iniciar sesión para realizar una compra.");
-            return;
-        }
-
         const config = JSON.parse(localStorage.getItem('cae_config')) || {
             price_basic: 350000,
             price_profesional: 990000,
@@ -1386,35 +1413,112 @@ function initInterestModal() {
         else if (plan === "Profesional") amount = config.price_profesional;
         else amount = config.price_basic;
 
-        const newOrder = {
-            id: orderId,
-            id_pedido_comercio: orderId,
-            userId: firebaseUser.uid,
-            email: firebaseUser.email,
-            plan: plan,
-            courseId: career,
-            career: career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica',
-            amount: amount,
-            status: "Pendiente",
-            createdAt: new Date().toISOString(),
-            comprador: {
-                ruc: ruc,
-                telefono: phone,
-                documento: doc
-            }
+        // Inyectar el popup dinámicamente si no existe ya
+        let overlay = document.getElementById('checkout-popup-overlay');
+        if (!overlay) {
+            const checkoutPopupHTML = `
+            <div id="checkout-popup-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(5,8,22,0.85); backdrop-filter:blur(16px); z-index:2000; justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s ease;">
+                <div style="background:rgba(10,16,48,0.95); border:1px solid rgba(124,77,255,0.35); box-shadow:0 0 50px rgba(124,77,255,0.25); border-radius:12px; width:90%; max-width:440px; padding:2.5rem; position:relative; transform:scale(0.9); transition:transform 0.3s ease;">
+                    <button id="close-checkout-popup" style="position:absolute; top:15px; right:15px; background:transparent; border:none; color:#A8B0C5; cursor:pointer; font-size:1.2rem; transition:color 0.2s;">✕</button>
+                    <h3 style="margin-top:0; margin-bottom:0.5rem; font-size:1.5rem; font-weight:800; background:linear-gradient(90deg, #7C4DFF, #00E676); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-family:var(--font-sans);">Confirmar Compra</h3>
+                    <p style="font-size:0.85rem; color:#A8B0C5; margin-bottom:1.5rem; line-height:1.4;" id="checkout-popup-summary">Cargando...</p>
+                    
+                    <form id="checkout-popup-form" style="display:flex; flex-direction:column; gap:1.25rem;">
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <label for="check-phone" style="font-size:0.8rem; font-weight:500; color:#fff;">Teléfono (obligatorio)</label>
+                            <input type="text" id="check-phone" required placeholder="Ej. +595981123456" style="padding:0.75rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; font-family:var(--font-sans);">
+                        </div>
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <label for="check-doc" style="font-size:0.8rem; font-weight:500; color:#fff;">Cédula de Identidad / CI (obligatorio)</label>
+                            <input type="text" id="check-doc" required placeholder="Ej. 1234567" style="padding:0.75rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; font-family:var(--font-sans);">
+                        </div>
+                        <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <label for="check-ruc" style="font-size:0.8rem; font-weight:500; color:#fff;">RUC (opcional)</label>
+                            <input type="text" id="check-ruc" placeholder="Ej. 1234567-8" style="padding:0.75rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; font-family:var(--font-sans);">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem; justify-content:center; padding:0.75rem;">IR A PAGAR</button>
+                    </form>
+                </div>
+            </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', checkoutPopupHTML);
+            overlay = document.getElementById('checkout-popup-overlay');
+        }
+
+        const card = overlay.querySelector('div');
+        const closeBtn = document.getElementById('close-checkout-popup');
+        const form = document.getElementById('checkout-popup-form');
+        const summary = document.getElementById('checkout-popup-summary');
+
+        summary.innerHTML = `Estás por adquirir:<br>
+        <strong style="color:#fff;">Carrera de ${career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica'}</strong> bajo el <strong style="color:#7C4DFF;">Plan ${plan}</strong>.<br>
+        Precio: <strong style="color:#00E676;">Gs. ${amount.toLocaleString('es-PY')}</strong>`;
+
+        const closeCheckoutPopup = () => {
+            overlay.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
         };
 
-        showPremiumNotification(plan);
+        closeBtn.onclick = closeCheckoutPopup;
 
-        db.collection('orders').doc(orderId).set(newOrder)
-        .then(() => {
-            localStorage.removeItem('cae_pending_purchase');
-            window.location.href = `/payment-processing?hash_pedido=${orderId}`;
-        })
-        .catch(err => {
-            console.error("Error creating order in Firestore:", err);
-            alert("Error al iniciar la simulación de transacción: " + err.message);
-        });
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        }, 50);
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const phone = document.getElementById('check-phone').value.trim();
+            const doc = document.getElementById('check-doc').value.trim();
+            const ruc = document.getElementById('check-ruc').value.trim() || "";
+
+            if (!phone || !doc) {
+                alert("Por favor complete los campos obligatorios.");
+                return;
+            }
+
+            const orderId = `CAE-${Math.floor(Math.random() * 9000000 + 1000000)}`;
+            const firebaseUser = auth ? auth.currentUser : null;
+            if (!firebaseUser) {
+                alert("Debes iniciar sesión para realizar una compra.");
+                return;
+            }
+
+            const newOrder = {
+                id: orderId,
+                id_pedido_comercio: orderId,
+                userId: firebaseUser.uid,
+                email: firebaseUser.email,
+                plan: plan,
+                courseId: career,
+                career: career === 'mecatronica' ? 'Mecatrónica' : 'Electrónica',
+                amount: amount,
+                status: "Pendiente",
+                createdAt: new Date().toISOString(),
+                comprador: {
+                    ruc: ruc,
+                    telefono: phone,
+                    documento: doc
+                }
+            };
+
+            showPremiumNotification(plan);
+
+            db.collection('orders').doc(orderId).set(newOrder)
+            .then(() => {
+                localStorage.removeItem('cae_pending_purchase');
+                closeCheckoutPopup();
+                window.location.href = `/payment-processing?hash_pedido=${orderId}`;
+            })
+            .catch(err => {
+                console.error("Error creating order in Firestore:", err);
+                alert("Error al iniciar la simulación de transacción: " + err.message);
+            });
+        };
     };
     
     if (mecaCard) mecaCard.addEventListener('click', () => handleInterestSelection('mecatronica'));

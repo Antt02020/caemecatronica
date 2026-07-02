@@ -292,22 +292,38 @@
                             return;
                         }
                         
-                        if (localStorage.getItem('cae_user') !== freshUserStr) {
-                            localStorage.setItem('cae_user', freshUserStr);
-                            window.location.reload();
-                        }
-                        
-                        // Solo si la validación pasó, inicializar el resto del campus
+                        // Actualizar localStorage si los datos de Firestore son más recientes
+                        localStorage.setItem('cae_user', JSON.stringify(freshUser));
+                        // Inicializar el dashboard con los datos frescos
                         initDashboardUI(auth, db, freshUser);
                     } else {
                         window.location.href = '/?auth=login';
                     }
                 } catch (err) {
                     console.error("Error validating session on Firestore:", err);
-                    window.location.href = '/'; // fail closed
+                    showDashboardError("No pudimos verificar tu sesión. Intenta recargar la página.");
+                    if (err && (err.code === 'permission-denied' || err.code === 'unauthenticated')) {
+                        window.location.href = '/?auth=login';
+                    }
                 }
             });
         });
+
+        function showDashboardError(msg) {
+            let banner = document.getElementById('db-error-banner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'db-error-banner';
+                banner.style.cssText = 'background: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; color: #ff8a80; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-sans);';
+                const mainPanel = document.querySelector('.main-panel');
+                if (mainPanel) {
+                    mainPanel.insertBefore(banner, mainPanel.firstChild);
+                } else {
+                    document.body.insertBefore(banner, document.body.firstChild);
+                }
+            }
+            banner.innerHTML = `<span>⚠️ ${msg}</span><button onclick="window.location.reload()" style="background: none; border: none; color: #fff; text-decoration: underline; cursor: pointer; font-weight: 600;">Recargar</button>`;
+        }
 
         function initDashboardUI(auth, db, user) {
 
@@ -520,8 +536,16 @@
 
             // Logout trigger
             document.getElementById('db-logout-btn').addEventListener('click', () => {
-                localStorage.removeItem('cae_user');
-                window.location.href = 'index.html';
+                auth.signOut()
+                    .then(() => {
+                        localStorage.removeItem('cae_user');
+                        window.location.href = '/';
+                    })
+                    .catch(err => {
+                        console.error("Error al cerrar sesión:", err);
+                        localStorage.removeItem('cae_user');
+                        window.location.href = '/';
+                    });
             });
 
             function renderCoursesList() {
